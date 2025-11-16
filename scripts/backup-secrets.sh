@@ -3,6 +3,9 @@
 # Viatra Secret Manager Backup Script
 # This script creates encrypted backups of Google Cloud Secret Manager values
 # for disaster recovery and audit purposes.
+#
+# Focuses on operational secrets that contain manually entered values.
+# Excludes auto-generated secrets that can be recreated via Terraform.
 
 set -euo pipefail  # Exit on any error, undefined variables, or pipe failures
 
@@ -57,9 +60,9 @@ show_usage() {
     echo "  $0 prod ./prod-backup"
     echo "  $0 staging --project=my-project --upload"
     echo
-    echo "Note: This script backs up only script-managed secrets."
-    echo "Terraform-managed secrets (db-password, jwt-secret) are excluded"
-    echo "as they should be backed up via Terraform state."
+    echo "Note: This script backs up secrets with operational values."
+    echo "Auto-generated secrets (db-password, jwt-secret, redis-auth) are excluded"
+    echo "as they can be recreated via Terraform or seed-secrets.sh."
 }
 
 # Parse command line arguments
@@ -194,13 +197,14 @@ EOF
     log_success "GPG key pair generated successfully"
 }
 
-# Get list of secrets to backup (script-managed only)
+# Get list of secrets to backup (operational values only)
 get_secrets_list() {
     log_info "Getting list of secrets to backup for environment: $ENVIRONMENT"
     
-    # Script-managed secrets (excluding Terraform-managed ones)
+    # Secrets commonly updated with operational values (worth backing up)
+    # Excludes auto-generated secrets that can be recreated (jwt-secret, db-password, redis-auth)
+    # These are secrets that contain manually entered or externally sourced values
     local secrets=(
-        "redis-auth-${ENVIRONMENT}"
         "api-keys-${ENVIRONMENT}"
         "app-config-${ENVIRONMENT}"
         "oauth-config-${ENVIRONMENT}"
@@ -393,7 +397,7 @@ $(ls -la "$BACKUP_DIR" | tail -n +2 | awk '{print "  " $9 " (" $5 " bytes)"}')
 $([ "$UPLOAD_TO_GCS" = true ] && echo "GCS Upload: Completed" || echo "GCS Upload: Skipped")
 
 Notes:
-- Terraform-managed secrets (db-password, jwt-secret) are excluded
+- Auto-generated secrets (db-password, jwt-secret, redis-auth) are excluded
 - Use corresponding decryption method to restore secrets if needed
 - Backup files are encrypted and safe for off-site storage
 - Verify backup integrity using checksums in backup-manifest.json

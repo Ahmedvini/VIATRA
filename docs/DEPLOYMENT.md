@@ -502,8 +502,8 @@ gcloud logging read 'resource.type="secret_manager_secret" AND protoPayload.serv
 ```
 
 **Important Notes:**
-- **Terraform-managed secrets** (`db-password-*`, `jwt-secret-*`) are excluded from script operations to prevent conflicts
-- **Script-managed secrets** include API keys, OAuth configs, and application-specific credentials
+- **Auto-generated secrets** (`db-password-*`, `jwt-secret-*`, `redis-auth-*`) are excluded from backups as they can be regenerated
+- **Operational secrets** include API keys, OAuth configs, SSL certificates, and manually configured values
 - All backup operations create encrypted files safe for off-site storage
 - Use Cloud Audit Logs to monitor secret access patterns and detect unauthorized usage
 
