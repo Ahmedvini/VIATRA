@@ -1,0 +1,161 @@
+steps:
+  # Step 1: Install backend dependencies
+  - name: 'node:20-alpine'
+    entrypoint: 'npm'
+    args: ['ci']
+    dir: 'backend'
+    id: 'install-backend-deps'
+  
+  # Step 2: Run backend linting
+  - name: 'node:20-alpine'
+    entrypoint: 'npm'
+    args: ['run', 'lint']
+    dir: 'backend'
+    id: 'lint-backend'
+    waitFor: ['install-backend-deps']
+  
+  # Step 3: Run backend tests
+  - name: 'node:20-alpine'
+    entrypoint: 'npm'
+    args: ['test']
+    dir: 'backend'
+    env:
+      - 'NODE_ENV=test'
+    id: 'test-backend'
+    waitFor: ['install-backend-deps']
+  
+  # Step 4: Build backend Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'build',
+      '-t', '${_REGION}-docker.pkg.dev/${PROJECT_ID}/viatra-repo/backend:${SHORT_SHA}',
+      '-t', '${_REGION}-docker.pkg.dev/${PROJECT_ID}/viatra-repo/backend:latest',
+      '-f', 'backend/Dockerfile',
+      './backend'
+    ]
+    id: 'build-backend-image'
+    waitFor: ['lint-backend', 'test-backend']
+  
+  # Step 5: Push backend Docker image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'push',
+      '--all-tags',
+      '${_REGION}-docker.pkg.dev/${PROJECT_ID}/viatra-repo/backend'
+    ]
+    id: 'push-backend-image'
+    waitFor: ['build-backend-image']
+  
+  # Step 6: Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'viatra-backend-${_ENVIRONMENT}'
+      - '--image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/viatra-repo/backend:${SHORT_SHA}'
+      - '--region=${_REGION}'
+      - '--service-account=${_SERVICE_ACCOUNT_EMAIL}'
+      - '--set-env-vars=NODE_ENV=production,ENVIRONMENT=${_ENVIRONMENT}'
+      - '--set-env-vars=GCP_PROJECT_ID=${PROJECT_ID}'
+      - '--vpc-connector=${_VPC_CONNECTOR}'
+      - '--vpc-egress=private-ranges-only'
+      - '--memory=512Mi'
+      - '--cpu=1'
+      - '--concurrency=100'
+      - '--max-instances=${_MAX_INSTANCES}'
+      - '--min-instances=${_MIN_INSTANCES}'
+      - '--port=8080'
+      - '--allow-unauthenticated'
+    id: 'deploy-backend'
+    waitFor: ['push-backend-image']
+  
+  # Step 7: Install Flutter dependencies
+  - name: 'cirrusci/flutter:3.16.0'
+    entrypoint: 'flutter'
+    args: ['pub', 'get']
+    dir: 'mobile'
+    id: 'install-flutter-deps'
+  
+  # Step 8: Run Flutter analyze
+  - name: 'cirrusci/flutter:3.16.0'
+    entrypoint: 'flutter'
+    args: ['analyze']
+    dir: 'mobile'
+    id: 'analyze-flutter'
+    waitFor: ['install-flutter-deps']
+  
+  # Step 9: Run Flutter tests
+  - name: 'cirrusci/flutter:3.16.0'
+    entrypoint: 'flutter'
+    args: ['test']
+    dir: 'mobile'
+    id: 'test-flutter'
+    waitFor: ['install-flutter-deps']
+  
+  # Step 10: Build Flutter APK (for artifacts)
+  - name: 'cirrusci/flutter:3.16.0'
+    entrypoint: 'flutter'
+    args: ['build', 'apk', '--release']
+    dir: 'mobile'
+    env:
+      - 'ENVIRONMENT=${_ENVIRONMENT}'
+    id: 'build-flutter-apk'
+    waitFor: ['analyze-flutter', 'test-flutter']
+  
+  # Step 11: Run integration tests (if backend deployment successful)
+  - name: 'node:20-alpine'
+    entrypoint: 'npm'
+    args: ['run', 'test:integration']
+    dir: 'backend'
+    env:
+      - 'NODE_ENV=test'
+      - 'API_BASE_URL=https://viatra-backend-${_ENVIRONMENT}-${_REGION_SUFFIX}.a.run.app'
+    id: 'integration-tests'
+    waitFor: ['deploy-backend']
+  
+  # Step 12: Update deployment status
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "✅ Backend deployed successfully!"
+        echo "🏥 Viatra Backend URL: https://viatra-backend-${_ENVIRONMENT}-${_REGION_SUFFIX}.a.run.app"
+        echo "📱 Flutter APK built successfully"
+        echo "🧪 All tests passed"
+    id: 'deployment-summary'
+    waitFor: ['integration-tests', 'build-flutter-apk']
+
+# Artifacts to store
+artifacts:
+  objects:
+    location: 'gs://${PROJECT_ID}-build-artifacts/${BUILD_ID}'
+    paths:
+      - 'mobile/build/app/outputs/flutter-apk/app-release.apk'
+
+# Build options
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: 'E2_STANDARD_2'
+  disk_size_gb: 100
+
+# Build timeout
+timeout: '1200s'  # 20 minutes
+
+# Substitutions (variables)
+substitutions:
+  _ENVIRONMENT: 'dev'
+  _REGION: 'us-central1'
+  _REGION_SUFFIX: 'uc'
+  _VPC_CONNECTOR: 'viatra-connector-dev'
+  _SERVICE_ACCOUNT_EMAIL: 'viatra-cloud-run-dev@${PROJECT_ID}.iam.gserviceaccount.com'
+  _MAX_INSTANCES: '10'
+  _MIN_INSTANCES: '0'
+
+# Tags for organizing builds
+tags:
+  - 'viatra-platform'
+  - 'backend'
+  - 'mobile'
+  - '${_ENVIRONMENT}'

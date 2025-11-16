@@ -1,0 +1,77 @@
+{
+  "name": "viatra-health-platform",
+  "version": "1.0.0",
+  "description": "Viatra Health Platform - Digital health platform with Node.js backend and Flutter mobile app",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "mobile"
+  ],
+  "scripts": {
+    "install:all": "npm install && cd backend && npm install",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:mobile\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:mobile": "cd mobile && flutter run",
+    "build": "npm run build:backend && npm run build:mobile",
+    "build:backend": "cd backend && npm run build",
+    "build:mobile": "cd mobile && flutter build apk",
+    "test": "npm run test:backend && npm run test:mobile",
+    "test:backend": "cd backend && npm test",
+    "test:mobile": "cd mobile && flutter test",
+    "lint": "npm run lint:backend && npm run lint:mobile",
+    "lint:backend": "cd backend && npm run lint",
+    "lint:mobile": "cd mobile && flutter analyze",
+    "format": "npm run format:backend && npm run format:mobile",
+    "format:backend": "cd backend && npm run format",
+    "format:mobile": "cd mobile && dart format lib/ test/",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "setup": "chmod +x scripts/setup.sh && ./scripts/setup.sh",
+    "deploy": "chmod +x scripts/deploy.sh && ./scripts/deploy.sh",
+    "seed-secrets": "chmod +x scripts/seed-secrets.sh && ./scripts/seed-secrets.sh",
+    "tf:init": "cd terraform && terraform init",
+    "tf:plan": "cd terraform && terraform plan",
+    "tf:apply": "cd terraform && terraform apply",
+    "tf:destroy": "cd terraform && terraform destroy"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "backend/**/*.{js,ts}": [
+      "npm run lint:backend",
+      "npm run format:backend"
+    ],
+    "mobile/**/*.dart": [
+      "dart format",
+      "flutter analyze"
+    ]
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=9.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/viatra-health/viatra-platform.git"
+  },
+  "keywords": [
+    "healthcare",
+    "digital-health",
+    "mobile-app",
+    "nodejs",
+    "flutter",
+    "gcp",
+    "cloud-native"
+  ],
+  "author": "Viatra Health Team",
+  "license": "UNLICENSED"
+}

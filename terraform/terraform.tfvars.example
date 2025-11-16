@@ -1,0 +1,62 @@
+# Example Terraform variables file
+# Copy this file to terraform.tfvars and update with your actual values
+
+# GCP Project Configuration
+project_id = "viatra-health-platform"  # Replace with your actual GCP project ID
+region     = "us-central1"              # Choose your preferred region
+environment = "dev"                     # Options: dev, staging, prod
+
+# Database Configuration
+db_instance_name = "viatra-db"
+db_tier         = "db-f1-micro"         # Use db-n1-standard-1 or higher for prod
+
+# Redis Configuration
+redis_memory_size_gb = 1                # Increase for production (e.g., 4, 8, 16)
+
+# Storage Configuration
+storage_bucket_name = "viatra-storage"  # Must be globally unique
+
+# Cloud Run Configuration
+cloud_run_service_name = "viatra-backend"
+cloud_run_cpu         = "1000m"        # 1 vCPU
+cloud_run_memory      = "512Mi"        # 512MB RAM
+cloud_run_max_instances = 10           # Max autoscaling instances
+cloud_run_min_instances = 0            # Min instances (0 for dev, 1+ for prod)
+
+# Network Configuration
+vpc_name           = "viatra-vpc"
+subnet_name        = "viatra-subnet"
+vpc_connector_name = "viatra-connector"
+
+# Resource Labels
+labels = {
+  project     = "viatra-health"
+  managed-by  = "terraform"
+  team        = "platform"
+  cost-center = "engineering"
+}
+
+# Example values for different environments:
+
+# Development Environment
+# environment = "dev"
+# db_tier = "db-f1-micro"
+# redis_memory_size_gb = 1
+# cloud_run_min_instances = 0
+# cloud_run_max_instances = 5
+
+# Staging Environment
+# environment = "staging"
+# db_tier = "db-g1-small"
+# redis_memory_size_gb = 2
+# cloud_run_min_instances = 1
+# cloud_run_max_instances = 8
+
+# Production Environment
+# environment = "prod"
+# db_tier = "db-n1-standard-2"
+# redis_memory_size_gb = 8
+# cloud_run_cpu = "2000m"
+# cloud_run_memory = "1Gi"
+# cloud_run_min_instances = 2
+# cloud_run_max_instances = 20
