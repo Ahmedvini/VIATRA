@@ -36,6 +36,11 @@ labels = {
   cost-center = "engineering"
 }
 
+# CI/CD Configuration
+github_owner = "your-github-username"   # Replace with your GitHub username or organization
+github_repo  = "VIATRA"                 # Replace with your repository name
+region_suffix = "uc"                    # Short suffix for us-central1 (adjust per region)
+
 # Example values for different environments:
 
 # Development Environment

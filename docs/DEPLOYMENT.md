@@ -178,6 +178,53 @@ chmod +x scripts/deploy.sh
 ```
 
 #### Option B: CI/CD Pipeline
+
+##### Trigger Service Account Configuration
+
+The Viatra platform uses dedicated service accounts for secure CI/CD operations:
+
+- **Cloud Build Service Account** (`viatra-cloud-build-${environment}@${PROJECT_ID}.iam.gserviceaccount.com`): Used for build operations, image pushing, and deployment commands
+- **Cloud Run Service Account** (`viatra-cloud-run-${environment}@${PROJECT_ID}.iam.gserviceaccount.com`): Used at runtime by the deployed backend service
+
+**Terraform manages the trigger configuration automatically.** When you run `terraform apply`, it creates:
+- Cloud Build triggers for main branch and pull requests
+- Proper service account bindings
+- Environment-specific substitutions
+
+**To verify trigger configuration:**
+```bash
+# List triggers
+gcloud builds triggers list --region=${REGION}
+
+# Describe specific trigger
+gcloud builds triggers describe viatra-main-${ENVIRONMENT} --region=${REGION}
+
+# Check service account binding
+gcloud iam service-accounts get-iam-policy viatra-cloud-build-${ENVIRONMENT}@${PROJECT_ID}.iam.gserviceaccount.com
+```
+
+**Manual trigger creation (if not using Terraform):**
+```bash
+# Set environment variables
+export PROJECT_ID="your-project-id"
+export ENVIRONMENT="dev"
+export REPO_OWNER="your-github-username"
+export REPO_NAME="VIATRA"
+export REGION="us-central1"
+
+# Create trigger with custom service account
+gcloud beta builds triggers create github \
+  --name=viatra-main-${ENVIRONMENT} \
+  --repo-name=${REPO_NAME} \
+  --repo-owner=${REPO_OWNER} \
+  --branch-pattern="^main$" \
+  --build-config=cloudbuild.yaml \
+  --service-account=viatra-cloud-build-${ENVIRONMENT}@${PROJECT_ID}.iam.gserviceaccount.com \
+  --region=${REGION}
+```
+
+##### Deployment Process
+
 Push to the main branch to trigger automatic deployment:
 
 ```bash
@@ -185,6 +232,13 @@ git add .
 git commit -m "Deploy to production"
 git push origin main
 ```
+
+**Build Pipeline Steps:**
+1. **Build Steps 1-3**: Install dependencies, lint, and test (using Cloud Build SA)
+2. **Build Steps 4-5**: Build and push Docker image to Artifact Registry (using Cloud Build SA)
+3. **Build Step 6**: Deploy to Cloud Run with runtime service account (Cloud Build SA deploys, but specifies Cloud Run SA for the service)
+4. **Build Steps 7-12**: Flutter testing and building
+5. **Build Step 13**: Integration tests against deployed backend
 
 ### 2. Mobile App Deployment
 
@@ -196,7 +250,7 @@ cd mobile
 flutter build apk --release --obfuscate --split-debug-info=build/symbols
 
 # Build App Bundle (recommended for Play Store)
-flutter build appbundle --release --obfuscate --split-debug-info=build/symbols
+flutter build appbundle --release
 
 # Upload to Google Play Console
 # Follow the Google Play Console upload process
@@ -409,6 +463,50 @@ terraform show -json > backup/terraform-state-$(date +%Y%m%d).json
 ./scripts/backup-secrets.sh prod
 ```
 
+### 3. Secrets Management
+
+The platform implements a comprehensive secrets management workflow using Google Secret Manager:
+
+#### Secret Creation and Initial Population
+```bash
+# Create and populate secrets for an environment
+./scripts/seed-secrets.sh [environment]
+
+# Examples
+./scripts/seed-secrets.sh dev
+./scripts/seed-secrets.sh prod --project=my-production-project
+```
+
+#### Secret Backup and Export
+```bash
+# Create encrypted backups for disaster recovery
+./scripts/backup-secrets.sh prod
+
+# With additional options
+./scripts/backup-secrets.sh prod ./backup-dir --upload --kms-key=projects/PROJECT/locations/LOCATION/keyRings/RING/cryptoKeys/KEY
+```
+
+#### Secret Rotation
+```bash
+# Rotate secrets (adds new versions while preserving old ones for audit)
+./scripts/seed-secrets.sh prod --rotate
+```
+
+#### Access Audit and Monitoring
+```bash
+# Check secret access permissions
+gcloud secrets get-iam-policy SECRET_NAME
+
+# View access logs
+gcloud logging read 'resource.type="secret_manager_secret" AND protoPayload.serviceName="secretmanager.googleapis.com"' --limit=50
+```
+
+**Important Notes:**
+- **Terraform-managed secrets** (`db-password-*`, `jwt-secret-*`) are excluded from script operations to prevent conflicts
+- **Script-managed secrets** include API keys, OAuth configs, and application-specific credentials
+- All backup operations create encrypted files safe for off-site storage
+- Use Cloud Audit Logs to monitor secret access patterns and detect unauthorized usage
+
 ## Rollback Procedures
 
 ### 1. Application Rollback
@@ -429,6 +527,57 @@ gcloud run services update-traffic viatra-backend-prod \
 # Rollback Terraform changes
 cd terraform
 terraform apply -var-file="terraform.tfvars" -target=previous_state
+```
+
+## Managing Deployment Drift
+
+### Infrastructure vs. Application Deployment
+
+The Viatra platform uses a **hybrid deployment model**:
+- **Terraform manages**: Infrastructure (VPC, scaling, env vars, IAM, service definitions)
+- **CI/CD manages**: Application runtime (container images, revisions, traffic)
+
+### Cloud Run Image Management
+
+**Problem**: Terraform defines Cloud Run with placeholder image, but CI/CD deploys actual images, causing state drift.
+
+**Solution**: The Cloud Run service uses `lifecycle.ignore_changes` to ignore image updates:
+
+```hcl
+lifecycle {
+  ignore_changes = [
+    template[0].spec[0].containers[0].image,  # CI/CD manages the image
+    traffic[0].latest_revision                # CI/CD manages traffic
+  ]
+}
+```
+
+### When to Use Each Method
+
+**Use `terraform apply` for:**
+- Environment variables or secrets
+- Scaling configuration (min/max instances) 
+- VPC or networking changes
+- IAM permissions
+- Resource limits (CPU, memory)
+
+**Use CI/CD (`git push`) for:**
+- Application code deployments
+- Container image updates  
+- Version rollbacks
+- Traffic management
+
+### Validation Commands
+
+```bash
+# Check for configuration drift
+terraform plan -var-file="terraform.tfvars"
+
+# Verify deployment
+gcloud run services describe viatra-backend-${ENVIRONMENT} --region=${REGION}
+
+# Check health
+curl https://viatra-backend-${ENVIRONMENT}-uc.a.run.app/health
 ```
 
 ## Troubleshooting

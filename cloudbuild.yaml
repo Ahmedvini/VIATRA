@@ -54,8 +54,9 @@ steps:
       - 'deploy'
       - 'viatra-backend-${_ENVIRONMENT}'
       - '--image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/viatra-repo/backend:${SHORT_SHA}'
+      - '--tag=${SHORT_SHA}'
       - '--region=${_REGION}'
-      - '--service-account=${_SERVICE_ACCOUNT_EMAIL}'
+      - '--service-account=${_CLOUD_RUN_SERVICE_ACCOUNT}'
       - '--set-env-vars=NODE_ENV=production,ENVIRONMENT=${_ENVIRONMENT}'
       - '--set-env-vars=GCP_PROJECT_ID=${PROJECT_ID}'
       - '--vpc-connector=${_VPC_CONNECTOR}'
@@ -66,7 +67,7 @@ steps:
       - '--max-instances=${_MAX_INSTANCES}'
       - '--min-instances=${_MIN_INSTANCES}'
       - '--port=8080'
-      - '--allow-unauthenticated'
+      - '${_AUTH_POLICY}'
     id: 'deploy-backend'
     waitFor: ['push-backend-image']
   
@@ -143,13 +144,18 @@ options:
 # Build timeout
 timeout: '1200s'  # 20 minutes
 
+# Service account for all build steps
+serviceAccount: '${_SERVICE_ACCOUNT_EMAIL}'
+
 # Substitutions (variables)
 substitutions:
   _ENVIRONMENT: 'dev'
   _REGION: 'us-central1'
   _REGION_SUFFIX: 'uc'
   _VPC_CONNECTOR: 'viatra-connector-dev'
-  _SERVICE_ACCOUNT_EMAIL: 'viatra-cloud-run-dev@${PROJECT_ID}.iam.gserviceaccount.com'
+  _SERVICE_ACCOUNT_EMAIL: 'viatra-cloud-build-${_ENVIRONMENT}@${PROJECT_ID}.iam.gserviceaccount.com'
+  _CLOUD_RUN_SERVICE_ACCOUNT: 'viatra-cloud-run-${_ENVIRONMENT}@${PROJECT_ID}.iam.gserviceaccount.com'
+  _AUTH_POLICY: '--allow-unauthenticated'  # Override to --no-allow-unauthenticated for prod
   _MAX_INSTANCES: '10'
   _MIN_INSTANCES: '0'
 

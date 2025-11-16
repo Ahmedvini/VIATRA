@@ -36,7 +36,8 @@ resource "google_cloud_run_service" "backend" {
       service_account_name = google_service_account.cloud_run.email
       
       containers {
-        # Placeholder image - will be updated by CI/CD
+        # Placeholder image - will be updated by CI/CD pipeline
+        # The actual backend image is deployed via Cloud Build to prevent Terraform drift
         image = "gcr.io/cloudrun/hello"
         
         ports {
@@ -163,6 +164,16 @@ resource "google_cloud_run_service" "backend" {
   traffic {
     percent         = 100
     latest_revision = true
+  }
+  
+  # Prevent Terraform drift when CI/CD updates the container image
+  # This allows CI/CD to manage the runtime image while Terraform manages the infrastructure
+  lifecycle {
+    ignore_changes = [
+      template[0].spec[0].containers[0].image,                                    # CI/CD deploys backend images
+      template[0].metadata[0].annotations["run.googleapis.com/execution-environment"], # May be set dynamically
+      traffic[0].latest_revision                                                  # CI/CD manages traffic routing
+    ]
   }
   
   autogenerate_revision_name = true

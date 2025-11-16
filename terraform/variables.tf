@@ -126,3 +126,33 @@ variable "labels" {
     managed-by  = "terraform"
   }
 }
+
+variable "github_owner" {
+  description = "GitHub repository owner/organization name"
+  type        = string
+  default     = ""
+  validation {
+    condition     = can(regex("^[a-zA-Z0-9._-]*$", var.github_owner))
+    error_message = "GitHub owner must contain only alphanumeric characters, dots, hyphens, and underscores."
+  }
+}
+
+variable "github_repo" {
+  description = "GitHub repository name"
+  type        = string
+  default     = "VIATRA"
+  validation {
+    condition     = can(regex("^[a-zA-Z0-9._-]*$", var.github_repo))
+    error_message = "GitHub repository name must contain only alphanumeric characters, dots, hyphens, and underscores."
+  }
+}
+
+variable "region_suffix" {
+  description = "Short region suffix for resource naming"
+  type        = string
+  default     = "uc"
+  validation {
+    condition     = length(var.region_suffix) <= 3
+    error_message = "Region suffix must be 3 characters or less."
+  }
+}

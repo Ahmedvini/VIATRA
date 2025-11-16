@@ -295,8 +295,12 @@ main() {
     echo
     log_info "Next steps:"
     echo "1. Edit configuration files (backend/.env, mobile/.env, terraform/terraform.tfvars)"
-    echo "2. Deploy infrastructure: cd terraform && terraform plan && terraform apply"
-    echo "3. Start development: npm run dev"
+    echo "2. Update terraform/terraform.tfvars with your GitHub repository details:"
+    echo "   - github_owner = \"your-username\""
+    echo "   - github_repo = \"your-repo-name\""
+    echo "3. Deploy infrastructure: cd terraform && terraform plan && terraform apply"
+    echo "4. Cloud Build triggers will be automatically created by Terraform"
+    echo "5. Start development: npm run dev"
     echo
     log_info "For more information, see the README.md file"
 }

@@ -126,6 +126,21 @@ chmod +x scripts/seed-secrets.sh
 ./scripts/seed-secrets.sh
 ```
 
+## Available Scripts
+
+The project includes several utility scripts in the `scripts/` directory:
+
+- **`setup.sh`** - Initial project setup, API enablement, and environment configuration
+- **`seed-secrets.sh`** - Populate Secret Manager with initial secrets for each environment
+- **`deploy.sh`** - Manual deployment helper for Cloud Run applications
+- **`backup-secrets.sh`** - Create encrypted backups of Secret Manager values for disaster recovery
+
+All scripts support environment-specific operations (dev, staging, prod) and include comprehensive help:
+
+```bash
+./scripts/[script-name] --help
+```
+
 ## Development
 
 - **Backend**: See [backend/README.md](backend/README.md)

@@ -115,3 +115,29 @@ output "container_registry_hostname" {
   description = "Container Registry hostname"
   value       = "${var.region}-docker.pkg.dev/${var.project_id}/viatra-repo"
 }
+
+# Cloud Build outputs
+output "cloud_build_service_account_email" {
+  description = "Email of the Cloud Build service account"
+  value       = google_service_account.cloud_build.email
+}
+
+output "cloud_build_trigger_main_id" {
+  description = "ID of the main branch Cloud Build trigger"
+  value       = google_cloudbuild_trigger.main_branch.id
+}
+
+output "cloud_build_trigger_main_name" {
+  description = "Name of the main branch Cloud Build trigger"
+  value       = google_cloudbuild_trigger.main_branch.name
+}
+
+output "cloud_build_trigger_pr_id" {
+  description = "ID of the pull request Cloud Build trigger"
+  value       = google_cloudbuild_trigger.pull_request.id
+}
+
+output "cloud_build_trigger_pr_name" {
+  description = "Name of the pull request Cloud Build trigger"
+  value       = google_cloudbuild_trigger.pull_request.name
+}

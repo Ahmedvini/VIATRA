@@ -8,9 +8,8 @@ import rateLimit from 'express-rate-limit';
 import config, { initConfig } from './config/index.js';
 import { connectDatabase, disconnectDatabase } from './config/database.js';
 import { connectRedis, disconnectRedis } from './config/redis.js';
-import logger from './config/logger.js';
+import logger, { requestLogger } from './config/logger.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
-import { requestLogger } from './middleware/requestLogger.js';
 
 const app = express();
 

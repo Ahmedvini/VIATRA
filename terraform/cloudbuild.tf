@@ -1,0 +1,155 @@
+# Cloud Build trigger configuration
+
+# Cloud Build trigger for main branch
+resource "google_cloudbuild_trigger" "main_branch" {
+  trigger_id  = "viatra-main-${var.environment}"
+  name        = "viatra-main-${var.environment}"
+  description = "Viatra Platform CI/CD trigger for main branch in ${var.environment}"
+  location    = var.region
+
+  # GitHub repository configuration
+  github {
+    owner = var.github_owner
+    name  = var.github_repo
+    push {
+      branch = "^main$"
+    }
+  }
+
+  # Use custom service account
+  service_account = google_service_account.cloud_build.id
+
+  # Build configuration
+  filename = "cloudbuild.yaml"
+
+  # Substitutions for environment-specific deployments
+  substitutions = {
+    _ENVIRONMENT              = var.environment
+    _REGION                   = var.region
+    _REGION_SUFFIX            = var.region_suffix
+    _VPC_CONNECTOR            = "viatra-connector-${var.environment}"
+    _SERVICE_ACCOUNT_EMAIL    = google_service_account.cloud_build.email
+    _CLOUD_RUN_SERVICE_ACCOUNT = google_service_account.cloud_run.email
+    _AUTH_POLICY              = var.environment == "dev" ? "--allow-unauthenticated" : "--no-allow-unauthenticated"
+    _MAX_INSTANCES            = var.environment == "prod" ? "100" : "10"
+    _MIN_INSTANCES            = var.environment == "prod" ? "1" : "0"
+  }
+
+  # Tags for organization
+  tags = [
+    "viatra-platform",
+    "backend",
+    "mobile",
+    var.environment
+  ]
+
+  # Enable build approval for production
+  approval_config {
+    approval_required = var.environment == "prod"
+  }
+
+  depends_on = [
+    google_service_account.cloud_build,
+    google_project_iam_member.cloud_build_run_admin,
+    google_project_iam_member.cloud_build_artifact_registry_admin,
+    google_project_iam_member.cloud_build_secret_admin,
+  ]
+}
+
+# Cloud Build trigger for pull requests (optional)
+resource "google_cloudbuild_trigger" "pull_request" {
+  trigger_id  = "viatra-pr-${var.environment}"
+  name        = "viatra-pr-${var.environment}"
+  description = "Viatra Platform PR validation trigger for ${var.environment}"
+  location    = var.region
+
+  # GitHub repository configuration
+  github {
+    owner = var.github_owner
+    name  = var.github_repo
+    pull_request {
+      branch = "^main$"
+    }
+  }
+
+  # Use custom service account
+  service_account = google_service_account.cloud_build.id
+
+  # Build configuration for PR validation (no deployment)
+  build {
+    # Step 1: Install backend dependencies
+    step {
+      name = "node:20-alpine"
+      entrypoint = "npm"
+      args = ["ci"]
+      dir = "backend"
+      id = "install-backend-deps"
+    }
+
+    # Step 2: Run backend linting
+    step {
+      name = "node:20-alpine"
+      entrypoint = "npm"
+      args = ["run", "lint"]
+      dir = "backend"
+      id = "lint-backend"
+      wait_for = ["install-backend-deps"]
+    }
+
+    # Step 3: Run backend tests
+    step {
+      name = "node:20-alpine"
+      entrypoint = "npm"
+      args = ["test"]
+      dir = "backend"
+      env = ["NODE_ENV=test"]
+      id = "test-backend"
+      wait_for = ["install-backend-deps"]
+    }
+
+    # Step 4: Flutter dependencies and tests
+    step {
+      name = "cirrusci/flutter:stable"
+      entrypoint = "flutter"
+      args = ["pub", "get"]
+      dir = "mobile"
+      id = "flutter-deps"
+    }
+
+    step {
+      name = "cirrusci/flutter:stable"
+      entrypoint = "flutter"
+      args = ["analyze"]
+      dir = "mobile"
+      id = "flutter-analyze"
+      wait_for = ["flutter-deps"]
+    }
+
+    step {
+      name = "cirrusci/flutter:stable"
+      entrypoint = "flutter"
+      args = ["test"]
+      dir = "mobile"
+      id = "flutter-test"
+      wait_for = ["flutter-deps"]
+    }
+
+    # Substitutions for PR builds
+    substitutions = {
+      _ENVIRONMENT = var.environment
+      _REGION      = var.region
+    }
+
+    # Tags
+    tags = [
+      "viatra-platform",
+      "pr-validation",
+      var.environment
+    ]
+  }
+
+  depends_on = [
+    google_service_account.cloud_build,
+    google_project_iam_member.cloud_build_source_repo_admin,
+  ]
+}
