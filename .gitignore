@@ -120,6 +120,8 @@ service-account*.json
 
 # Docker
 .dockerignore
+docker/nginx/ssl/*.key
+docker/volumes/
 
 # Temporary files
 tmp/

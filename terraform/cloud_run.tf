@@ -72,6 +72,20 @@ resource "google_cloud_run_service" "backend" {
         }
         
         # Database configuration from Secret Manager
+        # Preferred: Composite DATABASE_URL (complete connection string)
+        # This provides a cleaner, single-source configuration approach
+        env {
+          name = "DATABASE_URL"
+          value_source {
+            secret_key_ref {
+              secret  = google_secret_manager_secret.database_url.secret_id
+              version = "latest"
+            }
+          }
+        }
+        
+        # Backwards compatibility: Discrete database configuration
+        # These are maintained for legacy compatibility but DATABASE_URL takes precedence
         env {
           name = "DATABASE_HOST"
           value = google_sql_database_instance.main.private_ip_address
@@ -89,10 +103,10 @@ resource "google_cloud_run_service" "backend" {
         
         env {
           name = "DATABASE_PASSWORD"
-          value_from {
+          value_source {
             secret_key_ref {
-              name = google_secret_manager_secret.db_password.secret_id
-              key  = "latest"
+              secret  = google_secret_manager_secret.db_password.secret_id
+              version = "latest"
             }
           }
         }
@@ -110,10 +124,10 @@ resource "google_cloud_run_service" "backend" {
         
         env {
           name = "REDIS_AUTH"
-          value_from {
+          value_source {
             secret_key_ref {
-              name = google_secret_manager_secret.redis_auth.secret_id
-              key  = "latest"
+              secret  = google_secret_manager_secret.redis_auth.secret_id
+              version = "latest"
             }
           }
         }
@@ -127,10 +141,10 @@ resource "google_cloud_run_service" "backend" {
         # JWT secret from Secret Manager
         env {
           name = "JWT_SECRET"
-          value_from {
+          value_source {
             secret_key_ref {
-              name = google_secret_manager_secret.jwt_secret.secret_id
-              key  = "latest"
+              secret  = google_secret_manager_secret.jwt_secret.secret_id
+              version = "latest"
             }
           }
         }

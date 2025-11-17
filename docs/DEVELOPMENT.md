@@ -58,6 +58,7 @@ The project includes a Docker Compose setup for local development:
 - PostgreSQL database
 - Redis cache
 - Backend API (with hot reload)
+- Nginx (reverse proxy with HTTPS)
 - pgAdmin (database management)
 - Redis Commander (cache management)
 ```
@@ -75,6 +76,40 @@ docker-compose down
 # Reset volumes (fresh start)
 docker-compose down -v
 ```
+
+#### Nginx Reverse Proxy Setup
+
+The development environment includes Nginx as a reverse proxy with HTTPS support for production-like local testing:
+
+**Access Points:**
+- **HTTPS**: `https://localhost` (recommended - accept self-signed certificate)
+- **HTTP**: `http://localhost` (redirects to HTTPS)
+- **Health Check**: `http://localhost/health` (HTTP allowed)
+
+**Features:**
+- ✅ SSL/TLS with self-signed certificates for local development
+- ✅ CORS configuration for mobile app (`http://localhost:3000`)
+- ✅ Rate limiting on API and authentication endpoints
+- ✅ Security headers (HSTS, X-Frame-Options, etc.)
+- ✅ Gzip compression for improved performance
+- ✅ WebSocket support for real-time features
+
+**Configuration Files:**
+- `docker/nginx/nginx.conf` - Main nginx configuration
+- `docker/nginx/conf.d/default.conf` - Site-specific configuration
+- `docker/nginx/ssl/` - SSL certificates (excluded from git)
+
+**Customization:**
+```bash
+# Customize routing or add new endpoints
+vim docker/nginx/conf.d/default.conf
+
+# Restart nginx to apply changes
+docker-compose restart nginx
+```
+
+**For HTTP-Only Development:**
+If you don't need HTTPS for your development workflow, you can comment out the nginx service in `docker-compose.yml` and access the backend directly at `http://localhost:8080`.
 
 #### 3. Native Development (without Docker)
 

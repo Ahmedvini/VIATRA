@@ -2,9 +2,9 @@
 
 # Cloud Build trigger for main branch
 resource "google_cloudbuild_trigger" "main_branch" {
-  trigger_id  = "viatra-main-${var.environment}"
-  name        = "viatra-main-${var.environment}"
-  description = "Viatra Platform CI/CD trigger for main branch in ${var.environment}"
+  trigger_id  = "${var.cloud_run_service_name}-main-${var.environment}"
+  name        = "${var.cloud_run_service_name}-main-${var.environment}"
+  description = "Automatic deployment on main branch for ${var.environment} environment"
   location    = var.region
 
   # GitHub repository configuration
@@ -30,10 +30,16 @@ resource "google_cloudbuild_trigger" "main_branch" {
     _VPC_CONNECTOR            = "viatra-connector-${var.environment}"
     _SERVICE_ACCOUNT_EMAIL    = google_service_account.cloud_build.email
     _CLOUD_RUN_SERVICE_ACCOUNT = google_service_account.cloud_run.email
-    _AUTH_POLICY              = var.environment == "dev" ? "--allow-unauthenticated" : "--no-allow-unauthenticated"
-    _MAX_INSTANCES            = var.environment == "prod" ? "100" : "10"
-    _MIN_INSTANCES            = var.environment == "prod" ? "1" : "0"
+    _MAX_INSTANCES            = tostring(var.cloud_run_max_instances)
+    _MIN_INSTANCES            = tostring(var.cloud_run_min_instances)
   }
+
+  # Labels for organization
+  labels = merge(var.labels, {
+    environment = var.environment
+    service     = "build"
+    trigger     = "main-branch"
+  })
 
   # Tags for organization
   tags = [
@@ -53,14 +59,15 @@ resource "google_cloudbuild_trigger" "main_branch" {
     google_project_iam_member.cloud_build_run_admin,
     google_project_iam_member.cloud_build_artifact_registry_admin,
     google_project_iam_member.cloud_build_secret_admin,
+    google_artifact_registry_repository.viatra_repo,
   ]
 }
 
 # Cloud Build trigger for pull requests (optional)
 resource "google_cloudbuild_trigger" "pull_request" {
-  trigger_id  = "viatra-pr-${var.environment}"
-  name        = "viatra-pr-${var.environment}"
-  description = "Viatra Platform PR validation trigger for ${var.environment}"
+  trigger_id  = "${var.cloud_run_service_name}-pr-${var.environment}"
+  name        = "${var.cloud_run_service_name}-pr-${var.environment}"
+  description = "Pull request validation builds for ${var.environment} environment"
   location    = var.region
 
   # GitHub repository configuration
@@ -148,8 +155,16 @@ resource "google_cloudbuild_trigger" "pull_request" {
     ]
   }
 
+  # Labels for organization
+  labels = merge(var.labels, {
+    environment = var.environment
+    service     = "build" 
+    trigger     = "pull-request"
+  })
+
   depends_on = [
     google_service_account.cloud_build,
     google_project_iam_member.cloud_build_source_repo_admin,
+    google_artifact_registry_repository.viatra_repo,
   ]
 }

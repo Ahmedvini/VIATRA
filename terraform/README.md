@@ -119,6 +119,42 @@ The Terraform configuration creates the following resources:
 ### CI/CD
 - **Artifact Registry**: Container image repository
 - **Service Accounts**: For Cloud Build automation
+- **Cloud Build Triggers**: Terraform-managed triggers for main branch deployment and PR validation
+
+## Cloud Build Triggers
+
+The Terraform configuration automatically creates and manages Cloud Build triggers for CI/CD automation:
+
+### Managed Triggers
+
+1. **Main Branch Trigger** (`main_branch`)
+   - Automatically deploys to the target environment when code is pushed to main branch
+   - Uses `cloudbuild.yaml` configuration file
+   - Requires approval for production deployments
+   - Outputs: `cloud_build_trigger_main_id`, `cloud_build_trigger_main_name`
+
+2. **Pull Request Trigger** (`pull_request`)
+   - Runs validation builds (lint, test) on pull requests targeting main branch
+   - Does not deploy - validation only
+   - Provides fast feedback on code quality
+   - Outputs: `cloud_build_trigger_pr_id`, `cloud_build_trigger_pr_name`
+
+### Configuration
+
+Triggers are configured via Terraform variables:
+- `github_owner`: GitHub repository owner/organization
+- `github_repo`: GitHub repository name  
+- `environment`: Target deployment environment
+- `region`: GCP region for trigger execution
+- `enable_cloudbuild_triggers`: Boolean flag to enable/disable Terraform management (default: true)
+
+### Manual Management
+
+If you need to manage triggers manually instead of via Terraform:
+1. Set `enable_cloudbuild_triggers = false` in your `terraform.tfvars`
+2. The trigger outputs will automatically become inert (return null values)
+3. Create triggers via GCP Console or gcloud CLI
+4. No manual editing of outputs is required - they handle the disabled state automatically
 
 ## Environment-Specific Configurations
 

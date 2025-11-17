@@ -159,11 +159,28 @@ All API endpoints are prefixed with `/api/v1`:
 - `JWT_SECRET` - JWT secret key (min 32 characters)
 - `GCP_PROJECT_ID` - Google Cloud project ID
 
-### Optional Variables
+### Optional Variables (Local/Test Only)
 
+**Note**: In production, the following values are automatically sourced from Google Cloud Secret Manager:
+- **App Configuration**: Rate limiting, file upload settings from `app-config-${environment}`
+- **API Keys**: Stripe, Twilio, SendGrid, Firebase from `api-keys-${environment}`
+- **OAuth Credentials**: Google, Apple, Facebook from `oauth-config-${environment}`
+
+For local development and testing:
 - `CORS_ORIGIN` - Allowed CORS origins
-- `RATE_LIMIT_MAX` - Rate limit maximum requests
-- `FILE_UPLOAD_MAX_SIZE` - Maximum file upload size
+- `RATE_LIMIT_MAX` - Rate limit maximum requests (production: from Secret Manager)
+- `RATE_LIMIT_WINDOW` - Rate limit window in milliseconds (production: from Secret Manager)
+- `FILE_UPLOAD_MAX_SIZE` - Maximum file upload size (production: from Secret Manager)
+- `STRIPE_API_KEY` - Stripe API key (production: from Secret Manager)
+- `TWILIO_AUTH_TOKEN` - Twilio authentication token (production: from Secret Manager)
+- `SENDGRID_API_KEY` - SendGrid API key (production: from Secret Manager)
+- `FIREBASE_API_KEY` - Firebase API key (production: from Secret Manager)
+- `GOOGLE_CLIENT_ID` - Google OAuth client ID (production: from Secret Manager)
+- `GOOGLE_CLIENT_SECRET` - Google OAuth client secret (production: from Secret Manager)
+- `APPLE_CLIENT_ID` - Apple OAuth client ID (production: from Secret Manager)
+- `APPLE_CLIENT_SECRET` - Apple OAuth client secret (production: from Secret Manager)
+- `FACEBOOK_APP_ID` - Facebook app ID (production: from Secret Manager)
+- `FACEBOOK_APP_SECRET` - Facebook app secret (production: from Secret Manager)
 - `LOG_LEVEL` - Logging level (debug, info, warn, error)
 
 ## Testing

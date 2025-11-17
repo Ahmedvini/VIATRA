@@ -8,14 +8,14 @@
 # TERRAFORM-MANAGED SECRETS (DO NOT MODIFY WITH THIS SCRIPT):
 #   - db-password-${ENVIRONMENT}: Database password tightly coupled to Cloud SQL user
 #   - jwt-secret-${ENVIRONMENT}: JWT signing key (also managed by Terraform)
+#   - redis-auth-${ENVIRONMENT}: Redis authentication (managed by Terraform)
+#   - database-url-${ENVIRONMENT}: Complete database connection URL (computed from infrastructure)
+#   - redis-config-${ENVIRONMENT}: Redis connection configuration (computed from infrastructure)
 #
 # SCRIPT-MANAGED SECRETS (Safe to create/update):
-#   - redis-auth-${ENVIRONMENT}: Redis authentication
 #   - api-keys-${ENVIRONMENT}: Third-party API keys
 #   - app-config-${ENVIRONMENT}: Application configuration
 #   - oauth-config-${ENVIRONMENT}: OAuth provider configuration
-#   - database-url-${ENVIRONMENT}: Complete database connection URL
-#   - redis-config-${ENVIRONMENT}: Redis connection configuration
 #
 # To rotate Terraform-managed secrets, use: terraform taint <resource_name>
 
@@ -170,14 +170,11 @@ confirm_production() {
 check_existing_secrets() {
     log_info "Checking for existing secrets..."
     
-    # NOTE: db-password and jwt-secret are excluded as they're managed by Terraform
+    # NOTE: db-password, jwt-secret, and redis-auth are excluded as they're managed by Terraform
     local secrets=(
-        "redis-auth-${ENVIRONMENT}"
         "api-keys-${ENVIRONMENT}"
         "app-config-${ENVIRONMENT}"
         "oauth-config-${ENVIRONMENT}"
-        "database-url-${ENVIRONMENT}"
-        "redis-config-${ENVIRONMENT}"
     )
     
     local existing_secrets=()
@@ -213,20 +210,23 @@ seed_db_password() {
     return 1
 }
 
-# Seed Redis auth
-seed_redis_auth() {
-    local secret_name="redis-auth-${ENVIRONMENT}"
-    
-    if [ "$SKIP_EXISTING" = true ] && secret_exists "$secret_name"; then
-        log_info "Skipping existing secret: $secret_name"
-        return
-    fi
-    
-    log_info "Generating Redis authentication string..."
-    local redis_auth
-    redis_auth=$(generate_secret 32)
-    create_or_update_secret "$secret_name" "$redis_auth" "Redis authentication string for $ENVIRONMENT environment"
-}
+# DISABLED: Redis auth is managed by Terraform
+# This function is kept for reference but should not be used as it can desynchronize
+# the Redis auth from the Terraform-managed secret.
+# The redis-auth-${ENVIRONMENT} secret is created and managed by Terraform in redis.tf
+# seed_redis_auth() {
+#     local secret_name="redis-auth-${ENVIRONMENT}"
+#     
+#     if [ "$SKIP_EXISTING" = true ] && secret_exists "$secret_name"; then
+#         log_info "Skipping existing secret: $secret_name"
+#         return
+#     fi
+#     
+#     log_info "Generating Redis authentication string..."
+#     local redis_auth
+#     redis_auth=$(generate_secret 32)
+#     create_or_update_secret "$secret_name" "$redis_auth" "Redis authentication string for $ENVIRONMENT environment"
+# }
 
 # DISABLED: JWT secret is managed by Terraform
 # This function is kept for reference but should not be used as it can desynchronize
@@ -344,21 +344,17 @@ seed_oauth_config() {
     create_or_update_secret "$secret_name" "$oauth_config_json" "OAuth configuration for $ENVIRONMENT environment"
 }
 
-# Set IAM permissions
+# Set IAM permissions for script-managed secrets only
 set_iam_permissions() {
-    log_info "Setting IAM permissions for Cloud Run service account..."
+    log_info "Setting IAM permissions for Cloud Run service account on script-managed secrets..."
     
     local service_account="viatra-cloud-run-${ENVIRONMENT}@${PROJECT_ID}.iam.gserviceaccount.com"
     
+    # Only include script-managed secrets (Terraform handles IAM for its own secrets)
     local secrets=(
-        "db-password-${ENVIRONMENT}"
-        "redis-auth-${ENVIRONMENT}"
-        "jwt-secret-${ENVIRONMENT}"
         "api-keys-${ENVIRONMENT}"
         "app-config-${ENVIRONMENT}"
         "oauth-config-${ENVIRONMENT}"
-        "database-url-${ENVIRONMENT}"
-        "redis-config-${ENVIRONMENT}"
     )
     
     for secret in "${secrets[@]}"; do
@@ -391,8 +387,10 @@ main() {
     
     # Seed all secrets (excluding Terraform-managed secrets)
     log_warning "SKIPPING db-password-${ENVIRONMENT}: This secret is managed by Terraform and should not be overwritten"
-    log_warning "SKIPPING jwt-secret-${ENVIRONMENT}: This secret is managed by Terraform and should not be overwritten"
-    seed_redis_auth
+    log_warning "SKIPPING jwt-secret-${ENVIRONMENT}: This secret is managed by Terraform and should not be overwritten" 
+    log_warning "SKIPPING redis-auth-${ENVIRONMENT}: This secret is managed by Terraform and should not be overwritten"
+    log_warning "SKIPPING database-url-${ENVIRONMENT}: This secret is managed by Terraform and should not be overwritten"
+    log_warning "SKIPPING redis-config-${ENVIRONMENT}: This secret is managed by Terraform and should not be overwritten"
     seed_api_keys
     seed_app_config
     seed_oauth_config

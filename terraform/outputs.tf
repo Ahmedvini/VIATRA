@@ -34,6 +34,11 @@ output "db_password_secret_id" {
   value       = google_secret_manager_secret.db_password.secret_id
 }
 
+output "database_url_secret_id" {
+  description = "Secret Manager secret ID for composite database URL (preferred)"
+  value       = google_secret_manager_secret.database_url.secret_id
+}
+
 # Redis outputs
 output "redis_host" {
   description = "Redis instance host"
@@ -117,27 +122,37 @@ output "container_registry_hostname" {
 }
 
 # Cloud Build outputs
-output "cloud_build_service_account_email" {
-  description = "Email of the Cloud Build service account"
-  value       = google_service_account.cloud_build.email
-}
 
 output "cloud_build_trigger_main_id" {
   description = "ID of the main branch Cloud Build trigger"
-  value       = google_cloudbuild_trigger.main_branch.id
+  value       = var.enable_cloudbuild_triggers ? google_cloudbuild_trigger.main_branch[0].id : null
 }
 
 output "cloud_build_trigger_main_name" {
   description = "Name of the main branch Cloud Build trigger"
-  value       = google_cloudbuild_trigger.main_branch.name
+  value       = var.enable_cloudbuild_triggers ? google_cloudbuild_trigger.main_branch[0].name : null
 }
 
 output "cloud_build_trigger_pr_id" {
   description = "ID of the pull request Cloud Build trigger"
-  value       = google_cloudbuild_trigger.pull_request.id
+  value       = var.enable_cloudbuild_triggers ? google_cloudbuild_trigger.pull_request[0].id : null
 }
 
 output "cloud_build_trigger_pr_name" {
   description = "Name of the pull request Cloud Build trigger"
-  value       = google_cloudbuild_trigger.pull_request.name
+  value       = var.enable_cloudbuild_triggers ? google_cloudbuild_trigger.pull_request[0].name : null
+}
+
+output "cloud_build_trigger_webhook_url" {
+  description = "Webhook URL for the main branch Cloud Build trigger"
+  value       = var.enable_cloudbuild_triggers && length(google_cloudbuild_trigger.main_branch) > 0 && google_cloudbuild_trigger.main_branch[0].webhook_config != null ? google_cloudbuild_trigger.main_branch[0].webhook_config[0].url : null
+}
+
+output "github_repository_info" {
+  description = "GitHub repository configuration for triggers"
+  value = {
+    owner = var.github_owner
+    repo  = var.github_repo
+    url   = "https://github.com/${var.github_owner}/${var.github_repo}"
+  }
 }

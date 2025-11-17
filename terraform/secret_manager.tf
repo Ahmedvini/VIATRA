@@ -127,6 +127,8 @@ resource "google_secret_manager_secret_version" "oauth_config" {
 }
 
 # Database connection string (composite secret)
+# Preferred: Complete database connection URL for cleaner configuration
+# This eliminates the need to manage separate host/user/password/name variables
 resource "google_secret_manager_secret" "database_url" {
   secret_id = "database-url-${var.environment}"
   

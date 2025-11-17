@@ -5,15 +5,15 @@
  * Run with: node src/config/test-config.js
  */
 
-// Test in development mode
-console.log('Testing development mode...');
+// Test 1: Development mode without GCP_PROJECT_ID (should work)
+console.log('Testing development mode without GCP_PROJECT_ID...');
 process.env.NODE_ENV = 'development';
-process.env.GCP_PROJECT_ID = 'test-project';
+delete process.env.GCP_PROJECT_ID; // Remove to test conditional validation
 process.env.JWT_SECRET = 'test-jwt-secret-that-is-long-enough-for-validation';
 
 try {
   const config = (await import('./index.js')).default;
-  console.log('✅ Development config loaded successfully');
+  console.log('✅ Development config loaded successfully without GCP_PROJECT_ID');
   console.log(`Environment: ${config.nodeEnv}`);
   console.log(`Production mode: ${config.isProduction}`);
 } catch (error) {
@@ -21,8 +21,42 @@ try {
   process.exit(1);
 }
 
-// Test production mode initialization
+// Test 2: Development mode with USE_GCP_SECRETS=true (should require GCP_PROJECT_ID)
+console.log('\nTesting development mode with USE_GCP_SECRETS=true...');
+process.env.USE_GCP_SECRETS = 'true';
+
+try {
+  // Clear module cache to force reload
+  const moduleUrl = new URL('./index.js', import.meta.url);
+  delete globalThis[moduleUrl.href];
+  
+  const config = (await import('./index.js?' + Date.now())).default;
+  console.log('❌ This should have failed - GCP_PROJECT_ID should be required');
+  process.exit(1);
+} catch (error) {
+  if (error.message.includes('GCP_PROJECT_ID')) {
+    console.log('✅ Correctly failed when USE_GCP_SECRETS=true but no GCP_PROJECT_ID');
+  } else {
+    console.error('❌ Failed for wrong reason:', error.message);
+    process.exit(1);
+  }
+}
+
+// Test 3: Development mode with GCP_PROJECT_ID set
+console.log('\nTesting development mode with GCP_PROJECT_ID...');
+process.env.GCP_PROJECT_ID = 'test-project';
+
+try {
+  const config = (await import('./index.js?' + Date.now())).default;
+  console.log('✅ Development config loaded successfully with GCP_PROJECT_ID');
+} catch (error) {
+  console.error('❌ Failed to load development config with GCP_PROJECT_ID:', error.message);
+  process.exit(1);
+}
+
+// Test 4: Production mode initialization
 console.log('\nTesting production mode initialization...');
+delete process.env.USE_GCP_SECRETS; // Clean up from previous test
 process.env.NODE_ENV = 'production';
 process.env.ENVIRONMENT = 'test';
 

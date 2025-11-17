@@ -2,6 +2,12 @@
 
 # Viatra Health Platform Deployment Script
 # This script handles manual deployment of the backend service to Google Cloud Run
+# 
+# IMPORTANT: Infrastructure Management
+# ====================================
+# Terraform controls all infrastructure settings (memory, CPU, env vars, IAM, scaling)
+# This script is intended only to roll out a new container image
+# Use Terraform to modify service configuration, not this script
 
 set -e  # Exit on any error
 
@@ -194,53 +200,18 @@ push_image() {
     log_success "Image pushed to registry"
 }
 
-# Deploy to Cloud Run
+# Deploy to Cloud Run (update image only - Terraform manages infrastructure)
 deploy_service() {
-    log_info "Deploying to Cloud Run..."
+    log_info "Deploying new image to Cloud Run..."
+    log_info "Note: Terraform controls all infrastructure settings (memory, CPU, env vars, IAM)"
     
     SERVICE_NAME="viatra-backend-${ENVIRONMENT}"
     IMAGE_NAME="${REGION}-docker.pkg.dev/${PROJECT_ID}/viatra-repo/backend:${VERSION}"
     
-    # Set environment-specific configurations
-    case $ENVIRONMENT in
-        dev)
-            MIN_INSTANCES=0
-            MAX_INSTANCES=5
-            MEMORY="512Mi"
-            CPU=1
-            CONCURRENCY=100
-            ;;
-        staging)
-            MIN_INSTANCES=1
-            MAX_INSTANCES=8
-            MEMORY="1Gi"
-            CPU=1
-            CONCURRENCY=100
-            ;;
-        prod)
-            MIN_INSTANCES=2
-            MAX_INSTANCES=20
-            MEMORY="1Gi"
-            CPU=2
-            CONCURRENCY=100
-            ;;
-    esac
-    
-    # Deploy service
+    # Deploy service with minimal flags - use existing service definition managed by Terraform
     gcloud run deploy "$SERVICE_NAME" \
         --image="$IMAGE_NAME" \
         --region="$REGION" \
-        --service-account="viatra-cloud-run-${ENVIRONMENT}@${PROJECT_ID}.iam.gserviceaccount.com" \
-        --set-env-vars="NODE_ENV=production,ENVIRONMENT=${ENVIRONMENT},GCP_PROJECT_ID=${PROJECT_ID}" \
-        --vpc-connector="viatra-connector-${ENVIRONMENT}" \
-        --vpc-egress=private-ranges-only \
-        --memory="$MEMORY" \
-        --cpu="$CPU" \
-        --concurrency="$CONCURRENCY" \
-        --max-instances="$MAX_INSTANCES" \
-        --min-instances="$MIN_INSTANCES" \
-        --port=8080 \
-        --allow-unauthenticated \
         --quiet
     
     # Get service URL

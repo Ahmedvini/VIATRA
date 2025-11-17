@@ -8,6 +8,8 @@ const isProduction = nodeEnv === 'production';
 const isDevelopment = nodeEnv === 'development';
 
 // Database configuration
+// Preferred: DATABASE_URL (composite connection string)
+// Fallback: Discrete host/user/password/name (for backwards compatibility)
 const database = {
   url: process.env.DATABASE_URL,
   host: process.env.DATABASE_HOST || 'localhost',
@@ -58,11 +60,45 @@ const fileUpload = {
     ['image/jpeg', 'image/png', 'image/gif', 'application/pdf']
 };
 
+// Third-party integrations configuration
+const integrations = {
+  stripe: {
+    apiKey: process.env.STRIPE_API_KEY
+  },
+  twilio: {
+    authToken: process.env.TWILIO_AUTH_TOKEN
+  },
+  sendgrid: {
+    apiKey: process.env.SENDGRID_API_KEY
+  },
+  firebase: {
+    key: process.env.FIREBASE_API_KEY
+  },
+  oauth: {
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET
+    },
+    apple: {
+      clientId: process.env.APPLE_CLIENT_ID,
+      clientSecret: process.env.APPLE_CLIENT_SECRET
+    },
+    facebook: {
+      appId: process.env.FACEBOOK_APP_ID,
+      appSecret: process.env.FACEBOOK_APP_SECRET
+    }
+  }
+};
+
 // Validation function
 const validateConfig = () => {
-  const required = [
-    'GCP_PROJECT_ID'
-  ];
+  // Base required variables for all environments
+  const required = [];
+  
+  // GCP_PROJECT_ID is only required in production or when explicitly using GCP services
+  if (isProduction || process.env.USE_GCP_SECRETS === 'true') {
+    required.push('GCP_PROJECT_ID');
+  }
   
   const missing = required.filter(key => !process.env[key]);
   
@@ -70,13 +106,46 @@ const validateConfig = () => {
     throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
   }
   
-  // Validate JWT secret from resolved config object
+  // Validate JWT secret from resolved config object (after secrets are loaded)
   if (!config.jwt.secret) {
     throw new Error('JWT secret is required but not configured');
   }
   
   if (config.jwt.secret.length < 32) {
     throw new Error('JWT_SECRET must be at least 32 characters long');
+  }
+  
+  // Additional validation for production environment (after secrets are loaded)
+  if (isProduction) {
+    // Validate database configuration - prefer DATABASE_URL (composite) over discrete config
+    if (!config.database.url) {
+      console.warn('WARNING: DATABASE_URL not provided. Using discrete database configuration as fallback.');
+      // Validate discrete configuration when DATABASE_URL is not available
+      if (!config.database.host) {
+        throw new Error('DATABASE_HOST is required in production when DATABASE_URL is not provided');
+      }
+      if (!config.database.name) {
+        throw new Error('DATABASE_NAME is required in production when DATABASE_URL is not provided');
+      }
+      if (!config.database.user) {
+        throw new Error('DATABASE_USER is required in production when DATABASE_URL is not provided');
+      }
+      if (!config.database.password) {
+        throw new Error('DATABASE_PASSWORD is required in production when DATABASE_URL is not provided');
+      }
+    }
+    
+    // Validate Redis configuration (check resolved config object)
+    if (!config.redis.host) {
+      throw new Error('REDIS_HOST is required in production environment');
+    }
+    if (!config.redis.port) {
+      throw new Error('REDIS_PORT is required in production environment');
+    }
+    // Redis auth is optional but recommended - just log a warning if missing
+    if (!config.redis.auth) {
+      console.warn('WARNING: REDIS_AUTH is not set. Consider enabling Redis authentication for production.');
+    }
   }
 };
 
@@ -91,15 +160,21 @@ const config = {
   jwt,
   cors,
   rateLimit,
-  fileUpload
+  fileUpload,
+  integrations
 };
 
 // Load secrets from Secret Manager in production
 export const loadProductionSecrets = async () => {
   if (!isProduction) return;
   
-  // Import getSecret only when needed to avoid circular dependency
-  const { getSecret } = await import('./secrets.js');
+  // Validate GCP_PROJECT_ID when actually needed for Secret Manager
+  if (!config.gcp.projectId) {
+    throw new Error('GCP_PROJECT_ID is required in production for Secret Manager integration');
+  }
+  
+  // Import getSecret and getJsonSecret only when needed to avoid circular dependency
+  const { getSecret, getJsonSecret } = await import('./secrets.js');
   
   try {
     // Load database password
@@ -116,6 +191,35 @@ export const loadProductionSecrets = async () => {
     if (!config.jwt.secret) {
       config.jwt.secret = await getSecret(`jwt-secret-${process.env.ENVIRONMENT}`, config.gcp.projectId);
     }
+    
+    // Load app configuration from Secret Manager
+    const appConfigSecrets = await getJsonSecret(`app-config-${process.env.ENVIRONMENT}`);
+    
+    // Map app-config fields to existing config structure
+    config.fileUpload.maxSize = parseInt(appConfigSecrets.file_upload_max_size, 10) || config.fileUpload.maxSize;
+    config.rateLimit.max = parseInt(appConfigSecrets.rate_limit_max, 10) || config.rateLimit.max;
+    config.rateLimit.window = parseInt(appConfigSecrets.rate_limit_window, 10) || config.rateLimit.window;
+    
+    // Load API keys and third-party service credentials
+    const apiKeysSecrets = await getJsonSecret(`api-keys-${process.env.ENVIRONMENT}`);
+    
+    // Map API keys to integrations config
+    config.integrations.stripe.apiKey = apiKeysSecrets.stripe_api_key || config.integrations.stripe.apiKey;
+    config.integrations.twilio.authToken = apiKeysSecrets.twilio_auth_token || config.integrations.twilio.authToken;
+    config.integrations.sendgrid.apiKey = apiKeysSecrets.sendgrid_api_key || config.integrations.sendgrid.apiKey;
+    config.integrations.firebase.key = apiKeysSecrets.firebase_key || config.integrations.firebase.key;
+    
+    // Load OAuth configuration
+    const oauthSecrets = await getJsonSecret(`oauth-config-${process.env.ENVIRONMENT}`);
+    
+    // Map OAuth credentials to integrations config
+    config.integrations.oauth.google.clientId = oauthSecrets.google_client_id || config.integrations.oauth.google.clientId;
+    config.integrations.oauth.google.clientSecret = oauthSecrets.google_client_secret || config.integrations.oauth.google.clientSecret;
+    config.integrations.oauth.apple.clientId = oauthSecrets.apple_client_id || config.integrations.oauth.apple.clientId;
+    config.integrations.oauth.apple.clientSecret = oauthSecrets.apple_client_secret || config.integrations.oauth.apple.clientSecret;
+    config.integrations.oauth.facebook.appId = oauthSecrets.facebook_app_id || config.integrations.oauth.facebook.appId;
+    config.integrations.oauth.facebook.appSecret = oauthSecrets.facebook_app_secret || config.integrations.oauth.facebook.appSecret;
+    
   } catch (error) {
     console.error('Failed to load secrets from Secret Manager:', error);
     throw error;

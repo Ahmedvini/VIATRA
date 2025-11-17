@@ -2,7 +2,7 @@ steps:
   # Step 1: Install backend dependencies
   - name: 'node:20-alpine'
     entrypoint: 'npm'
-    args: ['ci']
+    args: ['install']
     dir: 'backend'
     id: 'install-backend-deps'
   
@@ -21,6 +21,7 @@ steps:
     dir: 'backend'
     env:
       - 'NODE_ENV=test'
+      - 'JWT_SECRET=test_jwt_secret_for_cloud_build_pipeline_32chars_minimum'
     id: 'test-backend'
     waitFor: ['install-backend-deps']
   
@@ -46,7 +47,7 @@ steps:
     id: 'push-backend-image'
     waitFor: ['build-backend-image']
   
-  # Step 6: Deploy to Cloud Run
+  # Step 6: Deploy to Cloud Run (image and traffic only - Terraform manages infrastructure)
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: 'gcloud'
     args:
@@ -57,17 +58,9 @@ steps:
       - '--tag=${SHORT_SHA}'
       - '--region=${_REGION}'
       - '--service-account=${_CLOUD_RUN_SERVICE_ACCOUNT}'
-      - '--set-env-vars=NODE_ENV=production,ENVIRONMENT=${_ENVIRONMENT}'
-      - '--set-env-vars=GCP_PROJECT_ID=${PROJECT_ID}'
-      - '--vpc-connector=${_VPC_CONNECTOR}'
-      - '--vpc-egress=private-ranges-only'
-      - '--memory=512Mi'
-      - '--cpu=1'
-      - '--concurrency=100'
-      - '--max-instances=${_MAX_INSTANCES}'
-      - '--min-instances=${_MIN_INSTANCES}'
       - '--port=8080'
-      - '${_AUTH_POLICY}'
+    # Note: All infrastructure config, env vars, and IAM policies (NODE_ENV, ENVIRONMENT, GCP_PROJECT_ID, auth) 
+    # managed by Terraform cloud_run.tf - Cloud Build only updates container image and traffic
     id: 'deploy-backend'
     waitFor: ['push-backend-image']
   
@@ -105,13 +98,38 @@ steps:
     waitFor: ['analyze-flutter', 'test-flutter']
   
   # Step 11: Run integration tests (if backend deployment successful)
-  - name: 'node:20-alpine'
-    entrypoint: 'npm'
-    args: ['run', 'test:integration']
-    dir: 'backend'
-    env:
-      - 'NODE_ENV=test'
-      - 'API_BASE_URL=https://viatra-backend-${_ENVIRONMENT}-${_REGION_SUFFIX}.a.run.app'
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # Get the actual Cloud Run service URL
+        SERVICE_URL=$$(gcloud run services describe viatra-backend-${_ENVIRONMENT} \
+          --region=${_REGION} \
+          --format="value(status.url)")
+        
+        if [ -z "$$SERVICE_URL" ]; then
+          echo "❌ Failed to get Cloud Run service URL"
+          exit 1
+        fi
+        
+        echo "🔍 Running integration tests against: $$SERVICE_URL"
+        
+        # Install Node.js and npm in the cloud-sdk container
+        apt-get update && apt-get install -y nodejs npm
+        
+        # Install backend dependencies
+        cd backend
+        npm install
+        
+        # Run integration tests with the actual service URL
+        # Note: API routes are not yet implemented, so we test the health endpoint
+        NODE_ENV=test API_BASE_URL=$$SERVICE_URL npm run test:integration
+        
+        # Additional health check to verify the service is responding
+        echo "🏥 Testing health endpoint..."
+        curl -f "$$SERVICE_URL/health" || (echo "❌ Health check failed" && exit 1)
+        echo "✅ Health check passed"
     id: 'integration-tests'
     waitFor: ['deploy-backend']
   
@@ -155,7 +173,6 @@ substitutions:
   _VPC_CONNECTOR: 'viatra-connector-dev'
   _SERVICE_ACCOUNT_EMAIL: 'viatra-cloud-build-${_ENVIRONMENT}@${PROJECT_ID}.iam.gserviceaccount.com'
   _CLOUD_RUN_SERVICE_ACCOUNT: 'viatra-cloud-run-${_ENVIRONMENT}@${PROJECT_ID}.iam.gserviceaccount.com'
-  _AUTH_POLICY: '--allow-unauthenticated'  # Override to --no-allow-unauthenticated for prod
   _MAX_INSTANCES: '10'
   _MIN_INSTANCES: '0'
 

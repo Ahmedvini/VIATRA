@@ -48,11 +48,11 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: backend/package-lock.json
+          cache-dependency-path: backend/package.json
       
       - name: Install backend dependencies
         working-directory: backend
-        run: npm ci
+        run: npm install
       
       - name: Run backend linting
         working-directory: backend
@@ -66,7 +66,7 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/viatra_test
           REDIS_HOST: localhost
           REDIS_PORT: 6379
-          JWT_SECRET: test_jwt_secret_for_ci_pipeline
+          JWT_SECRET: test_jwt_secret_for_github_actions_pipeline_32chars_minimum
       
       - name: Upload backend coverage
         uses: codecov/codecov-action@v3
@@ -147,7 +147,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: backend/package-lock.json
+          cache-dependency-path: backend/package.json
       
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -177,22 +177,14 @@ jobs:
           docker push us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/viatra-repo/backend:${{ github.sha }}
           docker push us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/viatra-repo/backend:latest
       
+      # Deploy to Cloud Run (Terraform manages all infrastructure config - CI only updates image)
       - name: Deploy to Cloud Run
         run: |
           gcloud run deploy viatra-backend-prod \
             --image=us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/viatra-repo/backend:${{ github.sha }} \
             --region=us-central1 \
             --service-account=viatra-cloud-run-prod@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com \
-            --set-env-vars=NODE_ENV=production,ENVIRONMENT=prod,GCP_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }} \
-            --vpc-connector=viatra-connector-prod \
-            --vpc-egress=private-ranges-only \
-            --memory=1Gi \
-            --cpu=2 \
-            --concurrency=100 \
-            --max-instances=20 \
-            --min-instances=2 \
-            --port=8080 \
-            --allow-unauthenticated
+
       
       - name: Build Flutter APK
         working-directory: mobile
@@ -233,7 +225,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: backend/package-lock.json
+          cache-dependency-path: backend/package.json
       
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
@@ -252,19 +244,11 @@ jobs:
           docker build -t us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/viatra-repo/backend:staging-${{ github.sha }} .
           docker push us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/viatra-repo/backend:staging-${{ github.sha }}
       
+      # Deploy to staging (Terraform manages all infrastructure config - CI only updates image)
       - name: Deploy to staging
         run: |
           gcloud run deploy viatra-backend-staging \
             --image=us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/viatra-repo/backend:staging-${{ github.sha }} \
             --region=us-central1 \
             --service-account=viatra-cloud-run-staging@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com \
-            --set-env-vars=NODE_ENV=production,ENVIRONMENT=staging,GCP_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }} \
-            --vpc-connector=viatra-connector-staging \
-            --vpc-egress=private-ranges-only \
-            --memory=512Mi \
-            --cpu=1 \
-            --concurrency=100 \
-            --max-instances=8 \
-            --min-instances=1 \
-            --port=8080 \
-            --allow-unauthenticated
+

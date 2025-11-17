@@ -130,10 +130,9 @@ variable "labels" {
 variable "github_owner" {
   description = "GitHub repository owner/organization name"
   type        = string
-  default     = ""
   validation {
-    condition     = can(regex("^[a-zA-Z0-9._-]*$", var.github_owner))
-    error_message = "GitHub owner must contain only alphanumeric characters, dots, hyphens, and underscores."
+    condition     = length(var.github_owner) > 0 && can(regex("^[a-zA-Z0-9._-]+$", var.github_owner))
+    error_message = "GitHub owner is required and must contain only alphanumeric characters, dots, hyphens, and underscores."
   }
 }
 
@@ -155,4 +154,10 @@ variable "region_suffix" {
     condition     = length(var.region_suffix) <= 3
     error_message = "Region suffix must be 3 characters or less."
   }
+}
+
+variable "enable_cloudbuild_triggers" {
+  description = "Whether Cloud Build triggers should be managed by Terraform. Set to false if managing triggers manually in GCP Console."
+  type        = bool
+  default     = true
 }

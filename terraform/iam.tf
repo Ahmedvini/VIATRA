@@ -92,6 +92,12 @@ resource "google_project_iam_member" "cloud_build_logging_writer" {
   member  = "serviceAccount:${google_service_account.cloud_build.email}"
 }
 
+resource "google_project_iam_member" "cloud_build_service_agent" {
+  project = var.project_id
+  role    = "roles/cloudbuild.serviceAgent"
+  member  = "serviceAccount:${google_service_account.cloud_build.email}"
+}
+
 # Custom IAM role for Cloud Run deployment (more restrictive than run.admin)
 resource "google_project_iam_custom_role" "cloud_run_deployer" {
   role_id     = "viatraCloudRunDeployer${title(var.environment)}"

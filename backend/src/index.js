@@ -55,6 +55,39 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Debug endpoint for environment variable validation (non-production only)
+app.get('/debug/env-check', (req, res) => {
+  // Only enable in development or when explicitly enabled
+  if (config.nodeEnv === 'production' && !process.env.ENABLE_DEBUG_ENDPOINTS) {
+    return res.status(404).json({ error: 'Not found' });
+  }
+
+  const envCheck = {
+    timestamp: new Date().toISOString(),
+    environment: config.nodeEnv,
+    secrets_loaded: {
+      DATABASE_PASSWORD: !!process.env.DATABASE_PASSWORD,
+      REDIS_AUTH: !!process.env.REDIS_AUTH,
+      JWT_SECRET: !!process.env.JWT_SECRET,
+    },
+    database_config: {
+      host_set: !!process.env.DATABASE_HOST,
+      name_set: !!process.env.DATABASE_NAME,
+      user_set: !!process.env.DATABASE_USER,
+    },
+    redis_config: {
+      host_set: !!process.env.REDIS_HOST,
+      port_set: !!process.env.REDIS_PORT,
+    },
+    project_config: {
+      gcp_project_set: !!process.env.GCP_PROJECT_ID,
+      bucket_name_set: !!process.env.GCS_BUCKET_NAME,
+    }
+  };
+
+  res.status(200).json(envCheck);
+});
+
 // API routes (to be added later)
 // app.use('/api/v1', routes);
 

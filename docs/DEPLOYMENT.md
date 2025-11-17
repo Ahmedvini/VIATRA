@@ -179,6 +179,21 @@ chmod +x scripts/deploy.sh
 
 #### Option B: CI/CD Pipeline
 
+##### GitHub Repository Setup
+
+**Prerequisites:**
+1. **GitHub Repository Connection**: Connect your GitHub repository in GCP Console:
+   - Navigate to Cloud Build > Triggers > Connect Repository
+   - Select your GitHub account and authorize access
+   - Choose the repository: `${var.github_owner}/${var.github_repo}` (configured in `terraform/variables.tf`)
+   - Install the Google Cloud Build GitHub app if prompted
+
+2. **Required Terraform Variables**: Ensure these are set in your `terraform.tfvars`:
+   ```hcl
+   github_owner = "your-github-username"
+   github_repo  = "VIATRA"
+   ```
+
 ##### Trigger Service Account Configuration
 
 The Viatra platform uses dedicated service accounts for secure CI/CD operations:
@@ -197,7 +212,7 @@ The Viatra platform uses dedicated service accounts for secure CI/CD operations:
 gcloud builds triggers list --region=${REGION}
 
 # Describe specific trigger
-gcloud builds triggers describe viatra-main-${ENVIRONMENT} --region=${REGION}
+gcloud builds triggers describe viatra-backend-main-${ENVIRONMENT} --region=${REGION}
 
 # Check service account binding
 gcloud iam service-accounts get-iam-policy viatra-cloud-build-${ENVIRONMENT}@${PROJECT_ID}.iam.gserviceaccount.com
@@ -214,7 +229,7 @@ export REGION="us-central1"
 
 # Create trigger with custom service account
 gcloud beta builds triggers create github \
-  --name=viatra-main-${ENVIRONMENT} \
+  --name=viatra-backend-main-${ENVIRONMENT} \
   --repo-name=${REPO_NAME} \
   --repo-owner=${REPO_OWNER} \
   --branch-pattern="^main$" \
@@ -488,8 +503,14 @@ The platform implements a comprehensive secrets management workflow using Google
 
 #### Secret Rotation
 ```bash
-# Rotate secrets (adds new versions while preserving old ones for audit)
+# Rotate script-managed secrets (adds new versions while preserving old ones for audit)
 ./scripts/seed-secrets.sh prod --rotate
+
+# Rotate Terraform-managed secrets (db-password, jwt-secret, redis-auth)
+terraform taint random_password.db_password
+terraform taint random_password.jwt_secret  
+terraform taint random_password.redis_auth
+terraform apply
 ```
 
 #### Access Audit and Monitoring
@@ -502,8 +523,9 @@ gcloud logging read 'resource.type="secret_manager_secret" AND protoPayload.serv
 ```
 
 **Important Notes:**
-- **Auto-generated secrets** (`db-password-*`, `jwt-secret-*`, `redis-auth-*`) are excluded from backups as they can be regenerated
+- **Terraform-managed secrets** (`db-password-*`, `jwt-secret-*`, `redis-auth-*`) are excluded from backups as they can be regenerated via Terraform
 - **Operational secrets** include API keys, OAuth configs, SSL certificates, and manually configured values
+- The `seed-secrets.sh` script does not modify Terraform-managed secrets to prevent configuration conflicts
 - All backup operations create encrypted files safe for off-site storage
 - Use Cloud Audit Logs to monitor secret access patterns and detect unauthorized usage
 
@@ -533,15 +555,15 @@ terraform apply -var-file="terraform.tfvars" -target=previous_state
 
 ### Infrastructure vs. Application Deployment
 
-The Viatra platform uses a **hybrid deployment model**:
-- **Terraform manages**: Infrastructure (VPC, scaling, env vars, IAM, service definitions)
-- **CI/CD manages**: Application runtime (container images, revisions, traffic)
+The Viatra platform uses a **Terraform-first deployment model**:
+- **Terraform manages**: All infrastructure configuration (CPU, memory, scaling, VPC, env vars, IAM policies, authentication settings, service definitions)
+- **CI/CD manages**: Only application images and traffic routing (no authentication flags or infrastructure config)
 
-### Cloud Run Image Management
+### Cloud Run Configuration Management
 
-**Problem**: Terraform defines Cloud Run with placeholder image, but CI/CD deploys actual images, causing state drift.
+**Ownership Model**: Terraform owns all runtime configuration to maintain declarative infrastructure.
 
-**Solution**: The Cloud Run service uses `lifecycle.ignore_changes` to ignore image updates:
+**Solution**: The Cloud Run service uses `lifecycle.ignore_changes` to ignore only image and traffic updates:
 
 ```hcl
 lifecycle {
@@ -555,11 +577,26 @@ lifecycle {
 ### When to Use Each Method
 
 **Use `terraform apply` for:**
-- Environment variables or secrets
+- Environment variables (NODE_ENV, ENVIRONMENT, GCP_PROJECT_ID, etc.)
+- Secret Manager integration 
 - Scaling configuration (min/max instances) 
 - VPC or networking changes
-- IAM permissions
+- CPU and memory limits
+- Concurrency settings
+- Any infrastructure configuration
+
+**Use Cloud Build/CI/CD for:**
+- Container image updates only
+- Traffic routing between revisions
+
+> **Important**: The Cloud Build deployment step (`cloudbuild.yaml` Step 6) deliberately omits all infrastructure flags including `--memory`, `--cpu`, `--vpc-connector`, `--allow-unauthenticated`, etc. These are managed exclusively by Terraform to prevent configuration drift. IAM policies and authentication settings are controlled by Terraform-managed `google_cloud_run_service_iam_binding` resources.
+
+### Verifying No Configuration Drift
+
+After a CI/CD build completes, verify Terraform maintains configuration ownership:
+- IAM permissions and authentication policies
 - Resource limits (CPU, memory)
+- Environment variables and runtime configuration
 
 **Use CI/CD (`git push`) for:**
 - Application code deployments
@@ -570,11 +607,13 @@ lifecycle {
 ### Validation Commands
 
 ```bash
-# Check for configuration drift
-terraform plan -var-file="terraform.tfvars"
+# Verify no configuration drift after CI/CD build
+terraform plan -var-file="terraform.tfvars"  # Should show no changes
 
-# Verify deployment
-gcloud run services describe viatra-backend-${ENVIRONMENT} --region=${REGION}
+# Verify Terraform-managed configuration remains intact
+gcloud run services describe viatra-backend-${ENVIRONMENT} --region=${REGION} \
+  --format="value(spec.template.spec.containerConcurrency,spec.template.spec.containers[0].resources.limits.memory)" 
+# Should match Terraform values (e.g., 100, 512Mi)
 
 # Check health
 curl https://viatra-backend-${ENVIRONMENT}-uc.a.run.app/health

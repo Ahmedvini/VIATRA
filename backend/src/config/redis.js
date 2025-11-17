@@ -6,19 +6,8 @@ let client = null;
 
 // Create Redis client
 const createRedisClient = () => {
-  const clientConfig = {
-    socket: {
-      host: config.redis.host,
-      port: config.redis.port,
-      connectTimeout: 10000,
-      lazyConnect: true
-    },
-    password: config.redis.auth || undefined,
-    database: config.redis.database
-  };
-  
-  // Retry strategy
-  clientConfig.socket.reconnectStrategy = (retries) => {
+  // Define reconnect strategy function
+  const reconnectStrategy = (retries) => {
     if (retries >= 10) {
       logger.error('Redis: Too many retry attempts, giving up');
       return new Error('Too many retry attempts');
@@ -27,6 +16,18 @@ const createRedisClient = () => {
     const delay = Math.min(retries * 100, 3000);
     logger.warn(`Redis: Retrying connection in ${delay}ms (attempt ${retries + 1})`);
     return delay;
+  };
+
+  const clientConfig = {
+    socket: {
+      host: config.redis.host,
+      port: config.redis.port,
+      connectTimeout: 10000,
+      lazyConnect: true,
+      reconnectStrategy: reconnectStrategy
+    },
+    password: config.redis.auth || undefined,
+    database: config.redis.database
   };
   
   return createClient(clientConfig);
