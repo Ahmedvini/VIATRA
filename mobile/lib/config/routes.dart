@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
+import '../screens/auth/login_screen.dart';
+import '../screens/auth/role_selection_screen.dart';
+import '../screens/auth/registration_form_screen.dart';
+import '../screens/auth/verification_pending_screen.dart';
 
 /// Application router configuration
 class AppRouter {
@@ -18,26 +24,29 @@ class AppRouter {
       
       // Authentication routes
       GoRoute(
-        path: '/auth',
-        name: 'auth',
-        builder: (context, state) => const AuthScreen(),
-        routes: [
-          GoRoute(
-            path: '/login',
-            name: 'login',
-            builder: (context, state) => const LoginScreen(),
-          ),
-          GoRoute(
-            path: '/register',
-            name: 'register',
-            builder: (context, state) => const RegisterScreen(),
-          ),
-          GoRoute(
-            path: '/forgot-password',
-            name: 'forgot-password',
-            builder: (context, state) => const ForgotPasswordScreen(),
-          ),
-        ],
+        path: '/auth/login',
+        name: 'login',
+        builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: '/auth/role-selection',
+        name: 'role-selection',
+        builder: (context, state) => const RoleSelectionScreen(),
+      ),
+      GoRoute(
+        path: '/auth/registration',
+        name: 'registration',
+        builder: (context, state) => const RegistrationFormScreen(),
+      ),
+      GoRoute(
+        path: '/auth/verification-pending',
+        name: 'verification-pending',
+        builder: (context, state) => const VerificationPendingScreen(),
+      ),
+      GoRoute(
+        path: '/auth/forgot-password',
+        name: 'forgot-password',
+        builder: (context, state) => const ForgotPasswordScreen(),
       ),
       
       // Main app routes
@@ -67,8 +76,20 @@ class AppRouter {
     
     // Redirect logic for authentication
     redirect: (context, state) {
-      // TODO: Implement authentication redirect logic
-      // This is a placeholder for future authentication checks
+      final authProvider = context.read<AuthProvider>();
+      final isAuthenticated = authProvider.isAuthenticated;
+      final isAuthRoute = state.matchedLocation.startsWith('/auth');
+      
+      // If not authenticated and trying to access protected routes
+      if (!isAuthenticated && !isAuthRoute && state.matchedLocation != '/') {
+        return '/auth/login';
+      }
+      
+      // If authenticated and trying to access auth routes
+      if (isAuthenticated && isAuthRoute) {
+        return '/home';
+      }
+      
       return null;
     },
   );
@@ -82,6 +103,16 @@ class SplashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Auto-navigate after checking auth state
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final authProvider = context.read<AuthProvider>();
+      if (authProvider.isAuthenticated) {
+        context.go('/home');
+      } else {
+        context.go('/auth/login');
+      }
+    });
+
     return const Scaffold(
       body: Center(
         child: Column(
@@ -92,55 +123,6 @@ class SplashScreen extends StatelessWidget {
             Text('Loading Viatra Health...'),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class AuthScreen extends StatelessWidget {
-  const AuthScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Authentication')),
-      body: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('Authentication Screen'),
-            SizedBox(height: 16),
-            // TODO: Add authentication UI
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
-      body: const Center(
-        child: Text('Login Screen - TODO: Implement'),
-      ),
-    );
-  }
-}
-
-class RegisterScreen extends StatelessWidget {
-  const RegisterScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Register')),
-      body: const Center(
-        child: Text('Register Screen - TODO: Implement'),
       ),
     );
   }

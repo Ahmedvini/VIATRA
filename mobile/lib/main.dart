@@ -8,9 +8,12 @@ import 'config/app_config.dart';
 import 'config/theme.dart';
 import 'config/routes.dart';
 import 'providers/auth_provider.dart';
+import 'providers/registration_provider.dart';
 import 'providers/theme_provider.dart';
 import 'providers/locale_provider.dart';
 import 'services/api_service.dart';
+import 'services/auth_service.dart';
+import 'services/verification_service.dart';
 import 'services/storage_service.dart';
 import 'services/navigation_service.dart';
 import 'utils/error_handler.dart';
@@ -77,6 +80,14 @@ class ViatraApp extends StatelessWidget {
           create: (_) => NavigationService(),
         ),
         
+        // Auth services
+        ProxyProvider<ApiService, AuthService>(
+          update: (_, apiService, __) => AuthService(apiService),
+        ),
+        ProxyProvider<ApiService, VerificationService>(
+          update: (_, apiService, __) => VerificationService(apiService),
+        ),
+        
         // State providers
         ChangeNotifierProvider<ThemeProvider>(
           create: (_) => ThemeProvider(),
@@ -84,11 +95,37 @@ class ViatraApp extends StatelessWidget {
         ChangeNotifierProvider<LocaleProvider>(
           create: (_) => LocaleProvider(),
         ),
-        ChangeNotifierProvider<AuthProvider>(
+        ChangeNotifierProxyProvider3<AuthService, StorageService, ApiService, AuthProvider>(
           create: (context) => AuthProvider(
-            apiService: context.read<ApiService>(),
+            authService: context.read<AuthService>(),
             storageService: context.read<StorageService>(),
+            apiService: context.read<ApiService>(),
           ),
+          update: (_, authService, storageService, apiService, previous) =>
+              previous ?? AuthProvider(
+                authService: authService,
+                storageService: storageService,
+                apiService: apiService,
+              ),
+        ),
+        ChangeNotifierProxyProvider3<AuthService, VerificationService, AuthProvider, RegistrationProvider>(
+          create: (context) {
+            final provider = RegistrationProvider(
+              context.read<AuthService>(),
+              context.read<VerificationService>(),
+            );
+            provider.setAuthProvider(context.read<AuthProvider>());
+            return provider;
+          },
+          update: (_, authService, verificationService, authProvider, previous) {
+            if (previous != null) {
+              previous.setAuthProvider(authProvider);
+              return previous;
+            }
+            final provider = RegistrationProvider(authService, verificationService);
+            provider.setAuthProvider(authProvider);
+            return provider;
+          },
         ),
       ],
       child: Consumer3<ThemeProvider, LocaleProvider, AuthProvider>(
