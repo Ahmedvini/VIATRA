@@ -1,5 +1,7 @@
 import pkg from 'pg';
+import { Sequelize } from 'sequelize';
 import config from './index.js';
+import dbConfig from './database.config.js';
 import logger from './logger.js';
 
 const { Pool } = pkg;
@@ -140,6 +142,50 @@ export const checkDatabaseHealth = async () => {
       status: 'unhealthy',
       error: error.message
     };
+  }
+};
+
+// Sequelize instance
+let sequelize = null;
+
+// Initialize Sequelize
+export const initializeSequelize = async () => {
+  try {
+    const environment = process.env.NODE_ENV || 'development';
+    const sequelizeConfig = dbConfig[environment];
+    
+    sequelize = new Sequelize(
+      sequelizeConfig.database,
+      sequelizeConfig.username,
+      sequelizeConfig.password,
+      sequelizeConfig
+    );
+    
+    // Test the connection
+    await sequelize.authenticate();
+    logger.info('Sequelize connection established successfully');
+    
+    return sequelize;
+  } catch (error) {
+    logger.error('Unable to connect to the database via Sequelize:', error);
+    throw error;
+  }
+};
+
+// Get Sequelize instance
+export const getSequelize = () => {
+  if (!sequelize) {
+    throw new Error('Sequelize not initialized. Call initializeSequelize() first.');
+  }
+  return sequelize;
+};
+
+// Close Sequelize connection
+export const closeSequelize = async () => {
+  if (sequelize) {
+    await sequelize.close();
+    sequelize = null;
+    logger.info('Sequelize connection closed');
   }
 };
 

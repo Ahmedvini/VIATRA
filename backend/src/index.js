@@ -6,10 +6,11 @@ import compression from 'compression';
 import rateLimit from 'express-rate-limit';
 
 import config, { initConfig } from './config/index.js';
-import { connectDatabase, disconnectDatabase } from './config/database.js';
+import { connectDatabase, disconnectDatabase, initializeSequelize, closeSequelize } from './config/database.js';
 import { connectRedis, disconnectRedis } from './config/redis.js';
 import logger, { requestLogger } from './config/logger.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
+import { authenticate, authorize } from './middleware/auth.js';
 
 const app = express();
 
@@ -88,8 +89,9 @@ app.get('/debug/env-check', (req, res) => {
   res.status(200).json(envCheck);
 });
 
-// API routes (to be added later)
-// app.use('/api/v1', routes);
+// Import and mount API routes
+import apiRoutes from './routes/index.js';
+app.use('/api/v1', apiRoutes);
 
 // 404 handler
 app.use(notFoundHandler);
@@ -102,6 +104,7 @@ const gracefulShutdown = async (signal) => {
   logger.info(`Received ${signal}. Starting graceful shutdown...`);
   
   try {
+    await closeSequelize();
     await disconnectDatabase();
     await disconnectRedis();
     logger.info('Graceful shutdown completed');
@@ -137,6 +140,9 @@ const startServer = async () => {
     // Connect to database and Redis
     await connectDatabase();
     await connectRedis();
+    
+    // Initialize Sequelize ORM
+    await initializeSequelize();
     
     // Start HTTP server
     const server = app.listen(config.port, '0.0.0.0', () => {

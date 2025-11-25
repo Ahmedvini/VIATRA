@@ -135,17 +135,315 @@ GET /health
 
 Returns server health status and basic information.
 
-### API Endpoints
+### Authentication API
 
-All API endpoints are prefixed with `/api/v1`:
+All authentication endpoints are prefixed with `/api/v1/auth`:
 
-- `POST /api/v1/auth/register` - User registration
-- `POST /api/v1/auth/login` - User login
-- `POST /api/v1/auth/refresh` - Refresh JWT token
-- `GET /api/v1/users/profile` - Get user profile
-- `PUT /api/v1/users/profile` - Update user profile
+#### Register User
+```
+POST /api/v1/auth/register
+Content-Type: application/json
 
-(Full API documentation will be available via Swagger/OpenAPI)
+{
+  "email": "user@example.com",
+  "password": "SecurePass123!",
+  "firstName": "John",
+  "lastName": "Doe",
+  "phone": "+1234567890",
+  "role": "patient"  // or "doctor", "admin"
+}
+
+// Doctor-specific additional fields:
+{
+  ...baseFields,
+  "role": "doctor",
+  "licenseNumber": "MD123456",
+  "specialty": "Cardiology",
+  "title": "Dr.",
+  "npiNumber": "1234567890",
+  "education": "Harvard Medical School",
+  "consultationFee": 150.00
+}
+```
+
+Rate limit: 3 requests per hour per IP
+
+#### Login
+```
+POST /api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "SecurePass123!",
+  "remember": true  // optional, extends token life
+}
+```
+
+Rate limit: 5 requests per 15 minutes per IP (failed attempts only)
+
+#### Logout
+```
+POST /api/v1/auth/logout
+Authorization: Bearer <access_token>
+```
+
+#### Refresh Token
+```
+POST /api/v1/auth/refresh-token
+Content-Type: application/json
+
+{
+  "refreshToken": "<refresh_token>"
+}
+```
+
+Rate limit: 10 requests per 5 minutes per IP
+
+#### Verify Email
+```
+POST /api/v1/auth/verify-email
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "code": "123456"
+}
+```
+
+Rate limit: 3 requests per 5 minutes per IP
+
+#### Request Password Reset
+```
+POST /api/v1/auth/request-password-reset
+Content-Type: application/json
+
+{
+  "email": "user@example.com"
+}
+```
+
+Rate limit: 3 requests per hour per IP
+
+#### Reset Password
+```
+POST /api/v1/auth/reset-password
+Content-Type: application/json
+
+{
+  "token": "<reset_token>",
+  "newPassword": "NewSecurePass123!"
+}
+```
+
+Rate limit: 3 requests per hour per IP
+
+#### Get Current User
+```
+GET /api/v1/auth/me
+Authorization: Bearer <access_token>
+```
+
+#### Validate Token
+```
+GET /api/v1/auth/validate-token
+Authorization: Bearer <access_token>
+```
+
+### Verification API
+
+All verification endpoints are prefixed with `/api/v1/verification`:
+
+#### Submit Document
+```
+POST /api/v1/verification/submit
+Authorization: Bearer <access_token>
+Content-Type: multipart/form-data
+Roles: doctor, admin
+
+Form fields:
+- file: <document_file>
+- documentType: medical_license | board_certification | education_certificate | identification | malpractice_insurance
+- description: "Optional description"
+```
+
+Rate limit: 10 requests per hour per IP
+
+#### Get Document Status
+```
+GET /api/v1/verification/document/:documentId
+Authorization: Bearer <access_token>
+```
+
+#### Get User Verification Status
+```
+GET /api/v1/verification/status
+Authorization: Bearer <access_token>
+```
+
+#### Update Document Status (Admin Only)
+```
+PATCH /api/v1/verification/document/:documentId/status
+Authorization: Bearer <access_token>
+Content-Type: application/json
+Roles: admin
+
+{
+  "status": "approved",  // or "rejected", "pending"
+  "comments": "Optional admin comments"
+}
+```
+
+Rate limit: 50 requests per 5 minutes per IP
+
+#### Resend Verification Email
+```
+POST /api/v1/verification/resend-email
+Authorization: Bearer <access_token>
+```
+
+Rate limit: 2 requests per 15 minutes per IP
+
+#### Get Pending Verifications (Admin Only)
+```
+GET /api/v1/verification/pending
+Authorization: Bearer <access_token>
+Roles: admin
+Query parameters:
+- page: 1 (optional)
+- limit: 20 (optional)
+- documentType: medical_license (optional)
+- userId: user_id (optional)
+```
+
+#### Bulk Update Documents (Admin Only)
+```
+POST /api/v1/verification/bulk-update
+Authorization: Bearer <access_token>
+Content-Type: application/json
+Roles: admin
+
+{
+  "documentIds": ["doc1", "doc2", "doc3"],
+  "status": "approved",
+  "comments": "Batch approval"
+}
+```
+
+#### Get Verification Statistics (Admin Only)
+```
+GET /api/v1/verification/stats
+Authorization: Bearer <access_token>
+Roles: admin
+```
+
+### cURL Examples
+
+#### Register a new patient
+```bash
+curl -X POST http://localhost:8080/api/v1/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "patient@example.com",
+    "password": "SecurePass123!",
+    "firstName": "John",
+    "lastName": "Doe",
+    "phone": "+1234567890",
+    "role": "patient"
+  }'
+```
+
+#### Login
+```bash
+curl -X POST http://localhost:8080/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "patient@example.com",
+    "password": "SecurePass123!"
+  }'
+```
+
+#### Upload verification document
+```bash
+curl -X POST http://localhost:8080/api/v1/verification/submit \
+  -H "Authorization: Bearer <your_access_token>" \
+  -F "file=@/path/to/license.pdf" \
+  -F "documentType=medical_license" \
+  -F "description=Medical license for verification"
+```
+
+#### Get current user profile
+```bash
+curl -X GET http://localhost:8080/api/v1/auth/me \
+  -H "Authorization: Bearer <your_access_token>"
+```
+
+### Response Format
+
+All API responses follow a consistent format:
+
+```json
+{
+  "message": "Success message",
+  "data": {
+    // Response data
+  },
+  "pagination": {  // Only for paginated responses
+    "page": 1,
+    "limit": 20,
+    "total": 100,
+    "pages": 5
+  }
+}
+```
+
+### Error Format
+
+```json
+{
+  "error": "Error type",
+  "message": "Human readable error message",
+  "details": [  // Only for validation errors
+    {
+      "field": "email",
+      "message": "Email is required"
+    }
+  ]
+}
+```
+
+### Rate Limits
+
+Rate limits are enforced per IP address. When exceeded, the API returns:
+
+```json
+{
+  "error": "Too many requests",
+  "message": "Rate limit exceeded. Try again later.",
+  "retryAfter": 300
+}
+```
+
+### File Upload Limits
+
+- **Max file size**: 10MB
+- **Allowed types**: JPEG, PNG, PDF
+- **Storage**: Google Cloud Storage
+- **Security**: Files are scanned and validated before storage
+
+### Authentication Flow
+
+1. **Register** → Email verification required
+2. **Login** → Receive access token (15 min) & refresh token (7 days)
+3. **Access APIs** → Use access token in Authorization header
+4. **Token expires** → Use refresh token to get new access token
+5. **Refresh expires** → Re-login required
+
+### Role-Based Access Control (RBAC)
+
+- **Patient**: Basic profile access, appointment booking
+- **Doctor**: Patient management, verification document upload, profile management
+- **Admin**: All doctor permissions + user management, verification approval, system stats
 
 ## Environment Variables
 
@@ -288,11 +586,37 @@ Log files are stored in the `logs/` directory:
 
 ### Migrations
 
-Database migrations will be managed through a dedicated migration system:
+Database migrations are managed through Sequelize CLI:
 
 ```bash
-npm run migrate
+# Run all pending migrations
+npm run db:migrate
+
+# Undo the last migration
+npm run db:migrate:undo
+
+# Undo all migrations
+npm run db:migrate:undo:all
+
+# Seed the database with sample data
+npm run db:seed
+
+# Undo all seeders
+npm run db:seed:undo
+
+# Reset database (undo all migrations, run all migrations, run all seeders)
+npm run db:reset
 ```
+
+### Database Schema
+
+The application uses a doctor/patient-centric schema with the following core models:
+- **Users** - Base user authentication and profile data
+- **Doctors** - Doctor-specific information (specialties, licenses, schedules)
+- **Patients** - Patient demographics and contact information  
+- **Appointments** - Scheduled consultations between doctors and patients
+- **HealthProfiles** - Patient medical history, allergies, medications
+- **Verifications** - Document verification for professional credentials
 
 ### Connection Pooling
 

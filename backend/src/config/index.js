@@ -60,6 +60,15 @@ const fileUpload = {
     ['image/jpeg', 'image/png', 'image/gif', 'application/pdf']
 };
 
+// Email configuration
+const email = {
+  from: process.env.EMAIL_FROM || process.env.SMTP_USER || 'noreply@viatra.health',
+  fromName: process.env.EMAIL_FROM_NAME || 'Viatra Health',
+  replyTo: process.env.EMAIL_REPLY_TO || 'support@viatra.health',
+  verificationCodeExpiry: parseInt(process.env.VERIFICATION_CODE_EXPIRY, 10) || 86400000, // 24 hours
+  resetTokenExpiry: parseInt(process.env.RESET_TOKEN_EXPIRY, 10) || 3600000 // 1 hour
+};
+
 // Third-party integrations configuration
 const integrations = {
   stripe: {
@@ -161,6 +170,7 @@ const config = {
   cors,
   rateLimit,
   fileUpload,
+  email,
   integrations
 };
 
