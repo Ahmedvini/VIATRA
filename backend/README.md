@@ -150,7 +150,7 @@ Content-Type: application/json
   "firstName": "John",
   "lastName": "Doe",
   "phone": "+1234567890",
-  "role": "patient"  // or "doctor", "admin"
+  "role": "patient"  // or "doctor", "hospital", "pharmacy", "admin"
 }
 
 // Doctor-specific additional fields:
@@ -443,7 +443,9 @@ Rate limits are enforced per IP address. When exceeded, the API returns:
 
 - **Patient**: Basic profile access, appointment booking
 - **Doctor**: Patient management, verification document upload, profile management
-- **Admin**: All doctor permissions + user management, verification approval, system stats
+- **Hospital**: Institution profile management, verification document upload, staff management
+- **Pharmacy**: Pharmacy profile management, verification document upload, medication management
+- **Admin**: All permissions + user management, verification approval, system stats
 
 ## Environment Variables
 

@@ -69,6 +69,11 @@ const email = {
   resetTokenExpiry: parseInt(process.env.RESET_TOKEN_EXPIRY, 10) || 3600000 // 1 hour
 };
 
+// Frontend configuration
+const frontend = {
+  url: process.env.FRONTEND_URL || 'http://localhost:3000'
+};
+
 // Third-party integrations configuration
 const integrations = {
   stripe: {
@@ -171,6 +176,7 @@ const config = {
   rateLimit,
   fileUpload,
   email,
+  frontend,
   integrations
 };
 

@@ -1,14 +1,12 @@
 import {
-  submitDocument,
-  getDocumentStatus,
+  uploadVerificationDocument,
   getVerificationStatus,
-  updateDocumentStatus,
+  approveVerification,
+  rejectVerification,
   resendVerificationEmail,
-  getPendingVerifications,
-  bulkUpdateStatus
+  getPendingVerifications
 } from '../services/verificationService.js';
-import { validateSubmitDocument, validateUpdateStatus } from '../utils/validators.js';
-import { uploadSingle } from '../utils/fileUpload.js';
+import { uploadFileToGCS } from '../utils/fileUpload.js';
 import logger from '../config/logger.js';
 
 /**

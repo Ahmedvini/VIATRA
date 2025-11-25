@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import { sendVerificationEmail, sendPasswordResetEmail, sendWelcomeEmail } from '../utils/email.js';
-import { generateTokens, verifyToken, validateTokenType } from '../utils/jwt.js';
+import { generateTokens, verifyToken, validateTokenType, decodeToken } from '../utils/jwt.js';
 import { createSession, getSession, deleteSession, updateSession } from './sessionService.js';
 import initModels from '../models/index.js';
 import logger from '../config/logger.js';
@@ -115,8 +115,8 @@ export const registerUser = async (userData) => {
       role: result.user.role
     });
     
-    // Create session with access token
-    await createSession(tokens.accessToken, {
+    // Prepare session payload
+    const sessionPayload = {
       userId: result.user.id,
       email: result.user.email,
       role: result.user.role,
@@ -124,7 +124,32 @@ export const registerUser = async (userData) => {
       lastName: result.user.last_name,
       isActive: result.user.is_active,
       emailVerified: result.user.email_verified
-    });
+    };
+    
+    // Decode tokens to get expiration dates
+    const accessTokenDecoded = decodeToken(tokens.accessToken);
+    const refreshTokenDecoded = decodeToken(tokens.refreshToken);
+    
+    const accessTokenExpiration = accessTokenDecoded ? new Date(accessTokenDecoded.exp * 1000) : null;
+    const refreshTokenExpiration = refreshTokenDecoded ? new Date(refreshTokenDecoded.exp * 1000) : null;
+    
+    // Create session for access token
+    await createSession(
+      tokens.accessToken, 
+      sessionPayload, 
+      false, 
+      'access', 
+      accessTokenExpiration
+    );
+    
+    // Create session for refresh token
+    await createSession(
+      tokens.refreshToken, 
+      sessionPayload, 
+      true, 
+      'refresh', 
+      refreshTokenExpiration
+    );
     
     logger.info('User registered successfully', {
       userId: result.user.id,
@@ -200,8 +225,8 @@ export const loginUser = async (email, password, rememberMe = false) => {
       role: user.role
     });
     
-    // Create session with access token
-    await createSession(tokens.accessToken, {
+    // Prepare session payload
+    const sessionPayload = {
       userId: user.id,
       email: user.email,
       role: user.role,
@@ -209,7 +234,32 @@ export const loginUser = async (email, password, rememberMe = false) => {
       lastName: user.last_name,
       isActive: user.is_active,
       emailVerified: user.email_verified
-    }, rememberMe);
+    };
+    
+    // Decode tokens to get expiration dates
+    const accessTokenDecoded = decodeToken(tokens.accessToken);
+    const refreshTokenDecoded = decodeToken(tokens.refreshToken);
+    
+    const accessTokenExpiration = accessTokenDecoded ? new Date(accessTokenDecoded.exp * 1000) : null;
+    const refreshTokenExpiration = refreshTokenDecoded ? new Date(refreshTokenDecoded.exp * 1000) : null;
+    
+    // Create session for access token
+    await createSession(
+      tokens.accessToken, 
+      sessionPayload, 
+      rememberMe, 
+      'access', 
+      accessTokenExpiration
+    );
+    
+    // Create session for refresh token
+    await createSession(
+      tokens.refreshToken, 
+      sessionPayload, 
+      true, 
+      'refresh', 
+      refreshTokenExpiration
+    );
     
     // Update last login time
     await user.update({

@@ -11,6 +11,7 @@ import {
   getVerificationStats
 } from '../controllers/verificationController.js';
 import { authenticate, authorize } from '../middleware/auth.js';
+import { uploadSingle } from '../utils/fileUpload.js';
 
 const router = express.Router();
 
@@ -59,8 +60,9 @@ const adminActionLimiter = rateLimit({
  */
 router.post('/submit',
   authenticate,
-  authorize('doctor', 'admin'),
+  authorize('doctor', 'hospital', 'pharmacy', 'admin'),
   documentUploadLimiter,
+  uploadSingle('document'),
   submitDocumentForVerification
 );
 
@@ -162,7 +164,7 @@ router.get('/stats',
  */
 router.post('/upload-document',
   authenticate,
-  authorize('doctor', 'admin'),
+  authorize('doctor', 'hospital', 'pharmacy', 'admin'),
   documentUploadLimiter,
   (req, res, next) => {
     // Redirect to the new submit endpoint

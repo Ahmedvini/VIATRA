@@ -37,22 +37,12 @@ export const authenticate = async (req, res, next) => {
     // First, verify JWT token
     let decodedToken;
     try {
-      const jwtResult = verifyToken(token);
-      if (!jwtResult.valid) {
-        logger.warn('JWT verification failed', { 
-          error: jwtResult.error,
-          token: token.substring(0, 8) + '...'
-        });
-        
-        return res.status(401).json({
-          error: 'Invalid token',
-          message: jwtResult.error || 'Token verification failed'
-        });
-      }
-      
-      decodedToken = jwtResult.decoded;
+      decodedToken = verifyToken(token);
     } catch (jwtError) {
-      logger.error('JWT verification error:', jwtError);
+      logger.warn('JWT verification failed', { 
+        error: jwtError.message,
+        token: token.substring(0, 8) + '...'
+      });
       
       if (jwtError.name === 'TokenExpiredError') {
         return res.status(401).json({
@@ -217,10 +207,7 @@ export const optionalAuthenticate = async (req, res, next) => {
     // Try to verify JWT token
     let decodedToken;
     try {
-      const jwtResult = verifyToken(token);
-      if (jwtResult.valid) {
-        decodedToken = jwtResult.decoded;
-      }
+      decodedToken = verifyToken(token);
     } catch (jwtError) {
       // JWT verification failed, continue without authentication
       logger.debug('Optional authentication: JWT verification failed', { error: jwtError.message });

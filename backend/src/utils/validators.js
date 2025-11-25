@@ -70,10 +70,10 @@ export const registerSchema = Joi.object({
   phone: phoneSchema.optional(),
   
   role: Joi.string()
-    .valid('patient', 'doctor')
+    .valid('patient', 'doctor', 'hospital', 'pharmacy', 'admin')
     .required()
     .messages({
-      'any.only': 'Role must be either patient or doctor',
+      'any.only': 'Role must be one of: patient, doctor, hospital, pharmacy, admin',
       'any.required': 'Role is required'
     }),
   

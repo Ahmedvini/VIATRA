@@ -3,7 +3,7 @@ import config from '../config/index.js';
 import logger from '../config/logger.js';
 
 // Initialize SendGrid
-sgMail.setApiKey(config.sendgrid.apiKey);
+sgMail.setApiKey(config.integrations.sendgrid.apiKey);
 
 /**
  * Send email verification code

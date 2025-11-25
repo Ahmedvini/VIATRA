@@ -68,6 +68,7 @@ export const generateTokens = (payload) => {
  * Verify JWT token
  * @param {string} token - JWT token to verify
  * @returns {Object} - Decoded token payload
+ * @throws {TokenExpiredError|JsonWebTokenError|NotBeforeError} - JWT-specific errors
  */
 export const verifyToken = (token) => {
   try {
@@ -78,16 +79,15 @@ export const verifyToken = (token) => {
     
     return decoded;
   } catch (error) {
-    if (error.name === 'TokenExpiredError') {
-      throw new Error('Token has expired');
-    } else if (error.name === 'JsonWebTokenError') {
-      throw new Error('Invalid token');
-    } else if (error.name === 'NotBeforeError') {
-      throw new Error('Token not active yet');
+    // Re-throw original jsonwebtoken errors to preserve error types
+    if (error.name === 'TokenExpiredError' || 
+        error.name === 'JsonWebTokenError' || 
+        error.name === 'NotBeforeError') {
+      throw error;
     }
     
     logger.error('Token verification error:', error);
-    throw new Error('Token verification failed');
+    throw error;
   }
 };
 

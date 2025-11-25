@@ -5,19 +5,19 @@ import {
   login,
   logout,
   refreshToken,
-  verifyEmail,
-  requestPasswordReset,
-  resetPassword,
+  verifyEmailHandler,
+  requestPasswordResetHandler,
+  resetPasswordHandler,
   getCurrentUser
 } from '../controllers/authController.js';
 import {
-  validateRegister,
-  validateLogin,
-  validateEmailVerification,
-  validatePasswordResetRequest,
-  validatePasswordReset,
-  validateRefreshToken,
-  validationMiddleware
+  registerSchema,
+  loginSchema,
+  emailVerificationSchema,
+  passwordResetRequestSchema,
+  passwordResetSchema,
+  refreshTokenSchema,
+  validate
 } from '../utils/validators.js';
 import { authenticate } from '../middleware/auth.js';
 
@@ -91,7 +91,7 @@ const refreshTokenLimiter = rateLimit({
  */
 router.post('/register', 
   registerLimiter,
-  validationMiddleware(validateRegister),
+  validate(registerSchema),
   register
 );
 
@@ -103,7 +103,7 @@ router.post('/register',
  */
 router.post('/login',
   loginLimiter,
-  validationMiddleware(validateLogin),
+  validate(loginSchema),
   login
 );
 
@@ -126,7 +126,7 @@ router.post('/logout',
  */
 router.post('/refresh-token',
   refreshTokenLimiter,
-  validationMiddleware(validateRefreshToken),
+  validate(refreshTokenSchema),
   refreshToken
 );
 
@@ -138,8 +138,8 @@ router.post('/refresh-token',
  */
 router.post('/verify-email',
   emailVerificationLimiter,
-  validationMiddleware(validateEmailVerification),
-  verifyEmail
+  validate(emailVerificationSchema),
+  verifyEmailHandler
 );
 
 /**
@@ -150,8 +150,8 @@ router.post('/verify-email',
  */
 router.post('/request-password-reset',
   passwordResetLimiter,
-  validationMiddleware(validatePasswordResetRequest),
-  requestPasswordReset
+  validate(passwordResetRequestSchema),
+  requestPasswordResetHandler
 );
 
 /**
@@ -162,8 +162,8 @@ router.post('/request-password-reset',
  */
 router.post('/reset-password',
   passwordResetLimiter,
-  validationMiddleware(validatePasswordReset),
-  resetPassword
+  validate(passwordResetSchema),
+  resetPasswordHandler
 );
 
 /**
