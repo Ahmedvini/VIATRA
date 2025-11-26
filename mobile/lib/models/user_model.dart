@@ -1,3 +1,6 @@
+import 'doctor_model.dart';
+import 'patient_model.dart';
+
 enum UserRole { patient, doctor, hospital, pharmacy }
 
 class User {
@@ -11,6 +14,11 @@ class User {
   final bool emailVerified;
   final DateTime createdAt;
   final DateTime updatedAt;
+  
+  // Role profile fields
+  final Doctor? doctorProfile;
+  final Patient? patientProfile;
+  final UserRole? activeRole;
 
   User({
     required this.id,
@@ -23,6 +31,9 @@ class User {
     required this.emailVerified,
     required this.createdAt,
     required this.updatedAt,
+    this.doctorProfile,
+    this.patientProfile,
+    this.activeRole,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -37,6 +48,15 @@ class User {
       emailVerified: json['emailVerified'] ?? json['email_verified'] ?? false,
       createdAt: _parseDateTime(json['createdAt'] ?? json['created_at']),
       updatedAt: _parseDateTime(json['updatedAt'] ?? json['updated_at']),
+      doctorProfile: json['doctorProfile'] != null 
+          ? Doctor.fromJson(json['doctorProfile']) 
+          : null,
+      patientProfile: json['patientProfile'] != null 
+          ? Patient.fromJson(json['patientProfile']) 
+          : null,
+      activeRole: json['activeRole'] != null 
+          ? _parseRole(json['activeRole']) 
+          : null,
     );
   }
 
@@ -52,6 +72,9 @@ class User {
       'emailVerified': emailVerified,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
+      if (doctorProfile != null) 'doctorProfile': doctorProfile!.toJson(),
+      if (patientProfile != null) 'patientProfile': patientProfile!.toJson(),
+      if (activeRole != null) 'activeRole': _roleToString(activeRole!),
     };
   }
 
@@ -66,6 +89,9 @@ class User {
     bool? emailVerified,
     DateTime? createdAt,
     DateTime? updatedAt,
+    Doctor? doctorProfile,
+    Patient? patientProfile,
+    UserRole? activeRole,
   }) {
     return User(
       id: id ?? this.id,
@@ -78,10 +104,43 @@ class User {
       emailVerified: emailVerified ?? this.emailVerified,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      doctorProfile: doctorProfile ?? this.doctorProfile,
+      patientProfile: patientProfile ?? this.patientProfile,
+      activeRole: activeRole ?? this.activeRole,
     );
   }
 
   String get fullName => '$firstName $lastName';
+
+  /// Returns list of available roles based on existing profiles
+  List<UserRole> get availableRoles {
+    final roles = <UserRole>[];
+    if (patientProfile != null) roles.add(UserRole.patient);
+    if (doctorProfile != null) roles.add(UserRole.doctor);
+    // If no profiles exist, use the user's primary role
+    if (roles.isEmpty) roles.add(role);
+    return roles;
+  }
+
+  /// Check if user has multiple roles
+  bool get hasMultipleRoles => availableRoles.length > 1;
+
+  /// Check if user can switch to a specific role
+  bool canSwitchToRole(UserRole targetRole) {
+    return availableRoles.contains(targetRole);
+  }
+
+  /// Get profile for a specific role
+  dynamic getProfileForRole(UserRole targetRole) {
+    switch (targetRole) {
+      case UserRole.doctor:
+        return doctorProfile;
+      case UserRole.patient:
+        return patientProfile;
+      default:
+        return null;
+    }
+  }
 
   static UserRole _parseRole(String? roleStr) {
     switch (roleStr?.toLowerCase()) {

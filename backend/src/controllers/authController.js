@@ -1,6 +1,7 @@
 import { registerUser, loginUser, verifyEmail, requestPasswordReset, resetPassword, refreshAccessToken } from '../services/authService.js';
 import { deleteSession } from '../services/sessionService.js';
 import logger from '../config/logger.js';
+import { User, Doctor, Patient } from '../models/index.js';
 
 /**
  * Register a new user
@@ -335,23 +336,77 @@ export const getCurrentUser = async (req, res) => {
         message: 'Please log in to access this resource'
       });
     }
+
+    // Fetch user with associated profiles
+    const userWithProfiles = await User.findByPk(user.id, {
+      include: [
+        {
+          model: Doctor,
+          as: 'doctorProfile',
+          required: false
+        },
+        {
+          model: Patient,
+          as: 'patientProfile',
+          required: false
+        }
+      ]
+    });
+
+    if (!userWithProfiles) {
+      return res.status(404).json({
+        error: 'User not found',
+        message: 'User data could not be retrieved'
+      });
+    }
     
     logger.info('Current user fetched', {
       userId: user.id,
+      hasDocktorProfile: !!userWithProfiles.doctorProfile,
+      hasPatientProfile: !!userWithProfiles.patientProfile,
       ip: req.ip
     });
+
+    // Build response with profile data
+    const responseData = {
+      id: userWithProfiles.id,
+      email: userWithProfiles.email,
+      firstName: userWithProfiles.firstName,
+      lastName: userWithProfiles.lastName,
+      role: userWithProfiles.role,
+      isActive: userWithProfiles.isActive,
+      emailVerified: userWithProfiles.emailVerified
+    };
+
+    // Include doctor profile if exists
+    if (userWithProfiles.doctorProfile) {
+      responseData.doctorProfile = {
+        id: userWithProfiles.doctorProfile.id,
+        licenseNumber: userWithProfiles.doctorProfile.licenseNumber,
+        specialty: userWithProfiles.doctorProfile.specialty,
+        title: userWithProfiles.doctorProfile.title,
+        bio: userWithProfiles.doctorProfile.bio,
+        yearsOfExperience: userWithProfiles.doctorProfile.yearsOfExperience,
+        consultationFee: userWithProfiles.doctorProfile.consultationFee,
+        verified: userWithProfiles.doctorProfile.verified
+      };
+    }
+
+    // Include patient profile if exists
+    if (userWithProfiles.patientProfile) {
+      responseData.patientProfile = {
+        id: userWithProfiles.patientProfile.id,
+        dateOfBirth: userWithProfiles.patientProfile.dateOfBirth,
+        gender: userWithProfiles.patientProfile.gender,
+        bloodType: userWithProfiles.patientProfile.bloodType,
+        allergies: userWithProfiles.patientProfile.allergies,
+        chronicConditions: userWithProfiles.patientProfile.chronicConditions,
+        emergencyContactName: userWithProfiles.patientProfile.emergencyContactName,
+        emergencyContactPhone: userWithProfiles.patientProfile.emergencyContactPhone
+      };
+    }
     
-    res.status(200).json({
-      user: {
-        id: user.id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        role: user.role,
-        isActive: user.isActive,
-        emailVerified: user.emailVerified
-      }
-    });
+    res.status(200).json(responseData);
   } catch (error) {
     logger.error('Get current user failed:', error, {
       userId: req.user?.id,

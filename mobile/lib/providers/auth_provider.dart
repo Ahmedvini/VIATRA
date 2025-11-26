@@ -26,6 +26,7 @@ class AuthProvider extends ChangeNotifier {
   String? _accessToken;
   String? _refreshToken;
   AuthResponse? _lastAuthResponse;
+  UserRole? _activeRole;
 
   AuthProvider({
     required AuthService authService,
@@ -46,6 +47,17 @@ class AuthProvider extends ChangeNotifier {
   AuthResponse? get lastAuthResponse => _lastAuthResponse;
   bool get isAuthenticated => _state == AuthState.authenticated && _user != null;
   bool get isLoading => _state == AuthState.loading;
+  
+  // Role management getters
+  UserRole? get activeRole => _activeRole;
+  bool get isActiveRoleDoctor => _activeRole == UserRole.doctor;
+  bool get isActiveRolePatient => _activeRole == UserRole.patient;
+  
+  /// Get the current role profile (Doctor or Patient) based on active role
+  dynamic get currentRoleProfile {
+    if (_user == null || _activeRole == null) return null;
+    return _user!.getProfileForRole(_activeRole!);
+  }
 
   /// Initialize authentication state
   Future<void> _initialize() async {
@@ -75,6 +87,21 @@ class AuthProvider extends ChangeNotifier {
         
         if (response.isSuccess && response.data != null) {
           _user = response.data!;
+          
+          // Load saved active role or default to user's primary role
+          final savedRole = await _storageService.getValue('active_role');
+          if (savedRole != null && savedRole is String) {
+            _activeRole = _parseRole(savedRole);
+            // Validate that the saved role is still available
+            if (!_user!.canSwitchToRole(_activeRole!)) {
+              _activeRole = _user!.role;
+              await _storageService.setValue('active_role', _roleToString(_activeRole!));
+            }
+          } else {
+            _activeRole = _user!.role;
+            await _storageService.setValue('active_role', _roleToString(_activeRole!));
+          }
+          
           _setState(AuthState.authenticated);
           return;
         } else {
@@ -100,10 +127,12 @@ class AuthProvider extends ChangeNotifier {
     await _storageService.removeSecureValue('access_token');
     await _storageService.removeSecureValue('refresh_token');
     await _storageService.removeValue('user_data');
+    await _storageService.removeValue('active_role');
     _apiService.clearAuthToken();
     _user = null;
     _accessToken = null;
     _refreshToken = null;
+    _activeRole = null;
   }
 
   /// Login with email and password
@@ -128,6 +157,10 @@ class AuthProvider extends ChangeNotifier {
         await _storageService.setSecureValue('access_token', _accessToken!);
         await _storageService.setSecureValue('refresh_token', _refreshToken!);
         await _storageService.setValue('user_data', _user!.toJson());
+        
+        // Set initial active role to user's primary role
+        _activeRole = _user!.role;
+        await _storageService.setValue('active_role', _roleToString(_activeRole!));
         
         // Set token on API service for subsequent requests
         _apiService.setAuthToken(_accessToken!);
@@ -166,6 +199,10 @@ class AuthProvider extends ChangeNotifier {
         await _storageService.setSecureValue('access_token', _accessToken!);
         await _storageService.setSecureValue('refresh_token', _refreshToken!);
         await _storageService.setValue('user_data', _user!.toJson());
+        
+        // Set initial active role to user's primary role
+        _activeRole = _user!.role;
+        await _storageService.setValue('active_role', _roleToString(_activeRole!));
         
         // Set token on API service for subsequent requests
         _apiService.setAuthToken(_accessToken!);
@@ -246,6 +283,17 @@ class AuthProvider extends ChangeNotifier {
         if (userResponse.isSuccess && userResponse.data != null) {
           _user = userResponse.data!;
           await _storageService.setValue('user_data', _user!.toJson());
+          
+          // Re-validate active role against new user data
+          if (_activeRole == null || !_user!.canSwitchToRole(_activeRole!)) {
+            // Active role is invalid, reset to user's primary role
+            _activeRole = _user!.role;
+            await _storageService.setValue('active_role', _roleToString(_activeRole!));
+          } else {
+            // Active role is still valid, ensure storage is in sync
+            await _storageService.setValue('active_role', _roleToString(_activeRole!));
+          }
+          
           _setState(AuthState.authenticated);
         }
         
@@ -310,6 +358,65 @@ class AuthProvider extends ChangeNotifier {
     } catch (e) {
       _setError('Profile update failed: $e');
       return false;
+    }
+  }
+
+  /// Switch active role
+  Future<bool> switchRole(UserRole newRole) async {
+    try {
+      if (_user == null) {
+        _setError('User not authenticated');
+        return false;
+      }
+
+      // Validate that the user can switch to this role
+      if (!_user!.canSwitchToRole(newRole)) {
+        _setError('Cannot switch to this role. Profile not available.');
+        return false;
+      }
+
+      // Update active role
+      _activeRole = newRole;
+      
+      // Persist the active role
+      await _storageService.setValue('active_role', _roleToString(newRole));
+      
+      // Notify listeners to rebuild UI
+      notifyListeners();
+      
+      return true;
+    } catch (e) {
+      _setError('Role switch failed: $e');
+      return false;
+    }
+  }
+
+  // Helper methods for role parsing
+  static UserRole _parseRole(String? roleStr) {
+    switch (roleStr?.toLowerCase()) {
+      case 'patient':
+        return UserRole.patient;
+      case 'doctor':
+        return UserRole.doctor;
+      case 'hospital':
+        return UserRole.hospital;
+      case 'pharmacy':
+        return UserRole.pharmacy;
+      default:
+        return UserRole.patient;
+    }
+  }
+
+  static String _roleToString(UserRole role) {
+    switch (role) {
+      case UserRole.patient:
+        return 'patient';
+      case UserRole.doctor:
+        return 'doctor';
+      case UserRole.hospital:
+        return 'hospital';
+      case UserRole.pharmacy:
+        return 'pharmacy';
     }
   }
 

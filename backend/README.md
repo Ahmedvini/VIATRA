@@ -245,6 +245,54 @@ GET /api/v1/auth/me
 Authorization: Bearer <access_token>
 ```
 
+Returns the authenticated user's profile data including associated role profiles (doctor and/or patient).
+
+**Response:**
+```json
+{
+  "user": {
+    "id": "user-uuid",
+    "email": "user@example.com",
+    "firstName": "John",
+    "lastName": "Doe",
+    "role": "patient",
+    "isActive": true,
+    "emailVerified": true,
+    "doctorProfile": {  // Only if user has a doctor profile
+      "id": "doctor-uuid",
+      "licenseNumber": "MD123456",
+      "specialty": "Cardiology",
+      "title": "Dr.",
+      "bio": "Experienced cardiologist...",
+      "yearsOfExperience": 10,
+      "consultationFee": 150.00,
+      "verified": true
+    },
+    "patientProfile": {  // Only if user has a patient profile
+      "id": "patient-uuid",
+      "dateOfBirth": "1990-01-01",
+      "gender": "male",
+      "bloodType": "O+",
+      "allergies": ["Penicillin"],
+      "chronicConditions": ["Hypertension"],
+      "emergencyContactName": "Jane Doe",
+      "emergencyContactPhone": "+1234567890"
+    }
+  }
+}
+```
+
+**Role Switching Support:**
+The `doctorProfile` and `patientProfile` fields enable the mobile app to determine which roles are available for the user and provide role-switching functionality. A user can have:
+- Only a patient profile (typical patient user)
+- Only a doctor profile (typical doctor user)
+- Both profiles (doctor who is also a patient)
+
+The mobile app uses these profiles to:
+1. Determine available roles for switching
+2. Display role-specific navigation and features
+3. Enable seamless switching between patient and doctor views
+
 #### Validate Token
 ```
 GET /api/v1/auth/validate-token

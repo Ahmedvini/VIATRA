@@ -131,6 +131,64 @@ flutter run
 
 ## Features
 
+### Role Switching & Multi-Role Support
+
+**Overview**: The app supports users with multiple roles, enabling seamless switching between Patient and Doctor profiles without logging out. This is particularly useful for doctors who are also patients or users managing multiple role contexts.
+
+**Architecture**:
+- **MainAppShell**: Central scaffold with role-based bottom navigation
+- **AuthProvider**: Manages active role state and switching logic
+- **User Model**: Supports multiple profile associations (doctorProfile, patientProfile)
+- **Profile Screen**: Provides intuitive role switcher UI
+
+**How It Works**:
+1. The backend `/auth/me` endpoint returns user data with associated `doctorProfile` and `patientProfile`
+2. The User model determines available roles based on which profiles exist
+3. AuthProvider tracks the active role and persists it to local storage
+4. MainAppShell renders role-specific navigation and screens based on active role
+5. ProfileScreen displays a role switcher when multiple roles are available
+
+**User Flows**:
+
+*Patient View*:
+- Bottom tabs: Home, Find Doctors, Appointments, Health Profile, Profile
+- Patient-specific quick actions and features
+- Access to doctor search and appointment booking
+
+*Doctor View*:
+- Bottom tabs: Dashboard, Appointments, Chat, Profile
+- Doctor-specific dashboard with statistics
+- Appointment management and patient communication
+
+**Implementation**:
+
+```dart
+// Switch roles in ProfileScreen
+await authProvider.switchRole(UserRole.doctor);
+
+// Check active role
+if (authProvider.isActiveRoleDoctor) {
+  // Show doctor-specific content
+}
+
+// Get current role profile
+final doctorProfile = authProvider.currentRoleProfile as Doctor?;
+```
+
+**Benefits**:
+- No need to logout/login when switching contexts
+- Seamless UX for multi-role users
+- Role state persisted across app restarts
+- Easy to extend for future roles (hospital, pharmacy)
+
+**Related Files**:
+- `lib/screens/main_app_shell.dart` - Role-based navigation shell
+- `lib/screens/profile/profile_screen.dart` - Profile with role switcher
+- `lib/screens/home/patient_home_screen.dart` - Patient home
+- `lib/widgets/profile/role_switcher_widget.dart` - Reusable switcher UI
+- `lib/providers/auth_provider.dart` - Role management logic
+- `lib/models/user_model.dart` - Multi-profile user model
+
 ### Authentication & Authorization
 
 - **Multi-role Registration**: Patient, Doctor, Hospital, Pharmacy, Admin
