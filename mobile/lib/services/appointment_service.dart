@@ -60,17 +60,17 @@ class AppointmentService {
       if (response.success && response.data != null) {
         final appointment = Appointment.fromJson(response.data as Map<String, dynamic>);
         return ApiResponse.success(
-          data: appointment,
+          appointment,
           message: response.message ?? 'Appointment created successfully',
         );
       }
 
       return ApiResponse.error(
-        message: response.message ?? 'Failed to create appointment',
+        response.message ?? 'Failed to create appointment',
       );
     } catch (e) {
       return ApiResponse.error(
-        message: 'An error occurred while creating appointment: $e',
+        'An error occurred while creating appointment: $e',
       );
     }
   }
@@ -117,17 +117,17 @@ class AppointmentService {
         );
 
         return ApiResponse.success(
-          data: result,
+          result,
           message: response.message ?? 'Appointments retrieved successfully',
         );
       }
 
       return ApiResponse.error(
-        message: response.message ?? 'Failed to retrieve appointments',
+        response.message ?? 'Failed to retrieve appointments',
       );
     } catch (e) {
       return ApiResponse.error(
-        message: 'An error occurred while fetching appointments: $e',
+        'An error occurred while fetching appointments: $e',
       );
     }
   }
@@ -140,17 +140,17 @@ class AppointmentService {
       if (response.success && response.data != null) {
         final appointment = Appointment.fromJson(response.data as Map<String, dynamic>);
         return ApiResponse.success(
-          data: appointment,
+          appointment,
           message: response.message ?? 'Appointment retrieved successfully',
         );
       }
 
       return ApiResponse.error(
-        message: response.message ?? 'Failed to retrieve appointment',
+        response.message ?? 'Failed to retrieve appointment',
       );
     } catch (e) {
       return ApiResponse.error(
-        message: 'An error occurred while fetching appointment: $e',
+        'An error occurred while fetching appointment: $e',
       );
     }
   }
@@ -169,17 +169,17 @@ class AppointmentService {
       if (response.success && response.data != null) {
         final appointment = Appointment.fromJson(response.data as Map<String, dynamic>);
         return ApiResponse.success(
-          data: appointment,
+          appointment,
           message: response.message ?? 'Appointment updated successfully',
         );
       }
 
       return ApiResponse.error(
-        message: response.message ?? 'Failed to update appointment',
+        response.message ?? 'Failed to update appointment',
       );
     } catch (e) {
       return ApiResponse.error(
-        message: 'An error occurred while updating appointment: $e',
+        'An error occurred while updating appointment: $e',
       );
     }
   }
@@ -197,17 +197,17 @@ class AppointmentService {
 
       if (response.success) {
         return ApiResponse.success(
-          data: response.data as Map<String, dynamic>? ?? {},
+          response.data as Map<String, dynamic>? ?? {},
           message: response.message ?? 'Appointment cancelled successfully',
         );
       }
 
       return ApiResponse.error(
-        message: response.message ?? 'Failed to cancel appointment',
+        response.message ?? 'Failed to cancel appointment',
       );
     } catch (e) {
       return ApiResponse.error(
-        message: 'An error occurred while cancelling appointment: $e',
+        'An error occurred while cancelling appointment: $e',
       );
     }
   }
@@ -235,48 +235,18 @@ class AppointmentService {
             .toList();
 
         return ApiResponse.success(
-          data: timeSlots,
+          timeSlots,
           message: response.message ?? 'Time slots retrieved successfully',
         );
       }
 
       return ApiResponse.error(
-        message: response.message ?? 'Failed to retrieve availability',
+        response.message ?? 'Failed to retrieve availability',
       );
     } catch (e) {
       return ApiResponse.error(
-        message: 'An error occurred while fetching availability: $e',
+        'An error occurred while fetching availability: $e',
       );
     }
-  }
-}
-
-class ApiResponse<T> {
-  final bool success;
-  final T? data;
-  final String? message;
-  final dynamic error;
-
-  ApiResponse({
-    required this.success,
-    this.data,
-    this.message,
-    this.error,
-  });
-
-  factory ApiResponse.success({T? data, String? message}) {
-    return ApiResponse(
-      success: true,
-      data: data,
-      message: message,
-    );
-  }
-
-  factory ApiResponse.error({String? message, dynamic error}) {
-    return ApiResponse(
-      success: false,
-      message: message,
-      error: error,
-    );
   }
 }

@@ -59,7 +59,14 @@ export const createAppointment = async (req, res) => {
     }
 
     // Extract patient ID from authenticated user
-    const patientId = req.user.patientId || req.user.id;
+    const patientId = req.user.patientId;
+    
+    if (!patientId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Patient profile not found for this user'
+      });
+    }
     
     // Create appointment
     const appointment = await appointmentService.createAppointment(
@@ -160,7 +167,14 @@ export const getMyAppointments = async (req, res) => {
       });
     }
 
-    const patientId = req.user.patientId || req.user.id;
+    const patientId = req.user.patientId;
+    
+    if (!patientId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Patient profile not found for this user'
+      });
+    }
     
     const filters = {
       status: value.status,

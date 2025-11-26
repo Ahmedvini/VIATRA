@@ -62,8 +62,7 @@ router.get('/', (req, res) => {
         getMyAppointments: 'GET /appointments',
         getAppointmentById: 'GET /appointments/:id',
         updateAppointment: 'PATCH /appointments/:id',
-        cancelAppointment: 'POST /appointments/:id/cancel',
-        getDoctorAvailability: 'GET /doctors/:doctorId/availability'
+        cancelAppointment: 'POST /appointments/:id/cancel'
       }
     },
     rateLimits: {

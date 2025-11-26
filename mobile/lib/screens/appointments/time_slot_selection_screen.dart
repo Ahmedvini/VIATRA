@@ -25,17 +25,16 @@ class TimeSlotSelectionScreen extends StatefulWidget {
 class _TimeSlotSelectionScreenState extends State<TimeSlotSelectionScreen> {
   DateTime _selectedDate = DateTime.now();
   TimeSlot? _selectedSlot;
-  String _selectedType = 'consultation';
+  String _selectedType = 'telehealth';
   String _reasonForVisit = '';
   String _chiefComplaint = '';
   bool _urgent = false;
   bool _isLoading = false;
 
   final List<Map<String, String>> _appointmentTypes = [
-    {'value': 'consultation', 'label': 'Consultation'},
-    {'value': 'follow_up', 'label': 'Follow-up'},
-    {'value': 'checkup', 'label': 'Check-up'},
-    {'value': 'procedure', 'label': 'Procedure'},
+    {'value': 'telehealth', 'label': 'Telehealth'},
+    {'value': 'in_person', 'label': 'In-Person'},
+    {'value': 'phone', 'label': 'Phone Call'},
   ];
 
   @override

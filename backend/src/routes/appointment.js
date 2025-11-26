@@ -106,15 +106,4 @@ router.post(
   appointmentController.cancelAppointment
 );
 
-/**
- * @route   GET /api/v1/doctors/:doctorId/availability
- * @desc    Get available time slots for doctor
- * @access  Public/Private
- */
-router.get(
-  '/doctors/:doctorId/availability',
-  availabilityLimiter,
-  appointmentController.getDoctorAvailability
-);
-
 export default router;

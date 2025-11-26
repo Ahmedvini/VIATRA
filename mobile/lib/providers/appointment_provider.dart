@@ -79,13 +79,19 @@ class AppointmentProvider extends ChangeNotifier {
   List<Appointment> get appointments => _appointments;
   Appointment? get currentAppointment => _currentAppointment;
   String? get errorMessage => _errorMessage;
+  String? get error => _errorMessage; // Alias for screen compatibility
   int get currentPage => _currentPage;
   int get totalPages => _totalPages;
   int get totalResults => _totalResults;
   bool get isLoading => _state == AppointmentState.loading;
   bool get hasError => _state == AppointmentState.error;
   bool get hasMore => _currentPage < _totalPages;
+  bool get hasMoreAppointments => hasMore; // Alias for screen compatibility
   bool get isLoadingMore => _state == AppointmentState.loadingMore;
+
+  // Time slot state
+  List<TimeSlot> _availableSlots = [];
+  List<TimeSlot> get availableSlots => _availableSlots;
 
   List<Appointment> get upcomingAppointments {
     return _appointments.where((a) => a.isUpcoming).toList();
@@ -396,5 +402,75 @@ class AppointmentProvider extends ChangeNotifier {
     } catch (e) {
       debugPrint('Failed to clear appointments cache: $e');
     }
+  }
+
+  // Alias methods for screen compatibility
+  Future<void> fetchAppointments({String? status, bool forceRefresh = false, bool loadMore = false}) async {
+    if (loadMore) {
+      await loadMoreAppointments();
+    } else {
+      await loadMyAppointments(status: status, refresh: forceRefresh);
+    }
+  }
+
+  Future<Appointment?> fetchAppointmentById(String appointmentId) async {
+    await loadAppointmentById(appointmentId);
+    return _currentAppointment;
+  }
+
+  /// Fetch available time slots for a doctor
+  Future<void> fetchAvailableSlots(String doctorId, DateTime date, {int duration = 30}) async {
+    try {
+      _state = AppointmentState.loading;
+      _errorMessage = null;
+      notifyListeners();
+
+      final response = await _appointmentService.getDoctorAvailability(
+        doctorId,
+        date,
+        duration,
+      );
+
+      if (response.success && response.data != null) {
+        _availableSlots = response.data!;
+        _state = AppointmentState.loaded;
+      } else {
+        _state = AppointmentState.error;
+        _errorMessage = response.message ?? 'Failed to load available slots';
+        _availableSlots = [];
+      }
+    } catch (e) {
+      _state = AppointmentState.error;
+      _errorMessage = 'An error occurred: $e';
+      _availableSlots = [];
+    }
+
+    notifyListeners();
+  }
+
+  /// Book an appointment (alias for createAppointment with named parameters)
+  Future<Appointment> bookAppointment({
+    required String doctorId,
+    required String appointmentType,
+    required DateTime scheduledStart,
+    required DateTime scheduledEnd,
+    required String reasonForVisit,
+    String? chiefComplaint,
+    bool urgent = false,
+  }) async {
+    final appointmentData = {
+      'appointmentType': appointmentType,
+      'scheduledStart': scheduledStart.toIso8601String(),
+      'scheduledEnd': scheduledEnd.toIso8601String(),
+      'reasonForVisit': reasonForVisit,
+      if (chiefComplaint != null) 'chiefComplaint': chiefComplaint,
+      'urgent': urgent,
+    };
+
+    final appointment = await createAppointment(doctorId, appointmentData);
+    if (appointment == null) {
+      throw Exception(_errorMessage ?? 'Failed to book appointment');
+    }
+    return appointment;
   }
 }

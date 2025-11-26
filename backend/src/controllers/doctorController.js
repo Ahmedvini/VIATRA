@@ -132,34 +132,56 @@ export const getDoctorAvailability = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Validate UUID
+    // Validate doctor ID
     const uuidSchema = Joi.string().uuid().required();
-    const { error } = uuidSchema.validate(id);
-    if (error) {
+    const { error: idError } = uuidSchema.validate(id);
+    if (idError) {
       return res.status(400).json({
         success: false,
         message: 'Invalid doctor ID format'
       });
     }
 
-    const availability = await doctorService.getDoctorAvailability(id);
+    // Validate query parameters for time slot generation
+    const querySchema = Joi.object({
+      date: Joi.date().iso().required(),
+      duration: Joi.number().integer().min(15).max(120).default(30)
+    });
 
-    if (!availability) {
+    const { error, value } = querySchema.validate(req.query);
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid query parameters',
+        errors: error.details.map(detail => detail.message)
+      });
+    }
+
+    // Import appointmentService for time slot generation
+    const appointmentService = await import('../services/appointmentService.js');
+    const timeSlots = await appointmentService.getAvailableTimeSlots(
+      id,
+      value.date,
+      value.duration
+    );
+
+    logger.info(`Retrieved ${timeSlots.length} time slots for doctor ${id}`);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Time slots retrieved successfully',
+      data: timeSlots
+    });
+  } catch (error) {
+    logger.error('Error in getDoctorAvailability controller:', error);
+    
+    if (error.message === 'Doctor not found') {
       return res.status(404).json({
         success: false,
         message: 'Doctor not found'
       });
     }
-
-    logger.info(`Doctor ${id} availability retrieved successfully`);
-
-    return res.status(200).json({
-      success: true,
-      message: 'Doctor availability retrieved successfully',
-      data: availability
-    });
-  } catch (error) {
-    logger.error('Error in getDoctorAvailability controller:', error);
+    
     return res.status(500).json({
       success: false,
       message: 'Failed to retrieve doctor availability',

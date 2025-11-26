@@ -65,27 +65,29 @@ export const checkDoctorAvailability = async (doctorId, startTime, endTime, excl
 
     // Check working hours
     const startDateTime = new Date(startTime);
-    const dayOfWeek = startDateTime.toLocaleLowerCase('en-US', { weekday: 'long' }).toLowerCase();
-    const requestedTime = startDateTime.toTimeString().slice(0, 5); // HH:mm format
+    const endDateTime = new Date(endTime);
+    const dayOfWeek = startDateTime.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+    const requestedStartTime = startDateTime.toTimeString().slice(0, 5); // HH:mm format
+    const requestedEndTime = endDateTime.toTimeString().slice(0, 5); // HH:mm format
 
-    if (doctor.working_hours && doctor.working_hours[dayOfWeek]) {
-      const workingHours = doctor.working_hours[dayOfWeek];
-      if (!workingHours || workingHours.length === 0) {
-        return { available: false, reason: 'Doctor not working on this day' };
-      }
+    // Check if working hours exist for this day
+    if (!doctor.working_hours || !doctor.working_hours[dayOfWeek]) {
+      return { available: false, reason: 'Doctor does not have working hours set for this day' };
+    }
 
-      // Check if requested time falls within any working hour slot
-      let withinWorkingHours = false;
-      for (const slot of workingHours) {
-        if (requestedTime >= slot.start && requestedTime < slot.end) {
-          withinWorkingHours = true;
-          break;
-        }
-      }
+    const daySchedule = doctor.working_hours[dayOfWeek];
+    
+    // Check if doctor is available on this day (single object with start, end, available)
+    if (!daySchedule.available || !daySchedule.start || !daySchedule.end) {
+      return { available: false, reason: 'Doctor not available on this day' };
+    }
 
-      if (!withinWorkingHours) {
-        return { available: false, reason: 'Requested time outside working hours' };
-      }
+    // Check if requested time falls within working hours
+    if (requestedStartTime < daySchedule.start || requestedEndTime > daySchedule.end) {
+      return { 
+        available: false, 
+        reason: `Requested time outside working hours (${daySchedule.start} - ${daySchedule.end})` 
+      };
     }
 
     // Check for conflicting appointments
@@ -150,43 +152,50 @@ export const getAvailableTimeSlots = async (doctorId, date, duration = 30) => {
     const requestedDate = new Date(date);
     const dayOfWeek = requestedDate.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
     
-    const workingHours = doctor.working_hours?.[dayOfWeek];
-    if (!workingHours || workingHours.length === 0) {
+    // Check if working hours exist for this day
+    if (!doctor.working_hours || !doctor.working_hours[dayOfWeek]) {
+      return [];
+    }
+
+    const shift = doctor.working_hours[dayOfWeek];
+    
+    // Check if doctor is available on this day (single object with start, end, available)
+    if (!shift.available || !shift.start || !shift.end) {
       return [];
     }
 
     const slots = [];
     
-    for (const shift of workingHours) {
-      const [startHour, startMin] = shift.start.split(':').map(Number);
-      const [endHour, endMin] = shift.end.split(':').map(Number);
+    // Parse start and end times from the single shift object
+    const [startHour, startMin] = shift.start.split(':').map(Number);
+    const [endHour, endMin] = shift.end.split(':').map(Number);
+    
+    let currentTime = new Date(requestedDate);
+    currentTime.setHours(startHour, startMin, 0, 0);
+    
+    const shiftEnd = new Date(requestedDate);
+    shiftEnd.setHours(endHour, endMin, 0, 0);
+    
+    // Generate slots from shift start to end at the requested duration
+    while (currentTime < shiftEnd) {
+      const slotEnd = new Date(currentTime.getTime() + duration * 60000);
       
-      let currentTime = new Date(requestedDate);
-      currentTime.setHours(startHour, startMin, 0, 0);
-      
-      const shiftEnd = new Date(requestedDate);
-      shiftEnd.setHours(endHour, endMin, 0, 0);
-      
-      while (currentTime < shiftEnd) {
-        const slotEnd = new Date(currentTime.getTime() + duration * 60000);
+      if (slotEnd <= shiftEnd) {
+        // Check availability for this slot
+        const availabilityCheck = await checkDoctorAvailability(
+          doctorId,
+          currentTime.toISOString(),
+          slotEnd.toISOString()
+        );
         
-        if (slotEnd <= shiftEnd) {
-          // Check availability for this slot
-          const availabilityCheck = await checkDoctorAvailability(
-            doctorId,
-            currentTime.toISOString(),
-            slotEnd.toISOString()
-          );
-          
-          slots.push({
-            start: currentTime.toISOString(),
-            end: slotEnd.toISOString(),
-            available: availabilityCheck.available
-          });
-        }
-        
-        currentTime = new Date(currentTime.getTime() + duration * 60000);
+        slots.push({
+          start: currentTime.toISOString(),
+          end: slotEnd.toISOString(),
+          available: availabilityCheck.available
+        });
       }
+      
+      currentTime = new Date(currentTime.getTime() + duration * 60000);
     }
 
     return slots;
@@ -262,8 +271,11 @@ export const createAppointment = async (patientId, doctorId, appointmentData) =>
       ]
     });
 
+    // Return plain object with associations for consistent serialization
+    const plainAppointment = createdAppointment.toJSON();
+
     logger.info(`Appointment created: ${appointment.id} for patient ${patientId}`);
-    return createdAppointment;
+    return plainAppointment;
   } catch (error) {
     await transaction.rollback();
     logger.error('Error creating appointment:', error);
@@ -331,10 +343,13 @@ export const getAppointmentById = async (appointmentId, userId, userRole) => {
       return null;
     }
 
-    // Cache result
-    await redisClient.setEx(cacheKey, 300, JSON.stringify(appointment)); // 5 min TTL
+    // Convert to plain object for consistent serialization
+    const plainAppointment = appointment.toJSON();
 
-    return appointment;
+    // Cache result as plain object
+    await redisClient.setEx(cacheKey, 300, JSON.stringify(plainAppointment)); // 5 min TTL
+
+    return plainAppointment;
   } catch (error) {
     logger.error('Error fetching appointment:', error);
     throw error;
@@ -397,8 +412,11 @@ export const getPatientAppointments = async (patientId, filters = {}) => {
       distinct: true
     });
 
+    // Convert appointments to plain objects for consistent serialization
+    const plainAppointments = appointments.map(apt => apt.toJSON());
+
     const result = {
-      appointments,
+      appointments: plainAppointments,
       pagination: {
         total: count,
         page: parseInt(page),
@@ -491,8 +509,11 @@ export const updateAppointment = async (appointmentId, userId, userRole, updateD
       ]
     });
 
+    // Return plain object for consistent serialization
+    const plainAppointment = updatedAppointment.toJSON();
+
     logger.info(`Appointment updated: ${appointmentId}`);
-    return updatedAppointment;
+    return plainAppointment;
   } catch (error) {
     await transaction.rollback();
     logger.error('Error updating appointment:', error);

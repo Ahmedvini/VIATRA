@@ -1,5 +1,6 @@
 import { getSession } from '../services/sessionService.js';
 import { verifyToken, decodeToken } from '../utils/jwt.js';
+import { Patient, Doctor } from '../models/index.js';
 import logger from '../config/logger.js';
 
 /**
@@ -95,6 +96,18 @@ export const authenticate = async (req, res, next) => {
       });
     }
     
+    // Fetch patient or doctor ID based on role
+    let patientId = null;
+    let doctorId = null;
+    
+    if (sessionData.role === 'patient') {
+      const patient = await Patient.findOne({ where: { user_id: sessionData.userId } });
+      patientId = patient ? patient.id : null;
+    } else if (sessionData.role === 'doctor') {
+      const doctor = await Doctor.findOne({ where: { user_id: sessionData.userId } });
+      doctorId = doctor ? doctor.id : null;
+    }
+    
     // Attach user data to request (prioritize JWT data for freshness)
     req.user = {
       id: decodedToken.userId || sessionData.userId,
@@ -104,6 +117,8 @@ export const authenticate = async (req, res, next) => {
       lastName: sessionData.lastName,
       isActive: sessionData.isActive,
       emailVerified: sessionData.emailVerified,
+      patientId: patientId,
+      doctorId: doctorId,
       sessionToken: token,
       sessionData: sessionData,
       tokenData: decodedToken

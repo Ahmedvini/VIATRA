@@ -71,6 +71,41 @@ class Appointment {
     return hoursUntilStart >= 2;
   }
   
+  bool get canBeRescheduled {
+    if (status == 'cancelled' || status == 'completed' || status == 'no_show') {
+      return false;
+    }
+    final hoursUntilStart = scheduledStart.difference(DateTime.now()).inHours;
+    return hoursUntilStart >= 2;
+  }
+  
+  String get doctorName {
+    return doctor?.displayName ?? doctor?.fullName ?? '';
+  }
+  
+  String get specialty {
+    return doctor?.specialty ?? '';
+  }
+  
+  String get statusLabel {
+    switch (status) {
+      case 'scheduled':
+        return 'Scheduled';
+      case 'confirmed':
+        return 'Confirmed';
+      case 'in_progress':
+        return 'In Progress';
+      case 'completed':
+        return 'Completed';
+      case 'cancelled':
+        return 'Cancelled';
+      case 'no_show':
+        return 'No Show';
+      default:
+        return status;
+    }
+  }
+  
   int get duration {
     return scheduledEnd.difference(scheduledStart).inMinutes;
   }
