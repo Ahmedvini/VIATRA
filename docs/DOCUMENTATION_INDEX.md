@@ -27,9 +27,9 @@
 | Document | Description | Path |
 |----------|-------------|------|
 | **Project README** | Main project overview and setup | [`/README.md`](../README.md) |
-| **Quick Reference** | Quick start guide and common commands | [`/docs/quick-references/QUICK_REFERENCE.md`](./quick-references/QUICK_REFERENCE.md) |
-| **Project Reference** | Complete project structure and conventions | [`/docs/quick-references/PROJECT_REFERENCE.md`](./quick-references/PROJECT_REFERENCE.md) |
-| **Development Guide** | Development workflow and best practices | [`/docs/DEVELOPMENT.md`](./DEVELOPMENT.md) |
+| **Quick Reference** | Quick start guide and common commands | [`quick-references/QUICK_REFERENCE.md`](quick-references/QUICK_REFERENCE.md) |
+| **Project Reference** | Complete project structure and conventions | [`quick-references/PROJECT_REFERENCE.md`](quick-references/PROJECT_REFERENCE.md) |
+| **Development Guide** | Development workflow and best practices | [`DEVELOPMENT.md`](DEVELOPMENT.md) |
 
 ---
 
@@ -38,10 +38,10 @@
 ### High-Level Documentation
 | Document | Description | Path |
 |----------|-------------|------|
-| **Architecture** | System architecture and design patterns | [`/docs/ARCHITECTURE.md`](./ARCHITECTURE.md) |
-| **Project Complete Summary** | Complete feature implementation summary | [`/docs/status/PROJECT_COMPLETE_SUMMARY.md`](./status/PROJECT_COMPLETE_SUMMARY.md) |
-| **Implementation Final Summary** | Final implementation status and deliverables | [`/docs/status/IMPLEMENTATION_FINAL_SUMMARY.md`](./status/IMPLEMENTATION_FINAL_SUMMARY.md) |
-| **Implementation Summary** | Detailed implementation progress | [`/docs/status/IMPLEMENTATION_SUMMARY.md`](./status/IMPLEMENTATION_SUMMARY.md) |
+| **Architecture** | System architecture and design patterns | [`ARCHITECTURE.md`](ARCHITECTURE.md) |
+| **Project Complete Summary** | Complete feature implementation summary | [`status/PROJECT_COMPLETE_SUMMARY.md`](status/PROJECT_COMPLETE_SUMMARY.md) |
+| **Implementation Final Summary** | Final implementation status and deliverables | [`status/IMPLEMENTATION_FINAL_SUMMARY.md`](status/IMPLEMENTATION_FINAL_SUMMARY.md) |
+| **Implementation Summary** | Detailed implementation progress | [`status/IMPLEMENTATION_SUMMARY.md`](status/IMPLEMENTATION_SUMMARY.md) |
 
 ---
 
@@ -56,8 +56,7 @@
 ### API References
 | Document | Description | Path |
 |----------|-------------|------|
-| **Chat API Documentation** | Complete chat REST & Socket.io API reference | [`/docs/api/CHAT_API.md`](./api/CHAT_API.md) |
-| **Health Profile API Reference** | Health profile endpoints and usage | [`/docs/quick-references/HEALTH_PROFILE_API_REFERENCE.md`](./quick-references/HEALTH_PROFILE_API_REFERENCE.md) |
+| **Health Profile API Reference** | Health profile endpoints and usage | [`quick-references/HEALTH_PROFILE_API_REFERENCE.md`](quick-references/HEALTH_PROFILE_API_REFERENCE.md) |
 
 ---
 
@@ -73,10 +72,10 @@
 | Document | Description | Path |
 |----------|-------------|------|
 | **Doctor Search Feature** | Doctor search implementation guide | [`/mobile/DOCTOR_SEARCH_FEATURE.md`](../mobile/DOCTOR_SEARCH_FEATURE.md) |
-| **Health Profile Flutter Complete** | Health profile UI implementation | [`/docs/features/HEALTH_PROFILE_FLUTTER_COMPLETE.md`](./features/HEALTH_PROFILE_FLUTTER_COMPLETE.md) |
-| **Health Profile Flutter Quick Ref** | Health profile quick reference | [`/docs/quick-references/HEALTH_PROFILE_FLUTTER_QUICK_REFERENCE.md`](./quick-references/HEALTH_PROFILE_FLUTTER_QUICK_REFERENCE.md) |
-| **Auth Provider Integration** | Authentication provider setup | [`/docs/features/AUTH_PROVIDER_INTEGRATION_COMPLETE.md`](./features/AUTH_PROVIDER_INTEGRATION_COMPLETE.md) |
-| **Auth Provider Quick Reference** | Auth provider quick guide | [`/docs/quick-references/AUTH_PROVIDER_QUICK_REFERENCE.md`](./quick-references/AUTH_PROVIDER_QUICK_REFERENCE.md) |
+| **Health Profile Flutter Complete** | Health profile UI implementation | [`features/HEALTH_PROFILE_FLUTTER_COMPLETE.md`](features/HEALTH_PROFILE_FLUTTER_COMPLETE.md) |
+| **Health Profile Flutter Quick Ref** | Health profile quick reference | [`quick-references/HEALTH_PROFILE_FLUTTER_QUICK_REFERENCE.md`](quick-references/HEALTH_PROFILE_FLUTTER_QUICK_REFERENCE.md) |
+| **Auth Provider Integration** | Authentication provider setup | [`features/AUTH_PROVIDER_INTEGRATION_COMPLETE.md`](features/AUTH_PROVIDER_INTEGRATION_COMPLETE.md) |
+| **Auth Provider Quick Reference** | Auth provider quick guide | [`quick-references/AUTH_PROVIDER_QUICK_REFERENCE.md`](quick-references/AUTH_PROVIDER_QUICK_REFERENCE.md) |
 
 ---
 
@@ -85,7 +84,7 @@
 ### Infrastructure
 | Document | Description | Path |
 |----------|-------------|------|
-| **Deployment Guide** | Production deployment instructions | [`/docs/DEPLOYMENT.md`](./DEPLOYMENT.md) |
+| **Deployment Guide** | Production deployment instructions | [`DEPLOYMENT.md`](DEPLOYMENT.md) |
 | **Terraform README** | Infrastructure as Code documentation | [`/terraform/README.md`](../terraform/README.md) |
 | **Docker README** | Docker containerization guide | [`/docker/README.md`](../docker/README.md) |
 
@@ -96,42 +95,40 @@
 ### Chat System
 | Document | Description | Path |
 |----------|-------------|------|
-| **Chat API Documentation** | Complete REST & Socket.io API reference | [`/docs/api/CHAT_API.md`](./api/CHAT_API.md) |
-| **Chat Implementation Complete** | Chat system implementation summary | [`/docs/features/CHAT_IMPLEMENTATION_COMPLETE.md`](./features/CHAT_IMPLEMENTATION_COMPLETE.md) |
+| **Chat Implementation Complete** | Chat system implementation summary | [`features/CHAT_IMPLEMENTATION_COMPLETE.md`](features/CHAT_IMPLEMENTATION_COMPLETE.md) |
 | **Chat Implementation Guide** | Detailed chat system documentation | [`/backend/CHAT_IMPLEMENTATION_GUIDE.md`](../backend/CHAT_IMPLEMENTATION_GUIDE.md) |
-| **Chat Verification Complete** | Verification & alignment work summary | [`/docs/status/CHAT_VERIFICATION_COMPLETE.md`](./status/CHAT_VERIFICATION_COMPLETE.md) |
 
 ### Appointments
 | Document | Description | Path |
 |----------|-------------|------|
-| **Appointment Implementation Complete** | Appointment system summary | [`/docs/features/APPOINTMENT_IMPLEMENTATION_COMPLETE.md`](./features/APPOINTMENT_IMPLEMENTATION_COMPLETE.md) |
-| **Appointment Implementation Status** | Current implementation status | [`/docs/status/APPOINTMENT_IMPLEMENTATION_STATUS.md`](./status/APPOINTMENT_IMPLEMENTATION_STATUS.md) |
-| **Appointment Verification Fixes** | Bug fixes and improvements | [`/docs/features/APPOINTMENT_VERIFICATION_FIXES.md`](./features/APPOINTMENT_VERIFICATION_FIXES.md) |
+| **Appointment Implementation Complete** | Appointment system summary | [`features/APPOINTMENT_IMPLEMENTATION_COMPLETE.md`](features/APPOINTMENT_IMPLEMENTATION_COMPLETE.md) |
+| **Appointment Implementation Status** | Current implementation status | [`status/APPOINTMENT_IMPLEMENTATION_STATUS.md`](status/APPOINTMENT_IMPLEMENTATION_STATUS.md) |
+| **Appointment Verification Fixes** | Bug fixes and improvements | [`features/APPOINTMENT_VERIFICATION_FIXES.md`](features/APPOINTMENT_VERIFICATION_FIXES.md) |
 
 ### Health Profiles
 | Document | Description | Path |
 |----------|-------------|------|
-| **Health Profile Backend Complete** | Backend implementation | [`/docs/features/HEALTH_PROFILE_BACKEND_COMPLETE.md`](./features/HEALTH_PROFILE_BACKEND_COMPLETE.md) |
-| **Health Profile Flutter Complete** | Mobile implementation | [`/docs/features/HEALTH_PROFILE_FLUTTER_COMPLETE.md`](./features/HEALTH_PROFILE_FLUTTER_COMPLETE.md) |
-| **Health Profile API Reference** | API endpoints reference | [`/docs/quick-references/HEALTH_PROFILE_API_REFERENCE.md`](./quick-references/HEALTH_PROFILE_API_REFERENCE.md) |
-| **Health Profile Flutter Quick Ref** | Quick reference guide | [`/docs/quick-references/HEALTH_PROFILE_FLUTTER_QUICK_REFERENCE.md`](./quick-references/HEALTH_PROFILE_FLUTTER_QUICK_REFERENCE.md) |
+| **Health Profile Backend Complete** | Backend implementation | [`features/HEALTH_PROFILE_BACKEND_COMPLETE.md`](features/HEALTH_PROFILE_BACKEND_COMPLETE.md) |
+| **Health Profile Flutter Complete** | Mobile implementation | [`features/HEALTH_PROFILE_FLUTTER_COMPLETE.md`](features/HEALTH_PROFILE_FLUTTER_COMPLETE.md) |
+| **Health Profile API Reference** | API endpoints reference | [`quick-references/HEALTH_PROFILE_API_REFERENCE.md`](quick-references/HEALTH_PROFILE_API_REFERENCE.md) |
+| **Health Profile Flutter Quick Ref** | Quick reference guide | [`quick-references/HEALTH_PROFILE_FLUTTER_QUICK_REFERENCE.md`](quick-references/HEALTH_PROFILE_FLUTTER_QUICK_REFERENCE.md) |
 
 ### Doctor Search
 | Document | Description | Path |
 |----------|-------------|------|
 | **Doctor Search Feature** | Search implementation guide | [`/mobile/DOCTOR_SEARCH_FEATURE.md`](../mobile/DOCTOR_SEARCH_FEATURE.md) |
-| **Doctor Search Final Quick Ref** | Final quick reference | [`/docs/quick-references/DOCTOR_SEARCH_FINAL_QUICK_REF.md`](./quick-references/DOCTOR_SEARCH_FINAL_QUICK_REF.md) |
-| **Doctor Search Persistence Complete** | Search persistence implementation | [`/docs/features/DOCTOR_SEARCH_PERSISTENCE_COMPLETE.md`](./features/DOCTOR_SEARCH_PERSISTENCE_COMPLETE.md) |
-| **Doctor Search Persistence Quick Ref** | Persistence quick guide | [`/docs/quick-references/DOCTOR_SEARCH_PERSISTENCE_QUICK_REF.md`](./quick-references/DOCTOR_SEARCH_PERSISTENCE_QUICK_REF.md) |
-| **Doctor Name Search Implementation** | Name search feature | [`/docs/features/DOCTOR_NAME_SEARCH_IMPLEMENTATION.md`](./features/DOCTOR_NAME_SEARCH_IMPLEMENTATION.md) |
+| **Doctor Search Final Quick Ref** | Final quick reference | [`quick-references/DOCTOR_SEARCH_FINAL_QUICK_REF.md`](quick-references/DOCTOR_SEARCH_FINAL_QUICK_REF.md) |
+| **Doctor Search Persistence Complete** | Search persistence implementation | [`features/DOCTOR_SEARCH_PERSISTENCE_COMPLETE.md`](features/DOCTOR_SEARCH_PERSISTENCE_COMPLETE.md) |
+| **Doctor Search Persistence Quick Ref** | Persistence quick guide | [`quick-references/DOCTOR_SEARCH_PERSISTENCE_QUICK_REF.md`](quick-references/DOCTOR_SEARCH_PERSISTENCE_QUICK_REF.md) |
+| **Doctor Name Search Implementation** | Name search feature | [`features/DOCTOR_NAME_SEARCH_IMPLEMENTATION.md`](features/DOCTOR_NAME_SEARCH_IMPLEMENTATION.md) |
 
 ### Verification System
 | Document | Description | Path |
 |----------|-------------|------|
-| **Verification Workflow Complete** | Verification system overview | [`/docs/features/VERIFICATION_WORKFLOW_COMPLETE.md`](./features/VERIFICATION_WORKFLOW_COMPLETE.md) |
-| **Verification Complete Checklist** | Implementation checklist | [`/docs/status/VERIFICATION_COMPLETE_CHECKLIST.md`](./status/VERIFICATION_COMPLETE_CHECKLIST.md) |
-| **Verification Checklist** | Original verification checklist | [`/docs/status/VERIFICATION_CHECKLIST.md`](./status/VERIFICATION_CHECKLIST.md) |
-| **Verification Comments Complete** | Comment system implementation | [`/docs/features/VERIFICATION_COMMENTS_COMPLETE.md`](./features/VERIFICATION_COMMENTS_COMPLETE.md) |
+| **Verification Workflow Complete** | Verification system overview | [`features/VERIFICATION_WORKFLOW_COMPLETE.md`](features/VERIFICATION_WORKFLOW_COMPLETE.md) |
+| **Verification Complete Checklist** | Implementation checklist | [`status/VERIFICATION_COMPLETE_CHECKLIST.md`](status/VERIFICATION_COMPLETE_CHECKLIST.md) |
+| **Verification Checklist** | Original verification checklist | [`status/VERIFICATION_CHECKLIST.md`](status/VERIFICATION_CHECKLIST.md) |
+| **Verification Comments Complete** | Comment system implementation | [`features/VERIFICATION_COMMENTS_COMPLETE.md`](features/VERIFICATION_COMMENTS_COMPLETE.md) |
 
 ---
 
@@ -140,8 +137,8 @@
 ### Testing Documentation
 | Document | Description | Path |
 |----------|-------------|------|
-| **Testing Guide** | General testing strategies and setup | [`/docs/guides/TESTING_GUIDE.md`](./guides/TESTING_GUIDE.md) |
-| **Testing Guide: Appointments** | Appointment-specific testing | [`/docs/guides/TESTING_GUIDE_APPOINTMENTS.md`](./guides/TESTING_GUIDE_APPOINTMENTS.md) |
+| **Testing Guide** | General testing strategies and setup | [`guides/TESTING_GUIDE.md`](guides/TESTING_GUIDE.md) |
+| **Testing Guide: Appointments** | Appointment-specific testing | [`guides/TESTING_GUIDE_APPOINTMENTS.md`](guides/TESTING_GUIDE_APPOINTMENTS.md) |
 
 ---
 
@@ -150,22 +147,21 @@
 ### Status Reports
 | Document | Description | Path |
 |----------|-------------|------|
-| **Chat Verification Complete** | Chat verification & alignment work (Jan 2025) | [`/docs/status/CHAT_VERIFICATION_COMPLETE.md`](./status/CHAT_VERIFICATION_COMPLETE.md) |
-| **Final Fixes Complete** | Latest bug fixes and improvements | [`/docs/status/FINAL_FIXES_COMPLETE.md`](./status/FINAL_FIXES_COMPLETE.md) |
-| **Project Complete Summary** | Overall project completion status | [`/docs/status/PROJECT_COMPLETE_SUMMARY.md`](./status/PROJECT_COMPLETE_SUMMARY.md) |
-| **Implementation Final Summary** | Final implementation report | [`/docs/status/IMPLEMENTATION_FINAL_SUMMARY.md`](./status/IMPLEMENTATION_FINAL_SUMMARY.md) |
-| **Implementation Summary** | Ongoing implementation tracking | [`/docs/status/IMPLEMENTATION_SUMMARY.md`](./status/IMPLEMENTATION_SUMMARY.md) |
+| **Final Fixes Complete** | Latest bug fixes and improvements | [`status/FINAL_FIXES_COMPLETE.md`](status/FINAL_FIXES_COMPLETE.md) |
+| **Project Complete Summary** | Overall project completion status | [`status/PROJECT_COMPLETE_SUMMARY.md`](status/PROJECT_COMPLETE_SUMMARY.md) |
+| **Implementation Final Summary** | Final implementation report | [`status/IMPLEMENTATION_FINAL_SUMMARY.md`](status/IMPLEMENTATION_FINAL_SUMMARY.md) |
+| **Implementation Summary** | Ongoing implementation tracking | [`status/IMPLEMENTATION_SUMMARY.md`](status/IMPLEMENTATION_SUMMARY.md) |
 
 ### Feature Status
 | Document | Description | Path |
 |----------|-------------|------|
-| **Chat Implementation Complete** | Chat system status (90% complete) | [`/docs/features/CHAT_IMPLEMENTATION_COMPLETE.md`](./features/CHAT_IMPLEMENTATION_COMPLETE.md) |
-| **Appointment Implementation Complete** | Appointments status (100% complete) | [`/docs/features/APPOINTMENT_IMPLEMENTATION_COMPLETE.md`](./features/APPOINTMENT_IMPLEMENTATION_COMPLETE.md) |
-| **Health Profile Backend Complete** | Health profiles backend (100%) | [`/docs/features/HEALTH_PROFILE_BACKEND_COMPLETE.md`](./features/HEALTH_PROFILE_BACKEND_COMPLETE.md) |
-| **Health Profile Flutter Complete** | Health profiles mobile (100%) | [`/docs/features/HEALTH_PROFILE_FLUTTER_COMPLETE.md`](./features/HEALTH_PROFILE_FLUTTER_COMPLETE.md) |
-| **Auth Provider Integration Complete** | Auth integration (100% complete) | [`/docs/features/AUTH_PROVIDER_INTEGRATION_COMPLETE.md`](./features/AUTH_PROVIDER_INTEGRATION_COMPLETE.md) |
-| **Verification Workflow Complete** | Verification system (100%) | [`/docs/features/VERIFICATION_WORKFLOW_COMPLETE.md`](./features/VERIFICATION_WORKFLOW_COMPLETE.md) |
-| **Doctor Search Persistence Complete** | Search persistence (100%) | [`/docs/features/DOCTOR_SEARCH_PERSISTENCE_COMPLETE.md`](./features/DOCTOR_SEARCH_PERSISTENCE_COMPLETE.md) |
+| **Chat Implementation Complete** | Chat system status (90% complete) | [`features/CHAT_IMPLEMENTATION_COMPLETE.md`](features/CHAT_IMPLEMENTATION_COMPLETE.md) |
+| **Appointment Implementation Complete** | Appointments status (100% complete) | [`features/APPOINTMENT_IMPLEMENTATION_COMPLETE.md`](features/APPOINTMENT_IMPLEMENTATION_COMPLETE.md) |
+| **Health Profile Backend Complete** | Health profiles backend (100%) | [`features/HEALTH_PROFILE_BACKEND_COMPLETE.md`](features/HEALTH_PROFILE_BACKEND_COMPLETE.md) |
+| **Health Profile Flutter Complete** | Health profiles mobile (100%) | [`features/HEALTH_PROFILE_FLUTTER_COMPLETE.md`](features/HEALTH_PROFILE_FLUTTER_COMPLETE.md) |
+| **Auth Provider Integration Complete** | Auth integration (100% complete) | [`features/AUTH_PROVIDER_INTEGRATION_COMPLETE.md`](features/AUTH_PROVIDER_INTEGRATION_COMPLETE.md) |
+| **Verification Workflow Complete** | Verification system (100%) | [`features/VERIFICATION_WORKFLOW_COMPLETE.md`](features/VERIFICATION_WORKFLOW_COMPLETE.md) |
+| **Doctor Search Persistence Complete** | Search persistence (100%) | [`features/DOCTOR_SEARCH_PERSISTENCE_COMPLETE.md`](features/DOCTOR_SEARCH_PERSISTENCE_COMPLETE.md) |
 
 ---
 
@@ -174,12 +170,12 @@
 ### Quick Reference Guides
 | Document | Description | Path |
 |----------|-------------|------|
-| **Quick Reference** | Main quick reference guide | [`/docs/quick-references/QUICK_REFERENCE.md`](./quick-references/QUICK_REFERENCE.md) |
-| **Project Reference** | Project structure reference | [`/docs/quick-references/PROJECT_REFERENCE.md`](./quick-references/PROJECT_REFERENCE.md) |
-| **Auth Provider Quick Reference** | Auth provider commands | [`/docs/quick-references/AUTH_PROVIDER_QUICK_REFERENCE.md`](./quick-references/AUTH_PROVIDER_QUICK_REFERENCE.md) |
-| **Health Profile Flutter Quick Ref** | Health profile mobile guide | [`/docs/quick-references/HEALTH_PROFILE_FLUTTER_QUICK_REFERENCE.md`](./quick-references/HEALTH_PROFILE_FLUTTER_QUICK_REFERENCE.md) |
-| **Doctor Search Final Quick Ref** | Doctor search commands | [`/docs/quick-references/DOCTOR_SEARCH_FINAL_QUICK_REF.md`](./quick-references/DOCTOR_SEARCH_FINAL_QUICK_REF.md) |
-| **Doctor Search Persistence Quick Ref** | Search persistence guide | [`/docs/quick-references/DOCTOR_SEARCH_PERSISTENCE_QUICK_REF.md`](./quick-references/DOCTOR_SEARCH_PERSISTENCE_QUICK_REF.md) |
+| **Quick Reference** | Main quick reference guide | [`quick-references/QUICK_REFERENCE.md`](quick-references/QUICK_REFERENCE.md) |
+| **Project Reference** | Project structure reference | [`quick-references/PROJECT_REFERENCE.md`](quick-references/PROJECT_REFERENCE.md) |
+| **Auth Provider Quick Reference** | Auth provider commands | [`quick-references/AUTH_PROVIDER_QUICK_REFERENCE.md`](quick-references/AUTH_PROVIDER_QUICK_REFERENCE.md) |
+| **Health Profile Flutter Quick Ref** | Health profile mobile guide | [`quick-references/HEALTH_PROFILE_FLUTTER_QUICK_REFERENCE.md`](quick-references/HEALTH_PROFILE_FLUTTER_QUICK_REFERENCE.md) |
+| **Doctor Search Final Quick Ref** | Doctor search commands | [`quick-references/DOCTOR_SEARCH_FINAL_QUICK_REF.md`](quick-references/DOCTOR_SEARCH_FINAL_QUICK_REF.md) |
+| **Doctor Search Persistence Quick Ref** | Search persistence guide | [`quick-references/DOCTOR_SEARCH_PERSISTENCE_QUICK_REF.md`](quick-references/DOCTOR_SEARCH_PERSISTENCE_QUICK_REF.md) |
 
 ---
 
@@ -200,17 +196,17 @@
 If you're new to the project, follow this learning path:
 
 1. **Start Here**:
-   - [`README.md`](../README.md) - Project overview
-   - [`docs/quick-references/QUICK_REFERENCE.md`](./quick-references/QUICK_REFERENCE.md) - Quick start
+   - [`../README.md`](../README.md) - Project overview
+   - [`quick-references/QUICK_REFERENCE.md`](quick-references/QUICK_REFERENCE.md) - Quick start
    
 2. **Understand Architecture**:
-   - [`docs/ARCHITECTURE.md`](./ARCHITECTURE.md) - System design
-   - [`docs/quick-references/PROJECT_REFERENCE.md`](./quick-references/PROJECT_REFERENCE.md) - Project structure
+   - [`ARCHITECTURE.md`](ARCHITECTURE.md) - System design
+   - [`quick-references/PROJECT_REFERENCE.md`](quick-references/PROJECT_REFERENCE.md) - Project structure
    
 3. **Setup Development**:
-   - [`docs/DEVELOPMENT.md`](./DEVELOPMENT.md) - Dev workflow
-   - [`backend/README.md`](../backend/README.md) - Backend setup
-   - [`mobile/README.md`](../mobile/README.md) - Mobile setup
+   - [`DEVELOPMENT.md`](DEVELOPMENT.md) - Dev workflow
+   - [`../backend/README.md`](../backend/README.md) - Backend setup
+   - [`../mobile/README.md`](../mobile/README.md) - Mobile setup
    
 4. **Explore Features**:
    - Choose a feature area from [Feature Documentation](#feature-documentation)
@@ -218,38 +214,38 @@ If you're new to the project, follow this learning path:
    - Check the quick reference guide
    
 5. **Learn Testing**:
-   - [`docs/guides/TESTING_GUIDE.md`](./guides/TESTING_GUIDE.md) - Testing strategies
+   - [`guides/TESTING_GUIDE.md`](guides/TESTING_GUIDE.md) - Testing strategies
 
 ### 🔍 By Role
 
 #### Backend Developers
-- [`backend/README.md`](../backend/README.md)
-- [`backend/CHAT_IMPLEMENTATION_GUIDE.md`](../backend/CHAT_IMPLEMENTATION_GUIDE.md)
-- [`docs/quick-references/HEALTH_PROFILE_API_REFERENCE.md`](./quick-references/HEALTH_PROFILE_API_REFERENCE.md)
-- [`docs/features/HEALTH_PROFILE_BACKEND_COMPLETE.md`](./features/HEALTH_PROFILE_BACKEND_COMPLETE.md)
-- [`docs/features/APPOINTMENT_IMPLEMENTATION_COMPLETE.md`](./features/APPOINTMENT_IMPLEMENTATION_COMPLETE.md)
+- [`../backend/README.md`](../backend/README.md)
+- [`../backend/CHAT_IMPLEMENTATION_GUIDE.md`](../backend/CHAT_IMPLEMENTATION_GUIDE.md)
+- [`quick-references/HEALTH_PROFILE_API_REFERENCE.md`](quick-references/HEALTH_PROFILE_API_REFERENCE.md)
+- [`features/HEALTH_PROFILE_BACKEND_COMPLETE.md`](features/HEALTH_PROFILE_BACKEND_COMPLETE.md)
+- [`features/APPOINTMENT_IMPLEMENTATION_COMPLETE.md`](features/APPOINTMENT_IMPLEMENTATION_COMPLETE.md)
 
 #### Mobile Developers
-- [`mobile/README.md`](../mobile/README.md)
-- [`mobile/firebase/README.md`](../mobile/firebase/README.md)
-- [`docs/features/HEALTH_PROFILE_FLUTTER_COMPLETE.md`](./features/HEALTH_PROFILE_FLUTTER_COMPLETE.md)
-- [`docs/features/AUTH_PROVIDER_INTEGRATION_COMPLETE.md`](./features/AUTH_PROVIDER_INTEGRATION_COMPLETE.md)
-- [`mobile/DOCTOR_SEARCH_FEATURE.md`](../mobile/DOCTOR_SEARCH_FEATURE.md)
+- [`../mobile/README.md`](../mobile/README.md)
+- [`../mobile/firebase/README.md`](../mobile/firebase/README.md)
+- [`features/HEALTH_PROFILE_FLUTTER_COMPLETE.md`](features/HEALTH_PROFILE_FLUTTER_COMPLETE.md)
+- [`features/AUTH_PROVIDER_INTEGRATION_COMPLETE.md`](features/AUTH_PROVIDER_INTEGRATION_COMPLETE.md)
+- [`../mobile/DOCTOR_SEARCH_FEATURE.md`](../mobile/DOCTOR_SEARCH_FEATURE.md)
 
 #### DevOps Engineers
-- [`docs/DEPLOYMENT.md`](./DEPLOYMENT.md)
-- [`terraform/README.md`](../terraform/README.md)
-- [`docker/README.md`](../docker/README.md)
+- [`DEPLOYMENT.md`](DEPLOYMENT.md)
+- [`../terraform/README.md`](../terraform/README.md)
+- [`../docker/README.md`](../docker/README.md)
 
 #### QA Engineers
-- [`docs/guides/TESTING_GUIDE.md`](./guides/TESTING_GUIDE.md)
-- [`docs/guides/TESTING_GUIDE_APPOINTMENTS.md`](./guides/TESTING_GUIDE_APPOINTMENTS.md)
-- [`docs/status/VERIFICATION_COMPLETE_CHECKLIST.md`](./status/VERIFICATION_COMPLETE_CHECKLIST.md)
+- [`guides/TESTING_GUIDE.md`](guides/TESTING_GUIDE.md)
+- [`guides/TESTING_GUIDE_APPOINTMENTS.md`](guides/TESTING_GUIDE_APPOINTMENTS.md)
+- [`status/VERIFICATION_COMPLETE_CHECKLIST.md`](status/VERIFICATION_COMPLETE_CHECKLIST.md)
 
 #### Project Managers
-- [`docs/status/PROJECT_COMPLETE_SUMMARY.md`](./status/PROJECT_COMPLETE_SUMMARY.md)
-- [`docs/status/IMPLEMENTATION_FINAL_SUMMARY.md`](./status/IMPLEMENTATION_FINAL_SUMMARY.md)
-- [`docs/features/CHAT_IMPLEMENTATION_COMPLETE.md`](./features/CHAT_IMPLEMENTATION_COMPLETE.md)
+- [`status/PROJECT_COMPLETE_SUMMARY.md`](status/PROJECT_COMPLETE_SUMMARY.md)
+- [`status/IMPLEMENTATION_FINAL_SUMMARY.md`](status/IMPLEMENTATION_FINAL_SUMMARY.md)
+- [`features/CHAT_IMPLEMENTATION_COMPLETE.md`](features/CHAT_IMPLEMENTATION_COMPLETE.md)
 
 ---
 
@@ -257,12 +253,12 @@ If you're new to the project, follow this learning path:
 
 | Feature | Status | Documentation |
 |---------|--------|---------------|
-| **Authentication** | ✅ 100% | [Auth Provider Integration](./features/AUTH_PROVIDER_INTEGRATION_COMPLETE.md) |
-| **Health Profiles** | ✅ 100% | [Health Profile Backend](./features/HEALTH_PROFILE_BACKEND_COMPLETE.md) \| [Health Profile Mobile](./features/HEALTH_PROFILE_FLUTTER_COMPLETE.md) |
-| **Appointments** | ✅ 100% | [Appointment Implementation](./features/APPOINTMENT_IMPLEMENTATION_COMPLETE.md) |
+| **Authentication** | ✅ 100% | [Auth Provider Integration](features/AUTH_PROVIDER_INTEGRATION_COMPLETE.md) |
+| **Health Profiles** | ✅ 100% | [Health Profile Backend](features/HEALTH_PROFILE_BACKEND_COMPLETE.md) \| [Health Profile Mobile](features/HEALTH_PROFILE_FLUTTER_COMPLETE.md) |
+| **Appointments** | ✅ 100% | [Appointment Implementation](features/APPOINTMENT_IMPLEMENTATION_COMPLETE.md) |
 | **Doctor Search** | ✅ 100% | [Doctor Search Feature](../mobile/DOCTOR_SEARCH_FEATURE.md) |
-| **Verification System** | ✅ 100% | [Verification Workflow](./features/VERIFICATION_WORKFLOW_COMPLETE.md) |
-| **Real-time Chat** | 🟡 90% | [Chat Implementation](./features/CHAT_IMPLEMENTATION_COMPLETE.md) |
+| **Verification System** | ✅ 100% | [Verification Workflow](features/VERIFICATION_WORKFLOW_COMPLETE.md) |
+| **Real-time Chat** | 🟡 90% | [Chat Implementation](features/CHAT_IMPLEMENTATION_COMPLETE.md) |
 | **Push Notifications** | 🟡 90% | [Chat Implementation Guide](../backend/CHAT_IMPLEMENTATION_GUIDE.md) |
 
 **Legend**: ✅ Complete | 🟡 In Progress | ⏸️ Paused | 📋 Planned
@@ -356,7 +352,7 @@ For questions or issues:
 
 ## 📄 License
 
-See [LICENSE](../LICENSE) file for license information.
+See [LICENSE](./LICENSE) file for license information.
 
 ---
 

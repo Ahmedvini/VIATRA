@@ -4,7 +4,7 @@ A comprehensive digital health platform built with a modern tech stack, featurin
 
 ## 📚 Documentation
 
-**📖 [Complete Documentation Index](./docs/DOCUMENTATION_INDEX.md)**
+**📖 [Complete Documentation Index](docs/DOCUMENTATION_INDEX.md)**
 
 For comprehensive documentation including:
 - 🚀 Getting Started Guides
