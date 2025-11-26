@@ -29,14 +29,16 @@ export const searchDoctors = async (filters, page = 1, limit = 20, sortBy = 'cre
     // Build where clause
     const whereClause = {};
 
-    // Free-text search across multiple fields
+    // Free-text search across multiple fields including doctor names
     if (filters.searchQuery) {
       whereClause[Op.or] = [
         { specialty: { [Op.iLike]: `%${filters.searchQuery}%` } },
         { sub_specialty: { [Op.iLike]: `%${filters.searchQuery}%` } },
         { office_city: { [Op.iLike]: `%${filters.searchQuery}%` } },
         { office_state: { [Op.iLike]: `%${filters.searchQuery}%` } },
-        { bio: { [Op.iLike]: `%${filters.searchQuery}%` } }
+        { bio: { [Op.iLike]: `%${filters.searchQuery}%` } },
+        { '$user.first_name$': { [Op.iLike]: `%${filters.searchQuery}%` } },
+        { '$user.last_name$': { [Op.iLike]: `%${filters.searchQuery}%` } }
       ];
     }
 
@@ -93,7 +95,8 @@ export const searchDoctors = async (filters, page = 1, limit = 20, sortBy = 'cre
         {
           model: User,
           as: 'user',
-          attributes: ['id', 'first_name', 'last_name', 'email', 'phone', 'profile_image']
+          attributes: ['id', 'first_name', 'last_name', 'email', 'phone', 'profile_image'],
+          required: false // Optional join for name search compatibility
         }
       ],
       order: [[sortBy, sortOrder]],
