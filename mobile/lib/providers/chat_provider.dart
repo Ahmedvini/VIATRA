@@ -134,16 +134,12 @@ class ChatProvider with ChangeNotifier {
 
   /// Create or get conversation
   Future<Conversation?> createConversation({
-    required String type,
     required List<String> participantIds,
-    Map<String, dynamic>? metadata,
   }) async {
     try {
       _error = null;
       final conversation = await _chatService.createConversation(
-        type: type,
         participantIds: participantIds,
-        metadata: metadata,
       );
 
       // Add to list if not exists
@@ -227,7 +223,6 @@ class ChatProvider with ChangeNotifier {
     required String conversationId,
     required String messageType,
     String? content,
-    String? parentMessageId,
     Map<String, dynamic>? metadata,
   }) async {
     if (_currentUserId == null) return;
@@ -239,7 +234,6 @@ class ChatProvider with ChangeNotifier {
       messageType: messageType,
       content: content,
       metadata: metadata,
-      parentMessageId: parentMessageId,
     );
 
     // Add to local list
@@ -248,16 +242,15 @@ class ChatProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      // Send via socket for real-time delivery
-      _socketService.sendMessage(
+      // Send via REST API - server will broadcast via socket
+      await _chatService.sendMessage(
         conversationId: conversationId,
         messageType: messageType,
         content: content,
-        parentMessageId: parentMessageId,
         metadata: metadata,
       );
 
-      // The actual message will be received via socket
+      // The real message will be received via socket 'new_message' event
       // Remove pending message when real one arrives
     } catch (e) {
       // Mark as failed
@@ -289,8 +282,8 @@ class ChatProvider with ChangeNotifier {
       }).toList();
       notifyListeners();
 
-      // Send to server via socket
-      _socketService.markRead(
+      // Send to server via REST API - server will broadcast via socket
+      await _chatService.markMessagesAsRead(
         conversationId: conversationId,
         messageIds: messageIds,
       );

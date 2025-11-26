@@ -1,8 +1,12 @@
 import { Op } from 'sequelize';
-import { Conversation, Message, User } from '../models/index.js';
+import initModels from '../models/index.js';
 import redisClient from '../config/redis.js';
 import logger from '../config/logger.js';
 import { sequelize } from '../config/database.js';
+
+// Initialize models
+const models = initModels();
+const { Conversation, Message, User } = models;
 
 /**
  * Generate Redis cache key for chat data

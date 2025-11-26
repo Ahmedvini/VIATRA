@@ -50,12 +50,13 @@
 ### Core Backend
 | Document | Description | Path |
 |----------|-------------|------|
-| **Backend README** | Backend API documentation and setup | [`/backend/README.md`](./backend/README.md) |
-| **Chat Implementation Guide** | Real-time chat system complete guide | [`/backend/CHAT_IMPLEMENTATION_GUIDE.md`](./backend/CHAT_IMPLEMENTATION_GUIDE.md) |
+| **Backend README** | Backend API documentation and setup | [`/backend/README.md`](../backend/README.md) |
+| **Chat Implementation Guide** | Real-time chat system complete guide | [`/backend/CHAT_IMPLEMENTATION_GUIDE.md`](../backend/CHAT_IMPLEMENTATION_GUIDE.md) |
 
 ### API References
 | Document | Description | Path |
 |----------|-------------|------|
+| **Chat API Documentation** | Complete chat REST & Socket.io API reference | [`/docs/api/CHAT_API.md`](./api/CHAT_API.md) |
 | **Health Profile API Reference** | Health profile endpoints and usage | [`/docs/quick-references/HEALTH_PROFILE_API_REFERENCE.md`](./quick-references/HEALTH_PROFILE_API_REFERENCE.md) |
 
 ---
@@ -95,8 +96,10 @@
 ### Chat System
 | Document | Description | Path |
 |----------|-------------|------|
+| **Chat API Documentation** | Complete REST & Socket.io API reference | [`/docs/api/CHAT_API.md`](./api/CHAT_API.md) |
 | **Chat Implementation Complete** | Chat system implementation summary | [`/docs/features/CHAT_IMPLEMENTATION_COMPLETE.md`](./features/CHAT_IMPLEMENTATION_COMPLETE.md) |
 | **Chat Implementation Guide** | Detailed chat system documentation | [`/backend/CHAT_IMPLEMENTATION_GUIDE.md`](../backend/CHAT_IMPLEMENTATION_GUIDE.md) |
+| **Chat Verification Complete** | Verification & alignment work summary | [`/docs/status/CHAT_VERIFICATION_COMPLETE.md`](./status/CHAT_VERIFICATION_COMPLETE.md) |
 
 ### Appointments
 | Document | Description | Path |
@@ -147,6 +150,7 @@
 ### Status Reports
 | Document | Description | Path |
 |----------|-------------|------|
+| **Chat Verification Complete** | Chat verification & alignment work (Jan 2025) | [`/docs/status/CHAT_VERIFICATION_COMPLETE.md`](./status/CHAT_VERIFICATION_COMPLETE.md) |
 | **Final Fixes Complete** | Latest bug fixes and improvements | [`/docs/status/FINAL_FIXES_COMPLETE.md`](./status/FINAL_FIXES_COMPLETE.md) |
 | **Project Complete Summary** | Overall project completion status | [`/docs/status/PROJECT_COMPLETE_SUMMARY.md`](./status/PROJECT_COMPLETE_SUMMARY.md) |
 | **Implementation Final Summary** | Final implementation report | [`/docs/status/IMPLEMENTATION_FINAL_SUMMARY.md`](./status/IMPLEMENTATION_FINAL_SUMMARY.md) |

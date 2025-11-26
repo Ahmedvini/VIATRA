@@ -61,16 +61,12 @@ class ChatService {
 
   /// Create or get existing conversation
   Future<Conversation> createConversation({
-    required String type,
     required List<String> participantIds,
-    Map<String, dynamic>? metadata,
   }) async {
     try {
       final uri = Uri.parse('$_baseUrl/api/v1/chat/conversations');
       final body = json.encode({
-        'type': type,
-        'participant_ids': participantIds,
-        if (metadata != null) 'metadata': metadata,
+        'participantIds': participantIds,
       });
 
       final response = await http.post(
@@ -129,16 +125,14 @@ class ChatService {
     required String conversationId,
     required String messageType,
     String? content,
-    String? parentMessageId,
     Map<String, dynamic>? metadata,
   }) async {
     try {
       final uri = Uri.parse(
           '$_baseUrl/api/v1/chat/conversations/$conversationId/messages');
       final body = json.encode({
-        'message_type': messageType,
+        'messageType': messageType,
         'content': content,
-        if (parentMessageId != null) 'parent_message_id': parentMessageId,
         if (metadata != null) 'metadata': metadata,
       });
 
@@ -168,7 +162,7 @@ class ChatService {
       final uri = Uri.parse(
           '$_baseUrl/api/v1/chat/conversations/$conversationId/read');
       final body = json.encode({
-        'message_ids': messageIds,
+        'messageIds': messageIds,
       });
 
       final response = await http.post(

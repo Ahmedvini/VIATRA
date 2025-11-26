@@ -247,12 +247,22 @@ export const markAsRead = async (req, res) => {
     
     await chatService.markMessagesAsRead(id, userId, value.messageIds);
     
-    // Emit Socket.io event
+    // Emit Socket.io events
     const io = req.app.get('io');
     if (io) {
+      // Emit to conversation room
       io.to(`conversation:${id}`).emit('messages_read', {
+        conversationId: id,
         messageIds: value.messageIds,
         userId: userId
+      });
+      
+      // Also emit individual message_read events for each message
+      value.messageIds.forEach(messageId => {
+        io.to(`conversation:${id}`).emit('message_read', {
+          messageId: messageId,
+          userId: userId
+        });
       });
     }
     

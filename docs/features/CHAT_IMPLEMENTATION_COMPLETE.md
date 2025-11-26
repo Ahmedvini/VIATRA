@@ -4,6 +4,11 @@
 
 This document summarizes the complete implementation of the real-time chat system for the VIATRA Health Platform, including backend Socket.io server, REST APIs, mobile app integration, and push notifications.
 
+**📚 For detailed API documentation, see:** [`docs/api/CHAT_API.md`](../api/CHAT_API.md)
+
+**Last Updated:** January 2025  
+**Status:** ✅ Production Ready
+
 ## ✅ Completed Components
 
 ### Backend Implementation
@@ -450,7 +455,16 @@ flutter test integration_test  # Run integration tests
 
 ## 📚 API Documentation
 
-### REST Endpoints
+**📖 Complete API Reference:** See [`docs/api/CHAT_API.md`](../api/CHAT_API.md) for:
+- REST API endpoints with request/response examples
+- Socket.io event specifications
+- Data models and field conventions
+- Error handling and status codes
+- Best practices and security considerations
+
+### Quick Reference
+
+#### REST Endpoints
 - `GET /api/v1/chat/conversations` - Get conversations
 - `POST /api/v1/chat/conversations` - Create conversation
 - `GET /api/v1/chat/conversations/:id/messages` - Get messages
@@ -461,23 +475,31 @@ flutter test integration_test  # Run integration tests
 
 ### Socket.io Events
 
+**✅ Updated (January 2025):** Socket events have been standardized. Mobile clients now use REST API for message sending and read receipts, with Socket.io used exclusively for server-to-client real-time broadcasts.
+
 **Client → Server:**
 - `join_conversation` - Join a conversation room
 - `leave_conversation` - Leave a conversation room
-- `send_message` - Send a message
 - `typing_start` - Start typing indicator
 - `typing_stop` - Stop typing indicator
 - `mark_delivered` - Mark messages as delivered
-- `mark_read` - Mark messages as read
 
 **Server → Client:**
-- `new_message` - New message received
+- `new_message` - New message received (broadcast after REST API send)
+- `messages_read` - Batch of messages marked as read (broadcast after REST API mark)
+- `message_read` - Individual message read receipt (broadcast after REST API mark)
 - `message_delivered` - Message delivered to user
-- `message_read` - Message read by user
 - `user_typing` - User is typing
 - `user_online` - User came online
 - `user_offline` - User went offline
 - `error` - Error occurred
+
+**🔧 Recent Changes:**
+- Removed client-side `send_message` socket event (use REST API)
+- Removed client-side `mark_read` socket event (use REST API)
+- Added dual `messages_read` (batch) and `message_read` (individual) server events
+- Standardized field names to camelCase in all API contracts
+- Mobile clients updated to match backend contracts
 
 ## 📖 References
 
