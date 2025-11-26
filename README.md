@@ -2,6 +2,21 @@
 
 A comprehensive digital health platform built with a modern tech stack, featuring a Node.js backend and Flutter mobile application, deployed on Google Cloud Platform.
 
+## 📚 Documentation
+
+**📖 [Complete Documentation Index](./docs/DOCUMENTATION_INDEX.md)**
+
+For comprehensive documentation including:
+- 🚀 Getting Started Guides
+- 🎯 Feature Documentation (Chat, Appointments, Health Profiles, etc.)
+- 📱 Mobile Development
+- 🔧 Backend API Reference
+- 🏗️ Infrastructure & Deployment
+- 🧪 Testing Guides
+- ⚡ Quick References
+
+---
+
 ## Overview
 
 Viatra Health Platform is designed to provide secure, scalable healthcare services through a mobile-first approach. The platform consists of:
