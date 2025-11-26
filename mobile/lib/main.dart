@@ -11,9 +11,11 @@ import 'providers/auth_provider.dart';
 import 'providers/registration_provider.dart';
 import 'providers/theme_provider.dart';
 import 'providers/locale_provider.dart';
+import 'providers/health_profile_provider.dart';
 import 'services/api_service.dart';
 import 'services/auth_service.dart';
 import 'services/verification_service.dart';
+import 'services/health_profile_service.dart';
 import 'services/storage_service.dart';
 import 'services/navigation_service.dart';
 import 'utils/error_handler.dart';
@@ -87,6 +89,9 @@ class ViatraApp extends StatelessWidget {
         ProxyProvider<ApiService, VerificationService>(
           update: (_, apiService, __) => VerificationService(apiService),
         ),
+        ProxyProvider<ApiService, HealthProfileService>(
+          update: (_, apiService, __) => HealthProfileService(),
+        ),
         
         // State providers
         ChangeNotifierProvider<ThemeProvider>(
@@ -126,6 +131,15 @@ class ViatraApp extends StatelessWidget {
             provider.setAuthProvider(authProvider);
             return provider;
           },
+        ),
+        ChangeNotifierProxyProvider<HealthProfileService, HealthProfileProvider>(
+          create: (context) => HealthProfileProvider(
+            healthProfileService: context.read<HealthProfileService>(),
+          ),
+          update: (_, healthProfileService, previous) =>
+              previous ?? HealthProfileProvider(
+                healthProfileService: healthProfileService,
+              ),
         ),
       ],
       child: Consumer3<ThemeProvider, LocaleProvider, AuthProvider>(

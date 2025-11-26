@@ -6,6 +6,10 @@ import '../screens/auth/login_screen.dart';
 import '../screens/auth/role_selection_screen.dart';
 import '../screens/auth/registration_form_screen.dart';
 import '../screens/auth/verification_pending_screen.dart';
+import '../screens/health_profile/health_profile_view_screen.dart';
+import '../screens/health_profile/health_profile_edit_screen.dart';
+import '../screens/health_profile/chronic_condition_form_screen.dart';
+import '../screens/health_profile/allergy_form_screen.dart';
 
 /// Application router configuration
 class AppRouter {
@@ -68,6 +72,52 @@ class AppRouter {
         path: '/settings',
         name: 'settings',
         builder: (context, state) => const SettingsScreen(),
+      ),
+      
+      // Health Profile routes
+      GoRoute(
+        path: '/health-profile',
+        name: 'health-profile',
+        builder: (context, state) => const HealthProfileViewScreen(),
+      ),
+      GoRoute(
+        path: '/health-profile/edit',
+        name: 'health-profile-edit',
+        builder: (context, state) {
+          final profile = state.extra;
+          return HealthProfileEditScreen(
+            profile: profile != null ? profile as dynamic : null,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/health-profile/chronic-condition/add',
+        name: 'chronic-condition-add',
+        builder: (context, state) => const ChronicConditionFormScreen(),
+      ),
+      GoRoute(
+        path: '/health-profile/chronic-condition/edit',
+        name: 'chronic-condition-edit',
+        builder: (context, state) {
+          final condition = state.extra as Map<String, dynamic>?;
+          return ChronicConditionFormScreen(
+            existingCondition: condition?['name'] as String?,
+            conditionIndex: condition?['index'] as int?,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/health-profile/allergy/add',
+        name: 'allergy-add',
+        builder: (context, state) => const AllergyFormScreen(),
+      ),
+      GoRoute(
+        path: '/health-profile/allergy/edit',
+        name: 'allergy-edit',
+        builder: (context, state) {
+          final allergy = state.extra as Map<String, dynamic>?;
+          return AllergyFormScreen(existingAllergy: allergy);
+        },
       ),
     ],
     

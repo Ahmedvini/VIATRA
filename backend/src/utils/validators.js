@@ -300,6 +300,229 @@ export const paginationSchema = Joi.object({
 });
 
 /**
+ * Health Profile validation schemas
+ */
+export const healthProfileCreateSchema = Joi.object({
+  bloodType: Joi.string()
+    .valid('A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-')
+    .messages({
+      'any.only': 'Blood type must be one of: A+, A-, B+, B-, AB+, AB-, O+, O-'
+    }),
+  
+  height: Joi.number()
+    .min(30)
+    .max(300)
+    .messages({
+      'number.min': 'Height must be at least 30 cm',
+      'number.max': 'Height cannot exceed 300 cm'
+    }),
+  
+  weight: Joi.number()
+    .min(1)
+    .max(1000)
+    .messages({
+      'number.min': 'Weight must be at least 1 kg',
+      'number.max': 'Weight cannot exceed 1000 kg'
+    }),
+  
+  allergies: Joi.array().items(
+    Joi.object({
+      allergen: Joi.string().required(),
+      severity: Joi.string().valid('mild', 'moderate', 'severe', 'life-threatening'),
+      notes: Joi.string().allow('', null)
+    })
+  ),
+  
+  chronicConditions: Joi.array().items(
+    Joi.object({
+      name: Joi.string().required(),
+      diagnosedDate: Joi.date(),
+      severity: Joi.string().valid('mild', 'moderate', 'severe'),
+      medications: Joi.array().items(Joi.string()),
+      notes: Joi.string().allow('', null)
+    })
+  ),
+  
+  currentMedications: Joi.array().items(
+    Joi.object({
+      name: Joi.string().required(),
+      dosage: Joi.string(),
+      frequency: Joi.string(),
+      startDate: Joi.date(),
+      endDate: Joi.date(),
+      prescribedBy: Joi.string()
+    })
+  ),
+  
+  lifestyle: Joi.object({
+    smoking: Joi.string().valid('never', 'former', 'current', 'occasional'),
+    alcohol: Joi.string().valid('never', 'occasional', 'moderate', 'heavy'),
+    exerciseFrequency: Joi.string().valid('sedentary', 'light', 'moderate', 'active', 'very-active'),
+    diet: Joi.string().valid('omnivore', 'vegetarian', 'vegan', 'pescatarian', 'other')
+  }),
+  
+  emergencyContactName: Joi.string().trim().max(100),
+  
+  emergencyContactPhone: phoneSchema,
+  
+  emergencyContactRelationship: Joi.string().trim().max(50),
+  
+  preferredPharmacy: Joi.string().trim().max(200),
+  
+  insuranceProvider: Joi.string().trim().max(100),
+  
+  insuranceId: Joi.string().trim().max(100),
+  
+  notes: Joi.string().allow('', null).max(2000)
+});
+
+export const healthProfileUpdateSchema = Joi.object({
+  bloodType: Joi.string()
+    .valid('A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-')
+    .messages({
+      'any.only': 'Blood type must be one of: A+, A-, B+, B-, AB+, AB-, O+, O-'
+    }),
+  
+  height: Joi.number()
+    .min(30)
+    .max(300)
+    .messages({
+      'number.min': 'Height must be at least 30 cm',
+      'number.max': 'Height cannot exceed 300 cm'
+    }),
+  
+  weight: Joi.number()
+    .min(1)
+    .max(1000)
+    .messages({
+      'number.min': 'Weight must be at least 1 kg',
+      'number.max': 'Weight cannot exceed 1000 kg'
+    }),
+  
+  allergies: Joi.array().items(
+    Joi.object({
+      allergen: Joi.string().required(),
+      severity: Joi.string().valid('mild', 'moderate', 'severe', 'life-threatening'),
+      notes: Joi.string().allow('', null)
+    })
+  ),
+  
+  chronicConditions: Joi.array().items(
+    Joi.object({
+      name: Joi.string().required(),
+      diagnosedDate: Joi.date(),
+      severity: Joi.string().valid('mild', 'moderate', 'severe'),
+      medications: Joi.array().items(Joi.string()),
+      notes: Joi.string().allow('', null)
+    })
+  ),
+  
+  currentMedications: Joi.array().items(
+    Joi.object({
+      name: Joi.string().required(),
+      dosage: Joi.string(),
+      frequency: Joi.string(),
+      startDate: Joi.date(),
+      endDate: Joi.date(),
+      prescribedBy: Joi.string()
+    })
+  ),
+  
+  lifestyle: Joi.object({
+    smoking: Joi.string().valid('never', 'former', 'current', 'occasional'),
+    alcohol: Joi.string().valid('never', 'occasional', 'moderate', 'heavy'),
+    exerciseFrequency: Joi.string().valid('sedentary', 'light', 'moderate', 'active', 'very-active'),
+    diet: Joi.string().valid('omnivore', 'vegetarian', 'vegan', 'pescatarian', 'other')
+  }),
+  
+  emergencyContactName: Joi.string().trim().max(100),
+  
+  emergencyContactPhone: phoneSchema,
+  
+  emergencyContactRelationship: Joi.string().trim().max(50),
+  
+  preferredPharmacy: Joi.string().trim().max(200),
+  
+  insuranceProvider: Joi.string().trim().max(100),
+  
+  insuranceId: Joi.string().trim().max(100),
+  
+  notes: Joi.string().allow('', null).max(2000)
+});
+
+export const chronicConditionSchema = Joi.object({
+  name: Joi.string().required().trim().min(2).max(200)
+    .messages({
+      'any.required': 'Condition name is required',
+      'string.min': 'Condition name must be at least 2 characters',
+      'string.max': 'Condition name cannot exceed 200 characters'
+    }),
+  
+  diagnosedDate: Joi.date()
+    .max('now')
+    .messages({
+      'date.max': 'Diagnosed date cannot be in the future'
+    }),
+  
+  severity: Joi.string()
+    .valid('mild', 'moderate', 'severe')
+    .required()
+    .messages({
+      'any.required': 'Severity is required',
+      'any.only': 'Severity must be mild, moderate, or severe'
+    }),
+  
+  medications: Joi.array().items(Joi.string()),
+  
+  notes: Joi.string().allow('', null).max(1000)
+});
+
+export const allergySchema = Joi.object({
+  allergen: Joi.string().required().trim().min(2).max(200)
+    .messages({
+      'any.required': 'Allergen name is required',
+      'string.min': 'Allergen name must be at least 2 characters',
+      'string.max': 'Allergen name cannot exceed 200 characters'
+    }),
+  
+  severity: Joi.string()
+    .valid('mild', 'moderate', 'severe', 'life-threatening')
+    .required()
+    .messages({
+      'any.required': 'Severity is required',
+      'any.only': 'Severity must be mild, moderate, severe, or life-threatening'
+    }),
+  
+  notes: Joi.string().allow('', null).max(500)
+});
+
+export const vitalsSchema = Joi.object({
+  height: Joi.number()
+    .min(30)
+    .max(300)
+    .messages({
+      'number.min': 'Height must be at least 30 cm',
+      'number.max': 'Height cannot exceed 300 cm'
+    }),
+  
+  weight: Joi.number()
+    .min(1)
+    .max(1000)
+    .messages({
+      'number.min': 'Weight must be at least 1 kg',
+      'number.max': 'Weight cannot exceed 1000 kg'
+    }),
+  
+  bloodType: Joi.string()
+    .valid('A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-')
+    .messages({
+      'any.only': 'Blood type must be one of: A+, A-, B+, B-, AB+, AB-, O+, O-'
+    })
+}).min(1).messages({
+  'object.min': 'At least one vital field must be provided'
+});
+
+/**
  * Validation middleware factory
  * @param {Object} schema - Joi schema to validate against
  * @param {string} property - Request property to validate (body, query, params)

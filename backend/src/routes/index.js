@@ -1,6 +1,7 @@
 import express from 'express';
 import authRoutes from './auth.js';
 import verificationRoutes from './verification.js';
+import healthProfileRoutes from './healthProfile.js';
 
 const router = express.Router();
 
@@ -12,7 +13,8 @@ router.get('/', (req, res) => {
     timestamp: new Date().toISOString(),
     endpoints: {
       authentication: '/auth',
-      verification: '/verification'
+      verification: '/verification',
+      healthProfiles: '/health-profiles'
     },
     documentation: {
       auth: {
@@ -35,6 +37,16 @@ router.get('/', (req, res) => {
         getPending: 'GET /verification/pending (Admin)',
         bulkUpdate: 'POST /verification/bulk-update (Admin)',
         getStats: 'GET /verification/stats (Admin)'
+      },
+      healthProfiles: {
+        getMyProfile: 'GET /health-profiles/me',
+        createProfile: 'POST /health-profiles',
+        updateProfile: 'PATCH /health-profiles/me',
+        addChronicCondition: 'POST /health-profiles/me/chronic-conditions',
+        removeChronicCondition: 'DELETE /health-profiles/me/chronic-conditions/:conditionId',
+        addAllergy: 'POST /health-profiles/me/allergies',
+        removeAllergy: 'DELETE /health-profiles/me/allergies/:allergen',
+        updateVitals: 'PATCH /health-profiles/me/vitals'
       }
     },
     rateLimits: {
@@ -50,6 +62,9 @@ router.get('/', (req, res) => {
         documentUpload: '10 per hour',
         resendEmail: '2 per 15 minutes',
         adminActions: '50 per 5 minutes'
+      },
+      healthProfile: {
+        allEndpoints: '10 per minute'
       }
     }
   });
@@ -58,6 +73,7 @@ router.get('/', (req, res) => {
 // Mount route modules
 router.use('/auth', authRoutes);
 router.use('/verification', verificationRoutes);
+router.use('/health-profiles', healthProfileRoutes);
 
 // API status endpoint
 router.get('/status', (req, res) => {
@@ -87,7 +103,8 @@ router.get('/features', (req, res) => {
       adminPanel: true,
       rateLimiting: true,
       sessionManagement: true,
-      rbac: true // Role-based access control
+      rbac: true, // Role-based access control
+      healthProfileManagement: true
     },
     supportedRoles: ['patient', 'doctor', 'admin'],
     supportedDocumentTypes: [

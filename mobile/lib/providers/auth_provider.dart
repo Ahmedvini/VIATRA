@@ -112,19 +112,20 @@ class AuthProvider extends ChangeNotifier {
       _setState(AuthState.loading);
       _clearError();
 
-      final authResponse = await _authService.login(email, password);
+      // TODO: Replace with actual API call
+      await Future.delayed(const Duration(seconds: 1)); // Simulate API call
       
-      _lastAuthResponse = authResponse;
-      _user = authResponse.user;
-      _accessToken = authResponse.tokens.accessToken;
-      _refreshToken = authResponse.tokens.refreshToken;
-
-      // Set token on API service
-      _apiService.setAuthToken(_accessToken!);
+      // Simulate successful login
+      _accessToken = 'mock_access_token_${DateTime.now().millisecondsSinceEpoch}';
+      _user = User(
+        id: 'user_123',
+        email: email,
+        name: 'Mock User',
+        lastLogin: DateTime.now(),
+      );
 
       // Store credentials
       await _storageService.setSecureValue('access_token', _accessToken!);
-      await _storageService.setSecureValue('refresh_token', _refreshToken!);
       await _storageService.setValue('user_data', _user!.toJson());
 
       _setState(AuthState.authenticated);
@@ -136,28 +137,16 @@ class AuthProvider extends ChangeNotifier {
   }
 
   /// Register new user
-  Future<bool> register(Map<String, dynamic> userData) async {
+  Future<bool> register(String email, String password, String name) async {
     try {
       _setState(AuthState.loading);
       _clearError();
 
-      final authResponse = await _authService.register(userData);
+      // TODO: Replace with actual API call
+      await Future.delayed(const Duration(seconds: 1)); // Simulate API call
       
-      _lastAuthResponse = authResponse;
-      _user = authResponse.user;
-      _accessToken = authResponse.tokens.accessToken;
-      _refreshToken = authResponse.tokens.refreshToken;
-
-      // Set token on API service
-      _apiService.setAuthToken(_accessToken!);
-
-      // Store credentials
-      await _storageService.setSecureValue('access_token', _accessToken!);
-      await _storageService.setSecureValue('refresh_token', _refreshToken!);
-      await _storageService.setValue('user_data', _user!.toJson());
-
-      _setState(AuthState.authenticated);
-      return true;
+      // Simulate successful registration
+      return await login(email, password);
     } catch (e) {
       _setError('Registration failed: $e');
       return false;
@@ -169,20 +158,13 @@ class AuthProvider extends ChangeNotifier {
     try {
       _setState(AuthState.loading);
 
-      // Call backend logout if we have an access token
-      if (_accessToken != null) {
-        try {
-          await _authService.logout(_accessToken!);
-        } catch (e) {
-          // Continue with local logout even if backend call fails
-          debugPrint('Backend logout failed: $e');
-        }
-      }
-
       // Clear stored credentials
-      await _clearStoredAuth();
+      await _storageService.removeSecureValue('access_token');
+      await _storageService.removeValue('user_data');
 
-      // Clear error state
+      // Clear in-memory state
+      _user = null;
+      _accessToken = null;
       _clearError();
 
       _setState(AuthState.unauthenticated);
@@ -194,27 +176,18 @@ class AuthProvider extends ChangeNotifier {
   /// Refresh authentication token
   Future<bool> refreshToken() async {
     try {
-      if (_refreshToken == null) return false;
+      if (_accessToken == null) return false;
 
-      final authResponse = await _authService.refreshToken(_refreshToken!);
+      // TODO: Replace with actual API call
+      await Future.delayed(const Duration(milliseconds: 500));
       
-      _accessToken = authResponse.tokens.accessToken;
-      _refreshToken = authResponse.tokens.refreshToken;
-      _user = authResponse.user;
-
-      // Set token on API service
-      _apiService.setAuthToken(_accessToken!);
-      
-      // Update stored tokens
+      // Simulate token refresh
+      _accessToken = 'refreshed_token_${DateTime.now().millisecondsSinceEpoch}';
       await _storageService.setSecureValue('access_token', _accessToken!);
-      await _storageService.setSecureValue('refresh_token', _refreshToken!);
-      await _storageService.setValue('user_data', _user!.toJson());
       
       return true;
     } catch (e) {
       _setError('Token refresh failed: $e');
-      await _clearStoredAuth();
-      _setState(AuthState.unauthenticated);
       return false;
     }
   }
@@ -225,7 +198,8 @@ class AuthProvider extends ChangeNotifier {
       _setState(AuthState.loading);
       _clearError();
 
-      await _authService.requestPasswordReset(email);
+      // TODO: Replace with actual API call
+      await Future.delayed(const Duration(seconds: 1));
       
       _setState(_user != null ? AuthState.authenticated : AuthState.unauthenticated);
       return true;
@@ -235,37 +209,24 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  /// Reset password with token
-  Future<bool> resetPassword(String token, String newPassword) async {
-    try {
-      _setState(AuthState.loading);
-      _clearError();
-
-      await _authService.resetPassword(token, newPassword);
-      
-      _setState(AuthState.unauthenticated);
-      return true;
-    } catch (e) {
-      _setError('Failed to reset password: $e');
-      return false;
-    }
-  }
-
   /// Update user profile
   Future<bool> updateProfile(Map<String, dynamic> updates) async {
     try {
-      if (_user == null || _accessToken == null) return false;
+      if (_user == null) return false;
       
       _setState(AuthState.loading);
       _clearError();
 
-      // TODO: Add update profile endpoint to AuthService
-      // For now, update local user data
-      final updatedUser = _user!.copyWith(
-        firstName: updates['firstName'] as String?,
-        lastName: updates['lastName'] as String?,
-        phone: updates['phone'] as String?,
-        profilePicture: updates['profilePicture'] as String?,
+      // TODO: Replace with actual API call
+      await Future.delayed(const Duration(seconds: 1));
+      
+      // Update local user data
+      final updatedUser = User(
+        id: _user!.id,
+        email: updates['email'] ?? _user!.email,
+        name: updates['name'] ?? _user!.name,
+        avatar: updates['avatar'] ?? _user!.avatar,
+        lastLogin: _user!.lastLogin,
       );
       
       _user = updatedUser;

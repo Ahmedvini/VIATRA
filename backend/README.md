@@ -337,6 +337,245 @@ Authorization: Bearer <access_token>
 Roles: admin
 ```
 
+### Health Profile Management API
+
+All health profile endpoints are prefixed with `/api/v1/health-profiles`:
+
+#### Get My Health Profile
+```
+GET /api/v1/health-profiles/me
+Authorization: Bearer <access_token>
+Roles: patient
+
+Response:
+{
+  "message": "Health profile retrieved successfully",
+  "data": {
+    "id": "profile_id",
+    "patientId": "patient_id",
+    "bloodType": "A+",
+    "height": 175,
+    "weight": 70,
+    "chronicConditions": [
+      {
+        "name": "Diabetes Type 2",
+        "diagnosedYear": 2020,
+        "notes": "Under control with medication"
+      }
+    ],
+    "allergies": [
+      {
+        "allergen": "Penicillin",
+        "reaction": "Skin rash",
+        "severity": "moderate"
+      }
+    ],
+    "medications": ["Metformin", "Aspirin"],
+    "emergencyContact": {
+      "name": "Jane Doe",
+      "relationship": "Spouse",
+      "phone": "+1234567890"
+    },
+    "notes": "Additional health information",
+    "bloodPressureSystolic": 120,
+    "bloodPressureDiastolic": 80,
+    "heartRate": 72,
+    "bloodGlucose": 95,
+    "oxygenSaturation": 98,
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
+  }
+}
+```
+
+Rate limit: 10 requests per minute
+
+#### Create Health Profile
+```
+POST /api/v1/health-profiles
+Authorization: Bearer <access_token>
+Content-Type: application/json
+Roles: patient
+
+{
+  "bloodType": "A+",
+  "height": 175,
+  "weight": 70,
+  "chronicConditions": [
+    {
+      "name": "Diabetes Type 2",
+      "diagnosedYear": 2020,
+      "notes": "Under control with medication"
+    }
+  ],
+  "allergies": [
+    {
+      "allergen": "Penicillin",
+      "reaction": "Skin rash",
+      "severity": "moderate"
+    }
+  ],
+  "medications": ["Metformin", "Aspirin"],
+  "emergencyContact": {
+    "name": "Jane Doe",
+    "relationship": "Spouse",
+    "phone": "+1234567890"
+  },
+  "notes": "Additional health information"
+}
+
+Response:
+{
+  "message": "Health profile created successfully",
+  "data": { /* health profile object */ }
+}
+```
+
+Rate limit: 10 requests per minute
+
+#### Update Health Profile
+```
+PATCH /api/v1/health-profiles/me
+Authorization: Bearer <access_token>
+Content-Type: application/json
+Roles: patient
+
+{
+  "bloodType": "A+",
+  "height": 180,
+  "weight": 72,
+  "medications": ["Metformin", "Aspirin", "Lisinopril"],
+  "notes": "Updated health information"
+}
+
+Response:
+{
+  "message": "Health profile updated successfully",
+  "data": { /* updated health profile object */ }
+}
+```
+
+Rate limit: 10 requests per minute
+
+#### Add Chronic Condition
+```
+POST /api/v1/health-profiles/me/chronic-conditions
+Authorization: Bearer <access_token>
+Content-Type: application/json
+Roles: patient
+
+{
+  "name": "Hypertension",
+  "diagnosedYear": 2022,
+  "notes": "Controlled with medication"
+}
+
+Response:
+{
+  "message": "Chronic condition added successfully",
+  "data": { /* updated health profile object */ }
+}
+```
+
+Rate limit: 10 requests per minute
+
+#### Remove Chronic Condition
+```
+DELETE /api/v1/health-profiles/me/chronic-conditions/:conditionId
+Authorization: Bearer <access_token>
+Roles: patient
+
+Response:
+{
+  "message": "Chronic condition removed successfully",
+  "data": { /* updated health profile object */ }
+}
+```
+
+Rate limit: 10 requests per minute
+
+#### Add Allergy
+```
+POST /api/v1/health-profiles/me/allergies
+Authorization: Bearer <access_token>
+Content-Type: application/json
+Roles: patient
+
+{
+  "allergen": "Peanuts",
+  "reaction": "Anaphylaxis",
+  "severity": "severe"
+}
+
+Response:
+{
+  "message": "Allergy added successfully",
+  "data": { /* updated health profile object */ }
+}
+```
+
+Rate limit: 10 requests per minute
+
+#### Remove Allergy
+```
+DELETE /api/v1/health-profiles/me/allergies/:allergen
+Authorization: Bearer <access_token>
+Roles: patient
+
+Response:
+{
+  "message": "Allergy removed successfully",
+  "data": { /* updated health profile object */ }
+}
+```
+
+Rate limit: 10 requests per minute
+
+#### Update Vitals
+```
+PATCH /api/v1/health-profiles/me/vitals
+Authorization: Bearer <access_token>
+Content-Type: application/json
+Roles: patient
+
+{
+  "bloodPressureSystolic": 125,
+  "bloodPressureDiastolic": 82,
+  "heartRate": 75,
+  "bloodGlucose": 98,
+  "oxygenSaturation": 99
+}
+
+Response:
+{
+  "message": "Vitals updated successfully",
+  "data": { /* updated health profile object */ }
+}
+```
+
+Rate limit: 10 requests per minute
+
+**Authentication & Authorization**
+- All health profile endpoints require authentication via Bearer token
+- Only patients can access their own health profiles
+- Patient lookup is automatic based on the authenticated user
+
+**Caching**
+- Health profiles are cached in Redis with a 5-minute TTL
+- Cache is automatically invalidated on create, update, or delete operations
+- Force refresh by re-fetching after cache expiration
+
+**Validation**
+- All request bodies are validated using Joi schemas
+- Blood type must be one of: A+, A-, B+, B-, AB+, AB-, O+, O-
+- Height must be between 30-300 cm
+- Weight must be between 1-500 kg
+- Blood pressure systolic: 70-250 mmHg, diastolic: 40-150 mmHg
+- Heart rate: 30-250 bpm
+- Blood glucose: 20-600 mg/dL
+- Oxygen saturation: 50-100%
+- Allergy severity must be: mild, moderate, or severe
+
 ### cURL Examples
 
 #### Register a new patient

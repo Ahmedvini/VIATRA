@@ -257,23 +257,6 @@ class Validators {
     return null;
   }
 
-  // Medical information validation
-  static String? validateBloodType(String? value) {
-    if (value == null || value.isEmpty) {
-      return null; // Optional field
-    }
-    
-    final validBloodTypes = [
-      'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'
-    ];
-    
-    if (!validBloodTypes.contains(value)) {
-      return 'Please select a valid blood type';
-    }
-    
-    return null;
-  }
-
   // Required field validation
   static String? validateRequired(String? value, String fieldName) {
     if (value == null || value.isEmpty) {
@@ -342,6 +325,232 @@ class Validators {
     
     if (age < 0 || age > 120) {
       return 'Please enter a valid age between 0 and 120';
+    }
+    
+    return null;
+  }
+}
+
+/// Validators specific to health profile management
+class HealthProfileValidators {
+  // Blood type validation
+  static String? validateBloodType(String? value) {
+    if (value == null || value.isEmpty) {
+      return null; // Optional field
+    }
+    
+    final validBloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+    if (!validBloodTypes.contains(value)) {
+      return 'Please select a valid blood type';
+    }
+    
+    return null;
+  }
+
+  // Height validation (in cm)
+  static String? validateHeight(String? value) {
+    if (value == null || value.isEmpty) {
+      return null; // Optional field
+    }
+    
+    final height = double.tryParse(value);
+    if (height == null) {
+      return 'Please enter a valid height';
+    }
+    
+    if (height < 30 || height > 300) {
+      return 'Height must be between 30 and 300 cm';
+    }
+    
+    return null;
+  }
+
+  // Weight validation (in kg)
+  static String? validateWeight(String? value) {
+    if (value == null || value.isEmpty) {
+      return null; // Optional field
+    }
+    
+    final weight = double.tryParse(value);
+    if (weight == null) {
+      return 'Please enter a valid weight';
+    }
+    
+    if (weight < 1 || weight > 500) {
+      return 'Weight must be between 1 and 500 kg';
+    }
+    
+    return null;
+  }
+
+  // Blood pressure systolic validation
+  static String? validateBloodPressureSystolic(String? value) {
+    if (value == null || value.isEmpty) {
+      return null; // Optional field
+    }
+    
+    final systolic = int.tryParse(value);
+    if (systolic == null) {
+      return 'Please enter a valid number';
+    }
+    
+    if (systolic < 70 || systolic > 250) {
+      return 'Systolic pressure must be between 70 and 250 mmHg';
+    }
+    
+    return null;
+  }
+
+  // Blood pressure diastolic validation
+  static String? validateBloodPressureDiastolic(String? value) {
+    if (value == null || value.isEmpty) {
+      return null; // Optional field
+    }
+    
+    final diastolic = int.tryParse(value);
+    if (diastolic == null) {
+      return 'Please enter a valid number';
+    }
+    
+    if (diastolic < 40 || diastolic > 150) {
+      return 'Diastolic pressure must be between 40 and 150 mmHg';
+    }
+    
+    return null;
+  }
+
+  // Heart rate validation
+  static String? validateHeartRate(String? value) {
+    if (value == null || value.isEmpty) {
+      return null; // Optional field
+    }
+    
+    final heartRate = int.tryParse(value);
+    if (heartRate == null) {
+      return 'Please enter a valid number';
+    }
+    
+    if (heartRate < 30 || heartRate > 250) {
+      return 'Heart rate must be between 30 and 250 bpm';
+    }
+    
+    return null;
+  }
+
+  // Blood glucose validation
+  static String? validateBloodGlucose(String? value) {
+    if (value == null || value.isEmpty) {
+      return null; // Optional field
+    }
+    
+    final glucose = double.tryParse(value);
+    if (glucose == null) {
+      return 'Please enter a valid number';
+    }
+    
+    if (glucose < 20 || glucose > 600) {
+      return 'Blood glucose must be between 20 and 600 mg/dL';
+    }
+    
+    return null;
+  }
+
+  // Oxygen saturation validation
+  static String? validateOxygenSaturation(String? value) {
+    if (value == null || value.isEmpty) {
+      return null; // Optional field
+    }
+    
+    final oxygen = double.tryParse(value);
+    if (oxygen == null) {
+      return 'Please enter a valid number';
+    }
+    
+    if (oxygen < 50 || oxygen > 100) {
+      return 'Oxygen saturation must be between 50 and 100%';
+    }
+    
+    return null;
+  }
+
+  // Chronic condition name validation
+  static String? validateChronicConditionName(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Condition name is required';
+    }
+    
+    if (value.trim().length < 2) {
+      return 'Condition name must be at least 2 characters';
+    }
+    
+    if (value.trim().length > 100) {
+      return 'Condition name must be no more than 100 characters';
+    }
+    
+    return null;
+  }
+
+  // Diagnosed year validation
+  static String? validateDiagnosedYear(String? value) {
+    if (value == null || value.isEmpty) {
+      return null; // Optional field
+    }
+    
+    final year = int.tryParse(value);
+    if (year == null) {
+      return 'Please enter a valid year';
+    }
+    
+    final currentYear = DateTime.now().year;
+    if (year < 1900 || year > currentYear) {
+      return 'Year must be between 1900 and $currentYear';
+    }
+    
+    return null;
+  }
+
+  // Allergen validation
+  static String? validateAllergen(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Allergen name is required';
+    }
+    
+    if (value.trim().length < 2) {
+      return 'Allergen name must be at least 2 characters';
+    }
+    
+    if (value.trim().length > 100) {
+      return 'Allergen name must be no more than 100 characters';
+    }
+    
+    return null;
+  }
+
+  // Allergy reaction validation
+  static String? validateAllergyReaction(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Reaction description is required';
+    }
+    
+    if (value.trim().length < 2) {
+      return 'Reaction must be at least 2 characters';
+    }
+    
+    if (value.trim().length > 200) {
+      return 'Reaction must be no more than 200 characters';
+    }
+    
+    return null;
+  }
+
+  // Notes validation
+  static String? validateNotes(String? value) {
+    if (value == null || value.isEmpty) {
+      return null; // Optional field
+    }
+    
+    if (value.trim().length > 1000) {
+      return 'Notes must be no more than 1000 characters';
     }
     
     return null;
