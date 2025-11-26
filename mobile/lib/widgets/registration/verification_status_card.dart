@@ -3,8 +3,18 @@ import '../../models/verification_model.dart';
 import '../../utils/constants.dart';
 
 class VerificationStatusCard extends StatelessWidget {
-  final List<Verification> verifications;
-  final String userRole;
+  final List<Verification> verifica                  ),
+                ],
+                if (verification?.comments?.isNotEmpty == true) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    verification!.comments!,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurface.withOpacity(0.7),
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ],al String userRole;
   final bool isLoading;
   final VoidCallback? onRefresh;
   final void Function(String documentType)? onResubmit;
@@ -215,10 +225,10 @@ class VerificationStatusCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                if (verification?.feedback?.isNotEmpty == true) ...[
+                if (verification?.comments?.isNotEmpty == true) ...[
                   const SizedBox(height: 4),
                   Text(
-                    verification!.feedback!,
+                    verification!.comments!,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: colorScheme.onSurface.withOpacity(0.7),
                       fontStyle: FontStyle.italic,

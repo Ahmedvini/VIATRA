@@ -211,4 +211,24 @@ class AuthService {
       return ApiResponse.error('Token validation failed: ${e.toString()}');
     }
   }
+
+  /// Update user profile
+  Future<ApiResponse<User>> updateProfile(String token, Map<String, dynamic> updates) async {
+    try {
+      // Set token for authenticated request
+      _apiService.setAuthToken(token);
+      
+      final response = await _apiService.put('/auth/profile', updates);
+      
+      if (response.isSuccess && response.data != null) {
+        final userData = response.data!['data'] ?? response.data!;
+        final user = User.fromJson(userData);
+        return ApiResponse.success(user);
+      }
+      
+      return ApiResponse.error(response.message ?? 'Profile update failed');
+    } catch (e) {
+      return ApiResponse.error('Profile update failed: ${e.toString()}');
+    }
+  }
 }

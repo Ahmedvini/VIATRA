@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../models/health_profile_model.dart';
 
 /// Widget for displaying a chronic condition in a tile format
 class ChronicConditionTile extends StatelessWidget {
-  final Map<String, dynamic> condition;
+  final ChronicCondition condition;
   final VoidCallback? onTap;
   final VoidCallback? onDelete;
 
@@ -13,11 +14,21 @@ class ChronicConditionTile extends StatelessWidget {
     this.onDelete,
   });
 
+  Color _getSeverityColor() {
+    switch (condition.severity.toLowerCase()) {
+      case 'severe':
+        return Colors.red;
+      case 'moderate':
+        return Colors.orange;
+      case 'mild':
+      default:
+        return Colors.blue;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final name = condition['name'] as String? ?? 'Unknown Condition';
-    final diagnosedYear = condition['diagnosedYear'] as int?;
-    final notes = condition['notes'] as String?;
+    final severityColor = _getSeverityColor();
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -26,16 +37,16 @@ class ChronicConditionTile extends StatelessWidget {
         leading: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.blue.shade100,
+            color: severityColor.withOpacity(0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(
             Icons.medical_information,
-            color: Colors.blue.shade700,
+            color: severityColor,
           ),
         ),
         title: Text(
-          name,
+          condition.name,
           style: const TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 16,
@@ -44,7 +55,27 @@ class ChronicConditionTile extends StatelessWidget {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (diagnosedYear != null) ...[
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: severityColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    condition.severity.toUpperCase(),
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: severityColor,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            if (condition.diagnosedDate != null) ...[
               const SizedBox(height: 4),
               Row(
                 children: [
@@ -55,7 +86,7 @@ class ChronicConditionTile extends StatelessWidget {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    'Diagnosed: $diagnosedYear',
+                    'Diagnosed: ${condition.diagnosedDate!.year}-${condition.diagnosedDate!.month.toString().padLeft(2, '0')}',
                     style: TextStyle(
                       fontSize: 12,
                       color: Colors.grey.shade600,
@@ -64,10 +95,34 @@ class ChronicConditionTile extends StatelessWidget {
                 ],
               ),
             ],
-            if (notes != null && notes.isNotEmpty) ...[
+            if (condition.medications.isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  Icon(
+                    Icons.medication,
+                    size: 14,
+                    color: Colors.grey.shade600,
+                  ),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: Text(
+                      condition.medications.join(', '),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey.shade600,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+            if (condition.notes != null && condition.notes!.isNotEmpty) ...[
               const SizedBox(height: 4),
               Text(
-                notes,
+                condition.notes!,
                 style: TextStyle(
                   fontSize: 12,
                   color: Colors.grey.shade700,
@@ -97,7 +152,7 @@ class ChronicConditionTile extends StatelessWidget {
       builder: (context) => AlertDialog(
         title: const Text('Delete Condition'),
         content: Text(
-          'Are you sure you want to delete "${condition['name']}"?',
+          'Are you sure you want to delete "${condition.name}"?',
         ),
         actions: [
           TextButton(

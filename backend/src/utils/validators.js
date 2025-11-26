@@ -244,17 +244,24 @@ export const documentUploadSchema = Joi.object({
  * Verification approval/rejection schema
  */
 export const verificationActionSchema = Joi.object({
+  status: Joi.string()
+    .valid('approved', 'rejected')
+    .required()
+    .messages({
+      'any.only': 'Status must be either approved or rejected',
+      'any.required': 'Status is required'
+    }),
+  
   reason: Joi.string()
     .trim()
     .max(1000)
-    .when('action', {
-      is: 'reject',
-      then: Joi.required(),
+    .when('status', {
+      is: 'rejected',
+      then: Joi.optional(), // Optional but recommended for rejected
       otherwise: Joi.optional()
     })
     .messages({
-      'string.max': 'Reason cannot exceed 1000 characters',
-      'any.required': 'Reason is required when rejecting verification'
+      'string.max': 'Reason cannot exceed 1000 characters'
     }),
   
   notes: Joi.string()

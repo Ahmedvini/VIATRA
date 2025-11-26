@@ -12,10 +12,14 @@ import 'providers/registration_provider.dart';
 import 'providers/theme_provider.dart';
 import 'providers/locale_provider.dart';
 import 'providers/health_profile_provider.dart';
+import 'providers/doctor_search_provider.dart';
+import 'providers/appointment_provider.dart';
 import 'services/api_service.dart';
 import 'services/auth_service.dart';
 import 'services/verification_service.dart';
 import 'services/health_profile_service.dart';
+import 'services/doctor_service.dart';
+import 'services/appointment_service.dart';
 import 'services/storage_service.dart';
 import 'services/navigation_service.dart';
 import 'utils/error_handler.dart';
@@ -92,6 +96,12 @@ class ViatraApp extends StatelessWidget {
         ProxyProvider<ApiService, HealthProfileService>(
           update: (_, apiService, __) => HealthProfileService(),
         ),
+        ProxyProvider<ApiService, DoctorService>(
+          update: (_, apiService, __) => DoctorService(apiService),
+        ),
+        ProxyProvider<ApiService, AppointmentService>(
+          update: (_, apiService, __) => AppointmentService(apiService),
+        ),
         
         // State providers
         ChangeNotifierProvider<ThemeProvider>(
@@ -132,13 +142,37 @@ class ViatraApp extends StatelessWidget {
             return provider;
           },
         ),
-        ChangeNotifierProxyProvider<HealthProfileService, HealthProfileProvider>(
+        ChangeNotifierProxyProvider2<HealthProfileService, StorageService, HealthProfileProvider>(
           create: (context) => HealthProfileProvider(
             healthProfileService: context.read<HealthProfileService>(),
+            storageService: context.read<StorageService>(),
           ),
-          update: (_, healthProfileService, previous) =>
+          update: (_, healthProfileService, storageService, previous) =>
               previous ?? HealthProfileProvider(
                 healthProfileService: healthProfileService,
+                storageService: storageService,
+              ),
+        ),
+        ChangeNotifierProxyProvider2<DoctorService, StorageService, DoctorSearchProvider>(
+          create: (context) => DoctorSearchProvider(
+            doctorService: context.read<DoctorService>(),
+            storageService: context.read<StorageService>(),
+          ),
+          update: (_, doctorService, storageService, previous) =>
+              previous ?? DoctorSearchProvider(
+                doctorService: doctorService,
+                storageService: storageService,
+              ),
+        ),
+        ChangeNotifierProxyProvider2<AppointmentService, StorageService, AppointmentProvider>(
+          create: (context) => AppointmentProvider(
+            appointmentService: context.read<AppointmentService>(),
+            storageService: context.read<StorageService>(),
+          ),
+          update: (_, appointmentService, storageService, previous) =>
+              previous ?? AppointmentProvider(
+                appointmentService: appointmentService,
+                storageService: storageService,
               ),
         ),
       ],

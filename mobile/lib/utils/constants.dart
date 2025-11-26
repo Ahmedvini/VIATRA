@@ -414,3 +414,53 @@ class FeatureFlags {
   static const bool enableVideoCall = true;
   static const bool enableOfflineMode = false;
 }
+
+// Doctor Search Constants
+class DoctorSearchConstants {
+  // Search parameters
+  static const double defaultSearchRadius = 25.0;
+  static const double minConsultationFee = 0.0;
+  static const double maxConsultationFee = 500.0;
+  
+  // Pagination
+  static const int defaultPageSize = 20;
+  static const int loadMoreThreshold = 200; // pixels from bottom
+  
+  // Caching
+  static const int cacheTTLMinutes = 5;
+  static const int cacheExpirationMinutes = 5;
+  
+  // Search debounce
+  static const Duration searchDebounce = Duration(milliseconds: 500);
+  static const int searchDebounceMilliseconds = 500;
+  
+  // Sort options
+  static const List<Map<String, String>> sortOptions = [
+    {'label': 'Newest First', 'sortBy': 'created_at', 'sortOrder': 'DESC'},
+    {'label': 'Oldest First', 'sortBy': 'created_at', 'sortOrder': 'ASC'},
+    {'label': 'Fee: Low to High', 'sortBy': 'consultation_fee', 'sortOrder': 'ASC'},
+    {'label': 'Fee: High to Low', 'sortBy': 'consultation_fee', 'sortOrder': 'DESC'},
+    {'label': 'Name: A-Z', 'sortBy': 'user.first_name', 'sortOrder': 'ASC'},
+    {'label': 'Name: Z-A', 'sortBy': 'user.first_name', 'sortOrder': 'DESC'},
+  ];
+  
+  // Fee range presets (in USD)
+  static const List<Map<String, double?>> feeRanges = [
+    {'label': 'Any', 'min': null, 'max': null},
+    {'label': 'Under \$50', 'min': null, 'max': 50},
+    {'label': '\$50 - \$100', 'min': 50, 'max': 100},
+    {'label': '\$100 - \$200', 'min': 100, 'max': 200},
+    {'label': 'Over \$200', 'min': 200, 'max': null},
+  ];
+}
+
+// Doctor Sort Options
+class DoctorSortOptions {
+  static const String byRelevance = 'relevance';
+  static const String byRating = 'rating';
+  static const String byPrice = 'consultation_fee';
+  static const String byDistance = 'distance';
+  static const String byExperience = 'years_of_experience';
+  static const String byName = 'user.first_name';
+  static const String byNewest = 'created_at';
+}

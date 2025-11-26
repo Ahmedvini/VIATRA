@@ -4,6 +4,11 @@ class HealthProfile {
   final String? bloodType;
   final double? height;
   final double? weight;
+  final int? bloodPressureSystolic;
+  final int? bloodPressureDiastolic;
+  final int? heartRate;
+  final double? bloodGlucose;
+  final int? oxygenSaturation;
   final List<Allergy> allergies;
   final List<ChronicCondition> chronicConditions;
   final List<Medication> currentMedications;
@@ -22,6 +27,11 @@ class HealthProfile {
     this.bloodType,
     this.height,
     this.weight,
+    this.bloodPressureSystolic,
+    this.bloodPressureDiastolic,
+    this.heartRate,
+    this.bloodGlucose,
+    this.oxygenSaturation,
     this.allergies = const [],
     this.chronicConditions = const [],
     this.currentMedications = const [],
@@ -42,6 +52,11 @@ class HealthProfile {
       bloodType: json['blood_type'] ?? json['bloodType'],
       height: json['height']?.toDouble(),
       weight: json['weight']?.toDouble(),
+      bloodPressureSystolic: json['blood_pressure_systolic']?.toInt() ?? json['bloodPressureSystolic']?.toInt(),
+      bloodPressureDiastolic: json['blood_pressure_diastolic']?.toInt() ?? json['bloodPressureDiastolic']?.toInt(),
+      heartRate: json['heart_rate']?.toInt() ?? json['heartRate']?.toInt(),
+      bloodGlucose: json['blood_glucose']?.toDouble() ?? json['bloodGlucose']?.toDouble(),
+      oxygenSaturation: json['oxygen_saturation']?.toInt() ?? json['oxygenSaturation']?.toInt(),
       allergies: (json['allergies'] as List<dynamic>?)
               ?.map((e) => Allergy.fromJson(e as Map<String, dynamic>))
               .toList() ??
@@ -97,6 +112,11 @@ class HealthProfile {
       'bloodType': bloodType,
       'height': height,
       'weight': weight,
+      'bloodPressureSystolic': bloodPressureSystolic,
+      'bloodPressureDiastolic': bloodPressureDiastolic,
+      'heartRate': heartRate,
+      'bloodGlucose': bloodGlucose,
+      'oxygenSaturation': oxygenSaturation,
       'allergies': allergies.map((e) => e.toJson()).toList(),
       'chronicConditions': chronicConditions.map((e) => e.toJson()).toList(),
       'currentMedications': currentMedications.map((e) => e.toJson()).toList(),
@@ -120,6 +140,11 @@ class HealthProfile {
     String? bloodType,
     double? height,
     double? weight,
+    int? bloodPressureSystolic,
+    int? bloodPressureDiastolic,
+    int? heartRate,
+    double? bloodGlucose,
+    int? oxygenSaturation,
     List<Allergy>? allergies,
     List<ChronicCondition>? chronicConditions,
     List<Medication>? currentMedications,
@@ -138,6 +163,11 @@ class HealthProfile {
       bloodType: bloodType ?? this.bloodType,
       height: height ?? this.height,
       weight: weight ?? this.weight,
+      bloodPressureSystolic: bloodPressureSystolic ?? this.bloodPressureSystolic,
+      bloodPressureDiastolic: bloodPressureDiastolic ?? this.bloodPressureDiastolic,
+      heartRate: heartRate ?? this.heartRate,
+      bloodGlucose: bloodGlucose ?? this.bloodGlucose,
+      oxygenSaturation: oxygenSaturation ?? this.oxygenSaturation,
       allergies: allergies ?? this.allergies,
       chronicConditions: chronicConditions ?? this.chronicConditions,
       currentMedications: currentMedications ?? this.currentMedications,

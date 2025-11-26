@@ -7,6 +7,7 @@ The Flutter mobile application for the Viatra Health Platform, providing healthc
 A cross-platform mobile app built with Flutter that provides:
 - User authentication and registration
 - Health profile management
+- Doctor search and discovery
 - Appointment booking and management
 - Telemedicine consultations
 - Prescription management
@@ -233,6 +234,191 @@ All inputs are validated using the `HealthProfileValidators` class:
 - Keyboard dismissal on scroll
 - Responsive layouts for different screen sizes
 
+### Doctor Search & Discovery
+
+Comprehensive doctor search feature with advanced filtering and real-time results.
+
+**Features**:
+- Real-time search with 500ms debounce
+- Advanced filtering (specialty, location, fee, languages, availability)
+- Sort by multiple criteria (fee, name, date added)
+- Pagination with infinite scroll
+- Redis-backed caching (5-minute TTL)
+- Doctor profile view with full details
+- Telehealth availability indication
+- Accepting patients status
+
+**Screens**:
+- `DoctorSearchScreen` - Main search interface
+  - Search bar with debounced input
+  - Filter button with active filter badge
+  - Doctor list with infinite scroll
+  - Pull-to-refresh support
+  - Loading states (initial, pagination, refresh)
+  - Empty state with helpful message
+  - Error state with retry action
+  
+- `DoctorDetailScreen` - Doctor profile view
+  - Doctor profile picture and basic info
+  - Specialty and sub-specialty
+  - Years of experience
+  - Education and qualifications
+  - Consultation fee
+  - Languages spoken
+  - Location and contact details
+  - Working hours
+  - Accepting patients status
+  - Telehealth availability
+  - Bio/description
+  - Action buttons (Book appointment, Contact)
+  
+- `DoctorSearchFilterSheet` - Advanced filters
+  - Specialty dropdown
+  - Sub-specialty dropdown (contextual)
+  - Location filters (city, state, zip code)
+  - Fee range slider or presets
+  - Languages multi-select
+  - Availability filters (accepting patients, telehealth)
+  - Sort options
+  - Active filter count indicator
+  - Clear all filters button
+  - Apply button
+
+**Widgets**:
+- `DoctorCard` - List item for search results
+  - Doctor photo
+  - Name and specialty
+  - Years of experience
+  - Consultation fee
+  - Location
+  - Rating (if available)
+  - Accepting patients badge
+  - Telehealth badge
+  - Tap to view details
+
+**Navigation**:
+- `/doctors/search` - Search and filter doctors
+- `/doctors/:id` - View doctor profile details
+
+### Appointment Booking & Management
+
+Complete appointment lifecycle management with availability checking and cancellation support.
+
+**Features**:
+- Doctor availability checking with time slot generation
+- Real-time conflict detection
+- Appointment type selection (consultation, follow-up, checkup, procedure)
+- Reason for visit and chief complaint capture
+- Urgent appointment marking
+- Appointment list with upcoming/past tabs
+- Status-based filtering (scheduled, confirmed, completed, cancelled)
+- Appointment details with full information
+- Reschedule functionality
+- Cancellation with reason (minimum 2 hours notice)
+- Dual caching (memory + persistent storage, 5-minute TTL)
+- Pull-to-refresh support
+- Pagination for appointment lists
+
+**Screens**:
+- `TimeSlotSelectionScreen` - Book appointment
+  - Doctor information display
+  - Appointment type selector (chips)
+  - Date picker (Material Design calendar)
+  - Duration selector dropdown
+  - Time slot grid (morning/afternoon/evening groups)
+  - Reason for visit field (required)
+  - Chief complaint field (optional)
+  - Urgent checkbox
+  - Continue to confirmation button
+  - Loading states for time slots
+  - Validation and error handling
+
+- `BookingConfirmationScreen` - Review before booking
+  - Appointment summary card
+  - Doctor information with avatar
+  - Date, time, and duration display
+  - Appointment type and priority badges
+  - Reason for visit display
+  - Cancellation policy notice
+  - Edit button (go back to modify)
+  - Confirm button with loading state
+  - Success/error feedback
+  - Navigate to appointment detail on success
+
+- `AppointmentListScreen` - View all appointments
+  - Tab bar (Upcoming / Past)
+  - Status filter chips (All, Scheduled, Completed, Cancelled)
+  - Pull-to-refresh support
+  - Infinite scroll pagination
+  - AppointmentCard widgets
+  - Empty states per tab
+  - Loading states (initial, pagination)
+  - Error states with retry
+  - Floating action button to book new appointment
+
+- `AppointmentDetailScreen` - View appointment details
+  - Status banner with color coding
+  - Urgent badge if applicable
+  - Doctor information card
+  - Appointment details (type, date, time, duration)
+  - Visit details (reason, chief complaint)
+  - Cancellation information (if cancelled)
+  - Action buttons:
+    - Reschedule (if upcoming)
+    - Cancel (if > 2 hours before and not completed)
+  - Cancellation confirmation dialog
+  - Success/error feedback
+
+**Widgets**:
+- `AppointmentCard` - List item for appointments
+  - Doctor avatar with name and specialty
+  - Date and time display
+  - Duration badge
+  - Appointment type icon and label
+  - Status chip with color coding
+  - Urgent badge (if applicable)
+  - Reason for visit summary
+  - Action buttons (Reschedule/Cancel for upcoming)
+  - Cancellation info (if cancelled)
+  - Tap to view full details
+
+- `TimeSlotPicker` - Time selection grid
+  - Grouped by time period (Morning/Afternoon/Evening)
+  - Period headers with icons
+  - Available slots (white background, blue border)
+  - Selected slot (blue background, white text)
+  - Unavailable slots (greyed out, disabled)
+  - Empty state message
+  - Responsive grid layout (3 columns)
+
+**State Management**:
+- `AppointmentProvider`:
+  - Appointment list state with filtering
+  - Current appointment detail state
+  - Available time slots state
+  - Loading/error states
+  - Create appointment action
+  - Update appointment action
+  - Cancel appointment action
+  - Fetch availability action
+  - Cache management with expiration
+  - Pagination support
+
+**Navigation**:
+- `/appointments` - List all appointments
+- `/appointments/:id` - View appointment details
+- Booking flow: Doctor Detail → Time Slot Selection → Booking Confirmation → Appointment Detail
+- FAB from Appointment List → Doctor Search for new booking
+
+**Integration Points**:
+- Doctor Detail Screen: "Book Appointment" button
+  - Disabled if doctor not accepting patients
+  - Navigates to TimeSlotSelectionScreen
+  - Passes doctor information
+- Home Screen: "Appointments" quick action
+  - Navigates to AppointmentListScreen
+  - Shows upcoming appointment count badge (future enhancement)
+
 ## State Management
 
 ### Provider Pattern
@@ -257,6 +443,7 @@ Consumer<HealthProfileProvider>(
 - **AuthProvider**: User authentication state
 - **RegistrationProvider**: Registration flow management
 - **HealthProfileProvider**: Health profile data and operations
+- **DoctorSearchProvider**: Doctor search, filtering, and pagination
 - **ThemeProvider**: App theme management
 - **LocaleProvider**: Localization management
 
@@ -285,6 +472,13 @@ Manages health profile operations:
 - Add/remove chronic conditions
 - Add/remove allergies
 - Update vitals
+
+#### DoctorService
+Manages doctor-related operations:
+- Search doctors with filters
+- Get doctor details
+- Pagination support
+- Backend caching integration
 
 #### StorageService
 Local storage management:

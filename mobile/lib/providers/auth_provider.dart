@@ -107,29 +107,37 @@ class AuthProvider extends ChangeNotifier {
   }
 
   /// Login with email and password
-  Future<bool> login(String email, String password) async {
+  Future<bool> login(String email, String password, {bool rememberMe = false}) async {
     try {
       _setState(AuthState.loading);
       _clearError();
 
-      // TODO: Replace with actual API call
-      await Future.delayed(const Duration(seconds: 1)); // Simulate API call
+      // Call real auth service
+      final response = await _authService.login(email, password, rememberMe);
       
-      // Simulate successful login
-      _accessToken = 'mock_access_token_${DateTime.now().millisecondsSinceEpoch}';
-      _user = User(
-        id: 'user_123',
-        email: email,
-        name: 'Mock User',
-        lastLogin: DateTime.now(),
-      );
-
-      // Store credentials
-      await _storageService.setSecureValue('access_token', _accessToken!);
-      await _storageService.setValue('user_data', _user!.toJson());
-
-      _setState(AuthState.authenticated);
-      return true;
+      if (response.isSuccess && response.data != null) {
+        final authResponse = response.data!;
+        
+        // Store tokens and user data
+        _accessToken = authResponse.tokens.accessToken;
+        _refreshToken = authResponse.tokens.refreshToken;
+        _user = authResponse.user;
+        _lastAuthResponse = authResponse;
+        
+        // Persist tokens and user data
+        await _storageService.setSecureValue('access_token', _accessToken!);
+        await _storageService.setSecureValue('refresh_token', _refreshToken!);
+        await _storageService.setValue('user_data', _user!.toJson());
+        
+        // Set token on API service for subsequent requests
+        _apiService.setAuthToken(_accessToken!);
+        
+        _setState(AuthState.authenticated);
+        return true;
+      } else {
+        _setError(response.message ?? 'Login failed');
+        return false;
+      }
     } catch (e) {
       _setError('Login failed: $e');
       return false;
@@ -137,16 +145,37 @@ class AuthProvider extends ChangeNotifier {
   }
 
   /// Register new user
-  Future<bool> register(String email, String password, String name) async {
+  Future<bool> register(Map<String, dynamic> userData) async {
     try {
       _setState(AuthState.loading);
       _clearError();
 
-      // TODO: Replace with actual API call
-      await Future.delayed(const Duration(seconds: 1)); // Simulate API call
+      // Call real auth service with user data
+      final response = await _authService.register(userData);
       
-      // Simulate successful registration
-      return await login(email, password);
+      if (response.isSuccess && response.data != null) {
+        final authResponse = response.data!;
+        
+        // Store tokens and user data
+        _accessToken = authResponse.tokens.accessToken;
+        _refreshToken = authResponse.tokens.refreshToken;
+        _user = authResponse.user;
+        _lastAuthResponse = authResponse;
+        
+        // Persist tokens and user data
+        await _storageService.setSecureValue('access_token', _accessToken!);
+        await _storageService.setSecureValue('refresh_token', _refreshToken!);
+        await _storageService.setValue('user_data', _user!.toJson());
+        
+        // Set token on API service for subsequent requests
+        _apiService.setAuthToken(_accessToken!);
+        
+        _setState(AuthState.authenticated);
+        return true;
+      } else {
+        _setError(response.message ?? 'Registration failed');
+        return false;
+      }
     } catch (e) {
       _setError('Registration failed: $e');
       return false;
@@ -158,34 +187,73 @@ class AuthProvider extends ChangeNotifier {
     try {
       _setState(AuthState.loading);
 
-      // Clear stored credentials
-      await _storageService.removeSecureValue('access_token');
-      await _storageService.removeValue('user_data');
+      // Call backend logout if we have a token
+      if (_accessToken != null) {
+        await _authService.logout(_accessToken!);
+      }
+
+      // Clear stored credentials and state
+      await _clearStoredAuth();
 
       // Clear in-memory state
       _user = null;
       _accessToken = null;
+      _refreshToken = null;
+      _lastAuthResponse = null;
       _clearError();
 
       _setState(AuthState.unauthenticated);
     } catch (e) {
+      // Even if backend logout fails, clear local state
+      await _clearStoredAuth();
+      _user = null;
+      _accessToken = null;
+      _refreshToken = null;
+      _lastAuthResponse = null;
       _setError('Logout failed: $e');
+      _setState(AuthState.unauthenticated);
     }
   }
 
   /// Refresh authentication token
   Future<bool> refreshToken() async {
     try {
-      if (_accessToken == null) return false;
+      if (_refreshToken == null) return false;
 
-      // TODO: Replace with actual API call
-      await Future.delayed(const Duration(milliseconds: 500));
+      // Call real auth service to refresh token
+      final response = await _authService.refreshToken(_refreshToken!);
       
-      // Simulate token refresh
-      _accessToken = 'refreshed_token_${DateTime.now().millisecondsSinceEpoch}';
-      await _storageService.setSecureValue('access_token', _accessToken!);
-      
-      return true;
+      if (response.isSuccess && response.data != null) {
+        final tokens = response.data!;
+        
+        // Update tokens
+        _accessToken = tokens.accessToken;
+        if (tokens.refreshToken.isNotEmpty) {
+          _refreshToken = tokens.refreshToken;
+        }
+        
+        // Persist new tokens
+        await _storageService.setSecureValue('access_token', _accessToken!);
+        if (tokens.refreshToken.isNotEmpty) {
+          await _storageService.setSecureValue('refresh_token', _refreshToken!);
+        }
+        
+        // Update API service with new token
+        _apiService.setAuthToken(_accessToken!);
+        
+        // Fetch updated user profile with new token
+        final userResponse = await _authService.getCurrentUser(_accessToken!);
+        if (userResponse.isSuccess && userResponse.data != null) {
+          _user = userResponse.data!;
+          await _storageService.setValue('user_data', _user!.toJson());
+          _setState(AuthState.authenticated);
+        }
+        
+        return true;
+      } else {
+        _setError(response.message ?? 'Token refresh failed');
+        return false;
+      }
     } catch (e) {
       _setError('Token refresh failed: $e');
       return false;
@@ -198,11 +266,16 @@ class AuthProvider extends ChangeNotifier {
       _setState(AuthState.loading);
       _clearError();
 
-      // TODO: Replace with actual API call
-      await Future.delayed(const Duration(seconds: 1));
+      // Call real auth service to request password reset
+      final response = await _authService.requestPasswordReset(email);
       
-      _setState(_user != null ? AuthState.authenticated : AuthState.unauthenticated);
-      return true;
+      if (response.isSuccess) {
+        _setState(_user != null ? AuthState.authenticated : AuthState.unauthenticated);
+        return true;
+      } else {
+        _setError(response.message ?? 'Failed to send reset email');
+        return false;
+      }
     } catch (e) {
       _setError('Failed to send reset email: $e');
       return false;
@@ -212,28 +285,28 @@ class AuthProvider extends ChangeNotifier {
   /// Update user profile
   Future<bool> updateProfile(Map<String, dynamic> updates) async {
     try {
-      if (_user == null) return false;
+      if (_user == null || _accessToken == null) {
+        _setError('User not authenticated');
+        return false;
+      }
       
       _setState(AuthState.loading);
       _clearError();
 
-      // TODO: Replace with actual API call
-      await Future.delayed(const Duration(seconds: 1));
+      // Call real auth service to update profile
+      final response = await _authService.updateProfile(_accessToken!, updates);
       
-      // Update local user data
-      final updatedUser = User(
-        id: _user!.id,
-        email: updates['email'] ?? _user!.email,
-        name: updates['name'] ?? _user!.name,
-        avatar: updates['avatar'] ?? _user!.avatar,
-        lastLogin: _user!.lastLogin,
-      );
-      
-      _user = updatedUser;
-      await _storageService.setValue('user_data', _user!.toJson());
-      
-      _setState(AuthState.authenticated);
-      return true;
+      if (response.isSuccess && response.data != null) {
+        // Update local user data with response
+        _user = response.data!;
+        await _storageService.setValue('user_data', _user!.toJson());
+        
+        _setState(AuthState.authenticated);
+        return true;
+      } else {
+        _setError(response.message ?? 'Profile update failed');
+        return false;
+      }
     } catch (e) {
       _setError('Profile update failed: $e');
       return false;

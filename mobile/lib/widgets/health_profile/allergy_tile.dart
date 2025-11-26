@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../models/health_profile_model.dart';
 
 /// Widget for displaying an allergy in a tile format
 class AllergyTile extends StatelessWidget {
-  final Map<String, dynamic> allergy;
+  final Allergy allergy;
   final VoidCallback? onTap;
   final VoidCallback? onDelete;
 
@@ -13,39 +14,37 @@ class AllergyTile extends StatelessWidget {
     this.onDelete,
   });
 
-  Color _getSeverityColor(String? severity) {
-    switch (severity) {
-      case 'mild':
-        return Colors.green;
-      case 'moderate':
-        return Colors.orange;
+  Color _getSeverityColor() {
+    switch (allergy.severity.toLowerCase()) {
+      case 'life-threatening':
+        return Colors.red.shade900;
       case 'severe':
         return Colors.red;
+      case 'moderate':
+        return Colors.orange;
+      case 'mild':
       default:
-        return Colors.grey;
+        return Colors.green;
     }
   }
 
-  IconData _getSeverityIcon(String? severity) {
-    switch (severity) {
-      case 'mild':
-        return Icons.check_circle;
-      case 'moderate':
-        return Icons.warning;
+  IconData _getSeverityIcon() {
+    switch (allergy.severity.toLowerCase()) {
+      case 'life-threatening':
+        return Icons.dangerous;
       case 'severe':
         return Icons.error;
+      case 'moderate':
+        return Icons.warning;
+      case 'mild':
       default:
-        return Icons.help;
+        return Icons.check_circle;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final allergen = allergy['allergen'] as String? ?? 'Unknown Allergen';
-    final reaction = allergy['reaction'] as String?;
-    final severity = allergy['severity'] as String? ?? 'mild';
-
-    final severityColor = _getSeverityColor(severity);
+    final severityColor = _getSeverityColor();
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -66,7 +65,7 @@ class AllergyTile extends StatelessWidget {
           children: [
             Expanded(
               child: Text(
-                allergen,
+                allergy.allergen,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
@@ -84,13 +83,13 @@ class AllergyTile extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
-                    _getSeverityIcon(severity),
+                    _getSeverityIcon(),
                     size: 14,
                     color: severityColor,
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    severity.substring(0, 1).toUpperCase() + severity.substring(1),
+                    allergy.severity.toUpperCase(),
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
@@ -102,20 +101,20 @@ class AllergyTile extends StatelessWidget {
             ),
           ],
         ),
-        subtitle: reaction != null && reaction.isNotEmpty
+        subtitle: allergy.notes != null && allergy.notes!.isNotEmpty
             ? Padding(
                 padding: const EdgeInsets.only(top: 4),
                 child: Row(
                   children: [
                     Icon(
-                      Icons.sick,
+                      Icons.notes,
                       size: 14,
                       color: Colors.grey.shade600,
                     ),
                     const SizedBox(width: 4),
                     Expanded(
                       child: Text(
-                        reaction,
+                        allergy.notes!,
                         style: TextStyle(
                           fontSize: 13,
                           color: Colors.grey.shade700,
@@ -132,7 +131,7 @@ class AllergyTile extends StatelessWidget {
             ? IconButton(
                 icon: const Icon(Icons.delete_outline, color: Colors.red),
                 onPressed: () {
-                  _showDeleteConfirmation(context, allergen);
+                  _showDeleteConfirmation(context);
                 },
               )
             : const Icon(Icons.chevron_right),
@@ -141,13 +140,13 @@ class AllergyTile extends StatelessWidget {
     );
   }
 
-  void _showDeleteConfirmation(BuildContext context, String allergen) {
+  void _showDeleteConfirmation(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Allergy'),
         content: Text(
-          'Are you sure you want to delete the allergy to "$allergen"?',
+          'Are you sure you want to delete the allergy to "${allergy.allergen}"?',
         ),
         actions: [
           TextButton(

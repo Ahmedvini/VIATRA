@@ -7,6 +7,7 @@ The backend API server for the Viatra Health Platform, built with Node.js and Ex
 This is a RESTful API service that provides:
 - User authentication and authorization
 - Healthcare data management
+- Appointment booking and management
 - File upload and storage integration
 - Real-time features with Redis caching
 - Integration with Google Cloud services
@@ -576,375 +577,502 @@ Rate limit: 10 requests per minute
 - Oxygen saturation: 50-100%
 - Allergy severity must be: mild, moderate, or severe
 
-### cURL Examples
+### Doctor Search API
 
-#### Register a new patient
-```bash
-curl -X POST http://localhost:8080/api/v1/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "patient@example.com",
-    "password": "SecurePass123!",
-    "firstName": "John",
-    "lastName": "Doe",
-    "phone": "+1234567890",
-    "role": "patient"
-  }'
+All doctor search endpoints are prefixed with `/api/v1/doctors`:
+
+#### Search Doctors
 ```
+GET /api/v1/doctors/search
+Query Parameters (all optional):
+- specialty: string (case-insensitive partial match)
+- subSpecialty: string (case-insensitive partial match)
+- city: string (case-insensitive partial match)
+- state: string (case-insensitive partial match)
+- zipCode: string (exact match)
+- minFee: number (minimum consultation fee)
+- maxFee: number (maximum consultation fee)
+- languages: string (comma-separated list, e.g., "English,Spanish")
+- isAcceptingPatients: boolean (true/false)
+- telehealthEnabled: boolean (true/false)
+- page: number (default: 1, min: 1)
+- limit: number (default: 20, min: 1, max: 100)
+- sortBy: string (default: 'created_at', options: 'created_at', 'consultation_fee', 'years_of_experience')
+- sortOrder: string (default: 'DESC', options: 'ASC', 'DESC')
 
-#### Login
-```bash
-curl -X POST http://localhost:8080/api/v1/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "patient@example.com",
-    "password": "SecurePass123!"
-  }'
-```
+Example Request:
+curl -X GET "http://localhost:8080/api/v1/doctors/search?specialty=Cardiology&city=New%20York&isAcceptingPatients=true&page=1&limit=20"
 
-#### Upload verification document
-```bash
-curl -X POST http://localhost:8080/api/v1/verification/submit \
-  -H "Authorization: Bearer <your_access_token>" \
-  -F "file=@/path/to/license.pdf" \
-  -F "documentType=medical_license" \
-  -F "description=Medical license for verification"
-```
-
-#### Get current user profile
-```bash
-curl -X GET http://localhost:8080/api/v1/auth/me \
-  -H "Authorization: Bearer <your_access_token>"
-```
-
-### Response Format
-
-All API responses follow a consistent format:
-
-```json
+Response:
 {
-  "message": "Success message",
+  "success": true,
+  "message": "Doctors retrieved successfully",
   "data": {
-    // Response data
-  },
-  "pagination": {  // Only for paginated responses
-    "page": 1,
-    "limit": 20,
-    "total": 100,
-    "pages": 5
+    "doctors": [
+      {
+        "id": "doctor_uuid",
+        "specialty": "Cardiology",
+        "sub_specialty": "Interventional Cardiology",
+        "years_of_experience": 15,
+        "consultation_fee": 250.00,
+        "office_city": "New York",
+        "office_state": "NY",
+        "office_zip_code": "10001",
+        "office_address_line1": "123 Medical Plaza",
+        "office_phone": "+1234567890",
+        "is_accepting_patients": true,
+        "telehealth_enabled": true,
+        "languages_spoken": ["English", "Spanish"],
+        "working_hours": {
+          "monday": { "open": "09:00", "close": "17:00" },
+          "tuesday": { "open": "09:00", "close": "17:00" },
+          ...
+        },
+        "user": {
+          "id": "user_uuid",
+          "first_name": "John",
+          "last_name": "Doe",
+          "email": "john.doe@example.com",
+          "phone": "+1234567890",
+          "profile_image": "https://..."
+        },
+        "created_at": "2024-01-01T00:00:00.000Z",
+        "updated_at": "2024-01-01T00:00:00.000Z"
+      }
+    ],
+    "pagination": {
+      "total": 45,
+      "page": 1,
+      "limit": 20,
+      "totalPages": 3
+    }
   }
 }
 ```
 
-### Error Format
+Rate limit: 30 requests per minute
 
-```json
+**Search Features**:
+- Case-insensitive partial matching for text fields (specialty, city, state)
+- Exact matching for zipCode
+- Price range filtering with minFee/maxFee
+- Array containment for languages (supports multiple language filters)
+- Boolean filters for availability and telehealth
+- Pagination with configurable page size
+- Sorting by multiple criteria
+- Returns associated User data for each doctor
+
+**Performance Optimization**:
+- Redis caching with 5-minute TTL
+- Database indexes on frequently queried columns:
+  - Composite index on `specialty` + `office_city`
+  - Index on `consultation_fee` for price range queries
+  - GIN index on `languages_spoken` for array queries
+  - Indexes on `is_accepting_patients` and `telehealth_enabled`
+  - Composite indexes for common filter combinations
+
+#### Get Doctor by ID
+```
+GET /api/v1/doctors/:id
+Path Parameters:
+- id: UUID of the doctor
+
+Example Request:
+curl -X GET "http://localhost:8080/api/v1/doctors/doctor_uuid"
+
+Response:
 {
-  "error": "Error type",
-  "message": "Human readable error message",
-  "details": [  // Only for validation errors
+  "success": true,
+  "message": "Doctor retrieved successfully",
+  "data": {
+    "id": "doctor_uuid",
+    "specialty": "Cardiology",
+    "sub_specialty": "Interventional Cardiology",
+    "license_number": "MD123456",
+    "npi_number": "1234567890",
+    "years_of_experience": 15,
+    "bio": "Experienced cardiologist specializing in...",
+    "education": "Harvard Medical School, MD",
+    "certifications": ["Board Certified in Cardiology", "ACLS Certified"],
+    "consultation_fee": 250.00,
+    "office_address_line1": "123 Medical Plaza",
+    "office_address_line2": "Suite 400",
+    "office_city": "New York",
+    "office_state": "NY",
+    "office_zip_code": "10001",
+    "office_phone": "+1234567890",
+    "is_accepting_patients": true,
+    "telehealth_enabled": true,
+    "languages_spoken": ["English", "Spanish"],
+    "working_hours": {
+      "monday": { "open": "09:00", "close": "17:00" },
+      "tuesday": { "open": "09:00", "close": "17:00" },
+      "wednesday": { "open": "09:00", "close": "17:00" },
+      "thursday": { "open": "09:00", "close": "17:00" },
+      "friday": { "open": "09:00", "close": "17:00" },
+      "saturday": null,
+      "sunday": null
+    },
+    "user": {
+      "id": "user_uuid",
+      "first_name": "John",
+      "last_name": "Doe",
+      "email": "john.doe@example.com",
+      "phone": "+1234567890",
+      "profile_image": "https://...",
+      "email_verified": true
+    },
+    "created_at": "2024-01-01T00:00:00.000Z",
+    "updated_at": "2024-01-01T00:00:00.000Z"
+  }
+}
+
+Error Response (404):
+{
+  "success": false,
+  "message": "Doctor not found"
+}
+```
+
+Rate limit: 60 requests per minute
+
+**Caching**: Individual doctor profiles are cached in Redis for 5 minutes
+
+#### Get Doctor Availability
+```
+GET /api/v1/doctors/:id/availability
+Path Parameters:
+- id: UUID of the doctor
+
+Example Request:
+curl -X GET "http://localhost:8080/api/v1/doctors/doctor_uuid/availability"
+
+Response:
+{
+  "success": true,
+  "message": "Doctor availability retrieved successfully",
+  "data": {
+    "workingHours": {
+      "monday": { "open": "09:00", "close": "17:00" },
+      "tuesday": { "open": "09:00", "close": "17:00" },
+      "wednesday": { "open": "09:00", "close": "17:00" },
+      "thursday": { "open": "09:00", "close": "17:00" },
+      "friday": { "open": "09:00", "close": "17:00" },
+      "saturday": null,
+      "sunday": null
+    },
+    "isAcceptingPatients": true,
+    "telehealthEnabled": true
+  }
+}
+
+Error Response (404):
+{
+  "success": false,
+  "message": "Doctor not found"
+}
+```
+
+Rate limit: 60 requests per minute
+
+**Use Case**: This endpoint is useful for quickly checking a doctor's availability status without fetching the full profile.
+
+**Authentication & Authorization**
+- All doctor endpoints are public (no authentication required)
+- Optional authentication context available for future features (favorites, booking history)
+
+**Database Indexes**
+The following indexes are created to optimize search performance:
+- `idx_doctors_specialty_city` - Composite index on specialty and city
+- `idx_doctors_specialty` - Index on specialty alone
+- `idx_doctors_city_state` - Composite index on city and state
+- `idx_doctors_consultation_fee` - Index on consultation fee
+- `idx_doctors_accepting_patients` - Index on is_accepting_patients
+- `idx_doctors_accepting_created` - Composite index on accepting patients and created_at
+- `idx_doctors_zip_code` - Index on office zip code
+- `idx_doctors_languages_spoken` - GIN index on languages_spoken JSONB array
+- `idx_doctors_created_at` - Index on created_at for sorting
+- `idx_doctors_telehealth_accepting` - Composite index on telehealth and accepting patients
+
+### Appointment Booking API
+
+All appointment endpoints are prefixed with `/api/v1/appointments`:
+
+#### Create Appointment
+```
+POST /api/v1/appointments
+Authorization: Bearer <access_token>
+Content-Type: application/json
+Roles: patient
+
+{
+  "doctorId": "doctor_uuid",
+  "appointmentType": "consultation",  // or "follow_up", "checkup", "procedure"
+  "scheduledStart": "2024-12-15T09:00:00.000Z",
+  "scheduledEnd": "2024-12-15T09:30:00.000Z",
+  "reasonForVisit": "Annual checkup",
+  "chiefComplaint": "Chest pain, shortness of breath",  // optional
+  "urgent": false  // optional, default false
+}
+
+Response:
+{
+  "success": true,
+  "message": "Appointment created successfully",
+  "data": {
+    "id": "appointment_uuid",
+    "patientId": "patient_uuid",
+    "doctorId": "doctor_uuid",
+    "appointmentType": "consultation",
+    "scheduledStart": "2024-12-15T09:00:00.000Z",
+    "scheduledEnd": "2024-12-15T09:30:00.000Z",
+    "status": "scheduled",
+    "reasonForVisit": "Annual checkup",
+    "urgent": false,
+    "doctor": {
+      "id": "doctor_uuid",
+      "specialty": "Cardiology",
+      "user": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "email": "doctor@example.com"
+      }
+    },
+    "createdAt": "2024-12-01T10:00:00.000Z",
+    "updatedAt": "2024-12-01T10:00:00.000Z"
+  }
+}
+```
+
+Rate limit: 20 requests per hour
+
+**Validation**:
+- Doctor must exist and be accepting patients
+- Scheduled time must be within doctor's working hours
+- No conflicting appointments for the same doctor
+- End time must be after start time
+- Scheduled time must be in the future
+
+#### Get My Appointments
+```
+GET /api/v1/appointments
+Authorization: Bearer <access_token>
+Roles: patient
+Query Parameters (all optional):
+- status: string (scheduled, confirmed, in_progress, completed, cancelled, no_show)
+- startDate: ISO date string (filter by scheduled start >= this date)
+- endDate: ISO date string (filter by scheduled start <= this date)
+- page: number (default: 1)
+- limit: number (default: 10, max: 50)
+- sortBy: string (default: 'scheduledStart')
+- sortOrder: string (default: 'DESC', options: 'ASC', 'DESC')
+
+Response:
+{
+  "success": true,
+  "message": "Appointments retrieved successfully",
+  "data": {
+    "appointments": [
+      {
+        "id": "appointment_uuid",
+        "appointmentType": "consultation",
+        "scheduledStart": "2024-12-15T09:00:00.000Z",
+        "scheduledEnd": "2024-12-15T09:30:00.000Z",
+        "status": "scheduled",
+        "reasonForVisit": "Annual checkup",
+        "urgent": false,
+        "doctor": {
+          "id": "doctor_uuid",
+          "specialty": "Cardiology",
+          "consultationFee": 250.00,
+          "user": {
+            "firstName": "John",
+            "lastName": "Doe"
+          }
+        }
+      }
+    ],
+    "pagination": {
+      "total": 15,
+      "page": 1,
+      "limit": 10,
+      "totalPages": 2
+    }
+  }
+}
+```
+
+Rate limit: 30 requests per minute
+
+**Caching**: Results are cached for 5 minutes per unique filter combination
+
+#### Get Appointment by ID
+```
+GET /api/v1/appointments/:id
+Authorization: Bearer <access_token>
+Path Parameters:
+- id: UUID of the appointment
+
+Response:
+{
+  "success": true,
+  "message": "Appointment retrieved successfully",
+  "data": {
+    "id": "appointment_uuid",
+    "patientId": "patient_uuid",
+    "doctorId": "doctor_uuid",
+    "appointmentType": "consultation",
+    "scheduledStart": "2024-12-15T09:00:00.000Z",
+    "scheduledEnd": "2024-12-15T09:30:00.000Z",
+    "actualStart": null,
+    "actualEnd": null,
+    "status": "scheduled",
+    "reasonForVisit": "Annual checkup",
+    "chiefComplaint": "Chest pain",
+    "urgent": false,
+    "notes": null,
+    "followUpRequired": null,
+    "followUpInstructions": null,
+    "cancellationReason": null,
+    "cancelledBy": null,
+    "cancelledAt": null,
+    "doctor": {
+      "id": "doctor_uuid",
+      "specialty": "Cardiology",
+      "officeAddress": "123 Medical Plaza",
+      "user": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "email": "doctor@example.com",
+        "phone": "+1234567890"
+      }
+    },
+    "patient": {
+      "id": "patient_uuid",
+      "user": {
+        "firstName": "Jane",
+        "lastName": "Smith",
+        "email": "patient@example.com",
+        "phone": "+0987654321"
+      }
+    },
+    "createdAt": "2024-12-01T10:00:00.000Z",
+    "updatedAt": "2024-12-01T10:00:00.000Z"
+  }
+}
+```
+
+Rate limit: 60 requests per minute
+
+**Access Control**: Patient can only view their own appointments; doctor can view appointments assigned to them
+
+#### Update Appointment
+```
+PATCH /api/v1/appointments/:id
+Authorization: Bearer <access_token>
+Content-Type: application/json
+Path Parameters:
+- id: UUID of the appointment
+
+{
+  "scheduledStart": "2024-12-15T10:00:00.000Z",  // optional
+  "scheduledEnd": "2024-12-15T10:30:00.000Z",  // optional
+  "notes": "Patient requested morning slot",  // optional
+  "status": "confirmed"  // optional
+}
+
+Response:
+{
+  "success": true,
+  "message": "Appointment updated successfully",
+  "data": { /* updated appointment object */ }
+}
+```
+
+Rate limit: 10 requests per hour
+
+**Validation**:
+- Cannot update completed, cancelled, or no-show appointments
+- If rescheduling, must check doctor availability
+- Only patient or assigned doctor can update
+
+#### Cancel Appointment
+```
+POST /api/v1/appointments/:id/cancel
+Authorization: Bearer <access_token>
+Content-Type: application/json
+Path Parameters:
+- id: UUID of the appointment
+
+{
+  "cancellationReason": "Schedule conflict"  // required
+}
+
+Response:
+{
+  "success": true,
+  "message": "Appointment cancelled successfully",
+  "data": {
+    "id": "appointment_uuid",
+    "status": "cancelled",
+    "cancelledBy": "patient",
+    "cancelledAt": "2024-12-01T10:00:00.000Z",
+    "cancellationReason": "Schedule conflict"
+  }
+}
+```
+
+Rate limit: 10 requests per hour
+
+**Validation**:
+- Appointment must be at least 2 hours in the future
+- Only scheduled or confirmed appointments can be cancelled
+- Cancelled appointments cannot be un-cancelled
+
+#### Get Doctor Availability (Time Slots)
+```
+GET /api/v1/doctors/:doctorId/availability
+Query Parameters:
+- date: ISO date string (required) - Date to check availability
+- duration: number (optional, default: 30) - Appointment duration in minutes
+
+Example Request:
+curl -X GET "http://localhost:8080/api/v1/doctors/doctor_uuid/availability?date=2024-12-15&duration=30"
+
+Response:
+{
+  "success": true,
+  "message": "Available time slots retrieved successfully",
+  "data": [
     {
-      "field": "email",
-      "message": "Email is required"
+      "start": "2024-12-15T09:00:00.000Z",
+      "end": "2024-12-15T09:30:00.000Z",
+      "available": true
+    },
+    {
+      "start": "2024-12-15T09:30:00.000Z",
+      "end": "2024-12-15T10:00:00.000Z",
+      "available": false
+    },
+    {
+      "start": "2024-12-15T10:00:00.000Z",
+      "end": "2024-12-15T10:30:00.000Z",
+      "available": true
     }
   ]
 }
 ```
 
-### Rate Limits
-
-Rate limits are enforced per IP address. When exceeded, the API returns:
-
-```json
-{
-  "error": "Too many requests",
-  "message": "Rate limit exceeded. Try again later.",
-  "retryAfter": 300
-}
-```
-
-### File Upload Limits
-
-- **Max file size**: 10MB
-- **Allowed types**: JPEG, PNG, PDF
-- **Storage**: Google Cloud Storage
-- **Security**: Files are scanned and validated before storage
-
-### Authentication Flow
-
-1. **Register** → Email verification required
-2. **Login** → Receive access token (15 min) & refresh token (7 days)
-3. **Access APIs** → Use access token in Authorization header
-4. **Token expires** → Use refresh token to get new access token
-5. **Refresh expires** → Re-login required
-
-### Role-Based Access Control (RBAC)
-
-- **Patient**: Basic profile access, appointment booking
-- **Doctor**: Patient management, verification document upload, profile management
-- **Hospital**: Institution profile management, verification document upload, staff management
-- **Pharmacy**: Pharmacy profile management, verification document upload, medication management
-- **Admin**: All permissions + user management, verification approval, system stats
-
-## Environment Variables
-
-### Required Variables
-
-- `NODE_ENV` - Environment (development, production)
-- `PORT` - Server port (default: 8080)
-- `DATABASE_URL` - PostgreSQL connection string
-- `REDIS_HOST` - Redis host
-- `REDIS_PORT` - Redis port
-- `JWT_SECRET` - JWT secret key (min 32 characters)
-- `GCP_PROJECT_ID` - Google Cloud project ID
-
-### Optional Variables (Local/Test Only)
-
-**Note**: In production, the following values are automatically sourced from Google Cloud Secret Manager:
-- **App Configuration**: Rate limiting, file upload settings from `app-config-${environment}`
-- **API Keys**: Stripe, Twilio, SendGrid, Firebase from `api-keys-${environment}`
-- **OAuth Credentials**: Google, Apple, Facebook from `oauth-config-${environment}`
-
-For local development and testing:
-- `CORS_ORIGIN` - Allowed CORS origins
-- `RATE_LIMIT_MAX` - Rate limit maximum requests (production: from Secret Manager)
-- `RATE_LIMIT_WINDOW` - Rate limit window in milliseconds (production: from Secret Manager)
-- `FILE_UPLOAD_MAX_SIZE` - Maximum file upload size (production: from Secret Manager)
-- `STRIPE_API_KEY` - Stripe API key (production: from Secret Manager)
-- `TWILIO_AUTH_TOKEN` - Twilio authentication token (production: from Secret Manager)
-- `SENDGRID_API_KEY` - SendGrid API key (production: from Secret Manager)
-- `FIREBASE_API_KEY` - Firebase API key (production: from Secret Manager)
-- `GOOGLE_CLIENT_ID` - Google OAuth client ID (production: from Secret Manager)
-- `GOOGLE_CLIENT_SECRET` - Google OAuth client secret (production: from Secret Manager)
-- `APPLE_CLIENT_ID` - Apple OAuth client ID (production: from Secret Manager)
-- `APPLE_CLIENT_SECRET` - Apple OAuth client secret (production: from Secret Manager)
-- `FACEBOOK_APP_ID` - Facebook app ID (production: from Secret Manager)
-- `FACEBOOK_APP_SECRET` - Facebook app secret (production: from Secret Manager)
-- `LOG_LEVEL` - Logging level (debug, info, warn, error)
-
-## Testing
-
-### Running Tests
-
-```bash
-# Run all tests
-npm test
-
-# Run tests in watch mode
-npm run test:watch
-
-# Run with coverage
-npm run test:coverage
-```
-
-### Test Structure
-
-```
-tests/
-├── unit/           # Unit tests
-├── integration/    # Integration tests
-├── fixtures/       # Test data
-└── helpers/        # Test utilities
-```
-
-### Writing Tests
-
-Example test file:
-
-```javascript
-import request from 'supertest';
-import app from '../src/index.js';
-
-describe('Health Check', () => {
-  it('should return health status', async () => {
-    const response = await request(app)
-      .get('/health')
-      .expect(200);
-    
-    expect(response.body.status).toBe('healthy');
-  });
-});
-```
-
-## Docker
-
-### Building Image
-
-```bash
-npm run docker:build
-```
-
-### Running Container
-
-```bash
-npm run docker:run
-```
-
-### Production Deployment
-
-The application uses a multi-stage Dockerfile optimized for production:
-
-1. **Builder stage**: Installs dependencies
-2. **Production stage**: Copies only production files and dependencies
-
-## Logging
-
-The application uses Winston for structured logging:
-
-- **Development**: Colorized console output
-- **Production**: JSON format with file rotation
-- **Levels**: error, warn, info, debug
-
-Log files are stored in the `logs/` directory:
-- `app.log` - Combined logs
-- `error.log` - Error logs only
-
-## Security
-
-### Authentication
-
-- JWT tokens for stateless authentication
-- Refresh token mechanism for security
-- Secure password hashing with bcrypt
-
-### Security Middleware
-
-- Helmet for security headers
-- CORS configuration
-- Rate limiting
-- Request size limits
-- Input validation with Joi
-
-### Best Practices
-
-- Environment variables for secrets
-- Least privilege database access
-- SQL injection prevention with parameterized queries
-- XSS protection
-- CSRF protection for web clients
-
-## Database
-
-### Migrations
-
-Database migrations are managed through Sequelize CLI:
-
-```bash
-# Run all pending migrations
-npm run db:migrate
-
-# Undo the last migration
-npm run db:migrate:undo
-
-# Undo all migrations
-npm run db:migrate:undo:all
-
-# Seed the database with sample data
-npm run db:seed
-
-# Undo all seeders
-npm run db:seed:undo
-
-# Reset database (undo all migrations, run all migrations, run all seeders)
-npm run db:reset
-```
-
-### Database Schema
-
-The application uses a doctor/patient-centric schema with the following core models:
-- **Users** - Base user authentication and profile data
-- **Doctors** - Doctor-specific information (specialties, licenses, schedules)
-- **Patients** - Patient demographics and contact information  
-- **Appointments** - Scheduled consultations between doctors and patients
-- **HealthProfiles** - Patient medical history, allergies, medications
-- **Verifications** - Document verification for professional credentials
-
-### Connection Pooling
-
-The application uses connection pooling for optimal database performance:
-- Max connections: 20
-- Idle timeout: 30 seconds
-- Connection timeout: 10 seconds
-
-## Caching
-
-Redis is used for:
-- Session storage
-- API response caching
-- Rate limiting counters
-- Temporary data storage
-
-## Error Handling
-
-Centralized error handling with:
-- Structured error responses
-- Request ID tracking
-- Detailed logging
-- Environment-specific error details
-
-## Performance
-
-### Optimization Techniques
-
-- Database connection pooling
-- Redis caching
-- Response compression
-- Async/await for non-blocking operations
-- Request timeout handling
-
-### Monitoring
-
-- Request/response logging
-- Performance metrics
-- Error rate tracking
-- Database query performance
-
-## Deployment
-
-### Google Cloud Run
-
-The application is designed to run on Google Cloud Run:
-
-1. Build Docker image
-2. Push to Google Container Registry
-3. Deploy to Cloud Run
-4. Configure environment variables from Secret Manager
-
-### Environment Setup
-
-Different configurations for each environment:
-
-- **Development**: Local databases, debug logging
-- **Staging**: Shared cloud resources, info logging
-- **Production**: High availability setup, error logging
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Database Connection Errors**
-   - Check connection string and credentials
-   - Verify database is running and accessible
-   - Check firewall rules for Cloud SQL
-
-2. **Redis Connection Errors**
-   - Verify Redis host and port
-   - Check authentication credentials
-   - Ensure Redis service is running
-
-3. **Authentication Issues**
-   - Verify JWT secret configuration
-   - Check token expiration settings
-   - Validate request headers
-
-4. **File Upload Problems**
-   - Check GCS bucket permissions
-   - Verify service account credentials
-   - Review file size limits
-
-### Getting Help
-
-- Check application logs in `logs/` directory
-- Enable debug logging: `LOG_LEVEL=debug`
-- Use health check endpoint: `/health`
-- Review error responses for details
+Rate limit: 30 requests per minute
+
+**Features**:
+- Generates time slots based on doctor's working hours
+- Checks for existing appointments to mark slots as unavailable
+- Configurable appointment duration
+- Returns only slots within the doctor's working day
+
+**Performance Optimization**:
+- Composite indexes on `(patient_id, status, scheduled_start)` and `(doctor_id, status, scheduled_start)`
+- Index on `(scheduled_start, scheduled_end)` for conflict detection
+- Redis caching with 5-minute TTL for availability queries
+- Cache invalidation on appointment create/update/cancel

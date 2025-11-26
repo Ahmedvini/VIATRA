@@ -10,6 +10,10 @@ import '../screens/health_profile/health_profile_view_screen.dart';
 import '../screens/health_profile/health_profile_edit_screen.dart';
 import '../screens/health_profile/chronic_condition_form_screen.dart';
 import '../screens/health_profile/allergy_form_screen.dart';
+import '../screens/doctor_search/doctor_search_screen.dart';
+import '../screens/doctor_search/doctor_detail_screen.dart';
+import '../screens/appointments/appointment_list_screen.dart';
+import '../screens/appointments/appointment_detail_screen.dart';
 
 /// Application router configuration
 class AppRouter {
@@ -119,6 +123,36 @@ class AppRouter {
           return AllergyFormScreen(existingAllergy: allergy);
         },
       ),
+      
+      // Doctor Search routes
+      GoRoute(
+        path: '/doctors/search',
+        name: 'doctor-search',
+        builder: (context, state) => const DoctorSearchScreen(),
+      ),
+      GoRoute(
+        path: '/doctors/:id',
+        name: 'doctor-detail',
+        builder: (context, state) {
+          final doctorId = state.pathParameters['id']!;
+          return DoctorDetailScreen(doctorId: doctorId);
+        },
+      ),
+      
+      // Appointment routes
+      GoRoute(
+        path: '/appointments',
+        name: 'appointments',
+        builder: (context, state) => const AppointmentListScreen(),
+      ),
+      GoRoute(
+        path: '/appointments/:id',
+        name: 'appointment-detail',
+        builder: (context, state) {
+          final appointmentId = state.pathParameters['id']!;
+          return AppointmentDetailScreen(appointmentId: appointmentId);
+        },
+      ),
     ],
     
     // Error handler
@@ -197,10 +231,155 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
     return Scaffold(
-      appBar: AppBar(title: const Text('Viatra Health')),
-      body: const Center(
-        child: Text('Home Screen - TODO: Implement'),
+      appBar: AppBar(
+        title: const Text('Viatra Health'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.person),
+            onPressed: () => context.push('/profile'),
+            tooltip: 'Profile',
+          ),
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () => context.push('/settings'),
+            tooltip: 'Settings',
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Welcome card
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Welcome to Viatra Health',
+                      style: theme.textTheme.headlineSmall,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Your healthcare companion',
+                      style: theme.textTheme.bodyMedium,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            
+            // Quick actions
+            Text(
+              'Quick Actions',
+              style: theme.textTheme.titleLarge,
+            ),
+            const SizedBox(height: 16),
+            
+            // Action cards grid
+            GridView.count(
+              crossAxisCount: 2,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              mainAxisSpacing: 16,
+              crossAxisSpacing: 16,
+              children: [
+                _buildActionCard(
+                  context,
+                  icon: Icons.search,
+                  title: 'Find Doctors',
+                  subtitle: 'Search & book',
+                  color: Colors.blue,
+                  onTap: () => context.push('/doctors/search'),
+                ),
+                _buildActionCard(
+                  context,
+                  icon: Icons.health_and_safety,
+                  title: 'Health Profile',
+                  subtitle: 'Manage your health',
+                  color: Colors.green,
+                  onTap: () => context.push('/health-profile'),
+                ),
+                _buildActionCard(
+                  context,
+                  icon: Icons.calendar_today,
+                  title: 'Appointments',
+                  subtitle: 'View & schedule',
+                  color: Colors.orange,
+                  onTap: () => context.push('/appointments'),
+                ),
+                _buildActionCard(
+                  context,
+                  icon: Icons.medical_services,
+                  title: 'Prescriptions',
+                  subtitle: 'View & refill',
+                  color: Colors.purple,
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Coming soon!')),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  
+  Widget _buildActionCard(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircleAvatar(
+                radius: 32,
+                backgroundColor: color.withOpacity(0.1),
+                child: Icon(
+                  icon,
+                  size: 32,
+                  color: color,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                title,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                subtitle,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Colors.grey,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

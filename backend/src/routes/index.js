@@ -2,6 +2,8 @@ import express from 'express';
 import authRoutes from './auth.js';
 import verificationRoutes from './verification.js';
 import healthProfileRoutes from './healthProfile.js';
+import doctorRoutes from './doctor.js';
+import appointmentRoutes from './appointment.js';
 
 const router = express.Router();
 
@@ -14,7 +16,9 @@ router.get('/', (req, res) => {
     endpoints: {
       authentication: '/auth',
       verification: '/verification',
-      healthProfiles: '/health-profiles'
+      healthProfiles: '/health-profiles',
+      doctors: '/doctors',
+      appointments: '/appointments'
     },
     documentation: {
       auth: {
@@ -47,6 +51,19 @@ router.get('/', (req, res) => {
         addAllergy: 'POST /health-profiles/me/allergies',
         removeAllergy: 'DELETE /health-profiles/me/allergies/:allergen',
         updateVitals: 'PATCH /health-profiles/me/vitals'
+      },
+      doctors: {
+        searchDoctors: 'GET /doctors/search',
+        getDoctorById: 'GET /doctors/:id',
+        getDoctorAvailability: 'GET /doctors/:id/availability'
+      },
+      appointments: {
+        createAppointment: 'POST /appointments',
+        getMyAppointments: 'GET /appointments',
+        getAppointmentById: 'GET /appointments/:id',
+        updateAppointment: 'PATCH /appointments/:id',
+        cancelAppointment: 'POST /appointments/:id/cancel',
+        getDoctorAvailability: 'GET /doctors/:doctorId/availability'
       }
     },
     rateLimits: {
@@ -65,6 +82,17 @@ router.get('/', (req, res) => {
       },
       healthProfile: {
         allEndpoints: '10 per minute'
+      },
+      doctors: {
+        search: '30 per minute',
+        details: '60 per minute'
+      },
+      appointments: {
+        create: '20 per hour',
+        list: '30 per minute',
+        details: '60 per minute',
+        update: '10 per hour',
+        cancel: '10 per hour'
       }
     }
   });
@@ -74,6 +102,8 @@ router.get('/', (req, res) => {
 router.use('/auth', authRoutes);
 router.use('/verification', verificationRoutes);
 router.use('/health-profiles', healthProfileRoutes);
+router.use('/doctors', doctorRoutes);
+router.use('/appointments', appointmentRoutes);
 
 // API status endpoint
 router.get('/status', (req, res) => {
@@ -104,7 +134,9 @@ router.get('/features', (req, res) => {
       rateLimiting: true,
       sessionManagement: true,
       rbac: true, // Role-based access control
-      healthProfileManagement: true
+      healthProfileManagement: true,
+      doctorSearch: true,
+      appointmentBooking: true
     },
     supportedRoles: ['patient', 'doctor', 'admin'],
     supportedDocumentTypes: [

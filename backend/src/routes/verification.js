@@ -12,6 +12,7 @@ import {
 } from '../controllers/verificationController.js';
 import { authenticate, authorize } from '../middleware/auth.js';
 import { uploadSingle } from '../utils/fileUpload.js';
+import { validate, documentUploadSchema, verificationActionSchema, paginationSchema } from '../utils/validators.js';
 
 const router = express.Router();
 
@@ -54,15 +55,16 @@ const adminActionLimiter = rateLimit({
 /**
  * @route   POST /api/v1/verification/submit
  * @desc    Submit a document for verification
- * @access  Private (Doctor, Admin)
+ * @access  Private (Doctor, Hospital, Pharmacy, Admin)
  * @headers Authorization: Bearer <token>
- * @body    Multipart form with file and { documentType, description }
+ * @body    Multipart form with file and { type, description }
  */
 router.post('/submit',
   authenticate,
   authorize('doctor', 'hospital', 'pharmacy', 'admin'),
   documentUploadLimiter,
   uploadSingle('document'),
+  validate(documentUploadSchema),
   submitDocumentForVerification
 );
 
@@ -93,12 +95,13 @@ router.get('/status',
  * @desc    Update document verification status (Admin only)
  * @access  Private (Admin only)
  * @headers Authorization: Bearer <token>
- * @body    { status: 'approved' | 'rejected' | 'pending', comments? }
+ * @body    { status: 'approved' | 'rejected', reason?, notes? }
  */
 router.patch('/document/:documentId/status',
   authenticate,
   authorize('admin'),
   adminActionLimiter,
+  validate(verificationActionSchema),
   updateDocumentVerificationStatus
 );
 
@@ -124,6 +127,7 @@ router.post('/resend-email',
 router.get('/pending',
   authenticate,
   authorize('admin'),
+  validate(paginationSchema, 'query'),
   getPendingVerificationsHandler
 );
 
