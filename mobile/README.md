@@ -809,158 +809,104 @@ final primaryColor = theme.colorScheme.primary;
 
 ## Testing
 
+The app uses a comprehensive testing strategy with unit tests, widget tests, and integration tests.
+
+### Test Coverage
+
+- **Unit Tests**: Test individual functions and classes
+- **Widget Tests**: Test individual widgets and interactions
+- **Integration Tests**: Test complete user journeys
+
 ### Running Tests
 
 ```bash
-# Run all tests
+# Run all unit and widget tests
 flutter test
 
 # Run with coverage
 flutter test --coverage
 
-# Run specific test
-flutter test test/unit/validators_test.dart
+# Run specific test file
+flutter test test/utils/validators_test.dart
+
+# Run integration tests
+flutter test integration_test
+
+# Run specific integration test
+flutter test integration_test/auth_flow_test.dart
+
+# View coverage report
+genhtml coverage/lcov.info -o coverage/html
+open coverage/html/index.html
 ```
 
-### Test Structure
+### Integration Tests
 
-```
-test/
-├── unit/           # Unit tests
-│   ├── validators_test.dart
-│   ├── models_test.dart
-│   └── ...
-├── widget/         # Widget tests
-│   └── screens_test.dart
-└── integration/    # Integration tests
-    └── app_test.dart
-```
+Located in `integration_test/` directory. Tests include:
 
-## Building for Release
+- **Authentication Flow**: Login, registration, logout
+- **Doctor Search & Booking**: Search, filters, booking flow
+- **Health Profile**: CRUD operations for health data
+- **Role Switching**: Switch between patient and doctor roles
+- **Localization**: Language switching and RTL support
+- **Error Handling**: Network errors, validation, recovery
 
-### Android
+#### Test Helpers
 
-```bash
-# Build APK
-flutter build apk --release
+Reusable utilities in `integration_test/test_helpers.dart`:
 
-# Build App Bundle (recommended for Play Store)
-flutter build appbundle --release
-```
+```dart
+// Navigation
+await TestHelpers.navigateToLogin(tester);
+await TestHelpers.navigateToSearch(tester);
 
-Output: `build/app/outputs/flutter-apk/app-release.apk`
+// Input
+await TestHelpers.enterText(tester, 'email_field', 'test@example.com');
+await TestHelpers.tapButton(tester, 'login_button');
 
-### iOS
+// Verification
+TestHelpers.verifyErrorDisplayed(tester);
+TestHelpers.verifyLoadingDisplayed(tester);
 
-```bash
-# Build for iOS
-flutter build ios --release
-
-# Create IPA
-flutter build ipa
+// Localization
+await TestHelpers.switchLanguage(tester, 'العربية');
+TestHelpers.verifyRTLLayout(tester);
 ```
 
-## Performance Optimization
+### Test Organization
 
-### Best Practices
+```
+mobile/
+├── test/                           # Unit and widget tests
+│   ├── utils/                      # Utility tests
+│   ├── widgets/                    # Widget tests
+│   ├── services/                   # Service tests
+│   └── providers/                  # Provider tests
+└── integration_test/               # Integration tests
+    ├── app_test.dart
+    ├── auth_flow_test.dart
+    ├── doctor_search_booking_test.dart
+    ├── chat_flow_test.dart
+    ├── health_profile_test.dart
+    ├── role_switching_test.dart
+    ├── localization_test.dart
+    ├── error_handling_test.dart
+    ├── test_helpers.dart
+    └── README.md
+```
 
-- Use `const` constructors where possible
-- Implement `RepaintBoundary` for complex widgets
-- Lazy load data with pagination
-- Cache network images
-- Use `ListView.builder` for long lists
-- Implement proper dispose methods
+### Coverage Goals
 
-### Caching Strategy
+- Overall: 80%+
+- Critical Paths: 95%+
+- Utils/Services: 90%+
+- Widgets: 80%+
 
-- API responses cached for 5 minutes
-- Images cached automatically
-- User preferences persisted locally
-- Offline mode for critical features
+### CI/CD Integration
 
-## Accessibility
+Tests run automatically on:
+- Pull requests to main/develop branches
+- Nightly builds
+- Pre-release builds
 
-- Screen reader support
-- High contrast mode
-- Scalable text
-- Keyboard navigation
-- ARIA labels on interactive elements
-
-## Internationalization
-
-### Supported Languages
-
-- English (en_US)
-- Arabic (ar_SA)
-
-### Adding Translations
-
-Translations are managed through `lib/l10n/`:
-- Add new ARB files for languages
-- Run code generation
-- Use localized strings in widgets
-
-## Security
-
-### Best Practices
-
-- Secure token storage with flutter_secure_storage
-- Certificate pinning for API requests
-- Input sanitization
-- Secure form handling
-- Biometric authentication (planned)
-
-### Data Protection
-
-- Encrypted local storage
-- Secure API communication (HTTPS only)
-- No sensitive data in logs
-- Token refresh mechanism
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Build Errors**
-   ```bash
-   flutter clean
-   flutter pub get
-   flutter run
-   ```
-
-2. **CocoaPods Issues (iOS)**
-   ```bash
-   cd ios
-   pod install
-   cd ..
-   ```
-
-3. **Gradle Issues (Android)**
-   ```bash
-   cd android
-   ./gradlew clean
-   cd ..
-   ```
-
-4. **API Connection Issues**
-   - Check API_BASE_URL in .env
-   - Verify network connectivity
-   - Check backend server status
-
-### Getting Help
-
-- Check Flutter documentation: https://flutter.dev/docs
-- Review app logs: `flutter logs`
-- Enable debug mode: `flutter run --debug`
-
-## Contributing
-
-1. Follow Flutter style guide
-2. Write tests for new features
-3. Update documentation
-4. Follow commit message conventions
-5. Create pull requests with clear descriptions
-
-## License
-
-Copyright © 2024 Viatra Health. All rights reserved.
+For more details, see [Testing Guide](../docs/TESTING_GUIDE.md) and [Integration Test README](integration_test/README.md).

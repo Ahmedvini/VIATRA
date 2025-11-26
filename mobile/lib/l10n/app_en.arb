@@ -1,0 +1,1083 @@
+{
+  "@@locale": "en",
+  
+  "appName": "Viatra Health",
+  "@appName": {
+    "description": "Application name displayed in app bar and splash screen"
+  },
+
+  "loginWelcome": "Welcome Back",
+  "@loginWelcome": {
+    "description": "Welcome message on login screen"
+  },
+
+  "loginSubtitle": "Sign in to continue to your account",
+  "@loginSubtitle": {
+    "description": "Subtitle text on login screen"
+  },
+
+  "labelEmail": "Email",
+  "@labelEmail": {
+    "description": "Label for email input field"
+  },
+
+  "labelPassword": "Password",
+  "@labelPassword": {
+    "description": "Label for password input field"
+  },
+
+  "labelRememberMe": "Remember me",
+  "@labelRememberMe": {
+    "description": "Label for remember me checkbox"
+  },
+
+  "buttonSignIn": "Sign In",
+  "@buttonSignIn": {
+    "description": "Sign in button label"
+  },
+
+  "buttonSignUp": "Sign Up",
+  "@buttonSignUp": {
+    "description": "Sign up button label"
+  },
+
+  "forgotPassword": "Forgot Password?",
+  "@forgotPassword": {
+    "description": "Forgot password link text"
+  },
+
+  "dontHaveAccount": "Don't have an account?",
+  "@dontHaveAccount": {
+    "description": "Text prompting user to register"
+  },
+
+  "registrationTitle": "Create Account",
+  "@registrationTitle": {
+    "description": "Registration screen title"
+  },
+
+  "stepPersonalInfo": "Personal Information",
+  "@stepPersonalInfo": {
+    "description": "Registration step 1 label"
+  },
+
+  "stepProfessionalInfo": "Professional Information",
+  "@stepProfessionalInfo": {
+    "description": "Registration step 2 label for doctors"
+  },
+
+  "stepDocuments": "Documents",
+  "@stepDocuments": {
+    "description": "Registration step for document upload"
+  },
+
+  "stepReview": "Review",
+  "@stepReview": {
+    "description": "Final registration step label"
+  },
+
+  "labelFullName": "Full Name",
+  "@labelFullName": {
+    "description": "Label for full name input field"
+  },
+
+  "labelPhone": "Phone Number",
+  "@labelPhone": {
+    "description": "Label for phone number input field"
+  },
+
+  "labelDateOfBirth": "Date of Birth",
+  "@labelDateOfBirth": {
+    "description": "Label for date of birth picker"
+  },
+
+  "labelGender": "Gender",
+  "@labelGender": {
+    "description": "Label for gender selection"
+  },
+
+  "genderMale": "Male",
+  "@genderMale": {
+    "description": "Male gender option"
+  },
+
+  "genderFemale": "Female",
+  "@genderFemale": {
+    "description": "Female gender option"
+  },
+
+  "genderOther": "Other",
+  "@genderOther": {
+    "description": "Other gender option"
+  },
+
+  "genderPreferNotToSay": "Prefer not to say",
+  "@genderPreferNotToSay": {
+    "description": "Prefer not to say gender option"
+  },
+
+  "labelAddress": "Address",
+  "@labelAddress": {
+    "description": "Label for address input field"
+  },
+
+  "labelCity": "City",
+  "@labelCity": {
+    "description": "Label for city input field"
+  },
+
+  "labelSpecialty": "Specialty",
+  "@labelSpecialty": {
+    "description": "Label for doctor specialty selection"
+  },
+
+  "labelLicenseNumber": "License Number",
+  "@labelLicenseNumber": {
+    "description": "Label for medical license number"
+  },
+
+  "labelYearsOfExperience": "Years of Experience",
+  "@labelYearsOfExperience": {
+    "description": "Label for years of experience input"
+  },
+
+  "labelConsultationFee": "Consultation Fee",
+  "@labelConsultationFee": {
+    "description": "Label for consultation fee input"
+  },
+
+  "buttonNext": "Next",
+  "@buttonNext": {
+    "description": "Next button label"
+  },
+
+  "buttonBack": "Back",
+  "@buttonBack": {
+    "description": "Back button label"
+  },
+
+  "buttonSubmit": "Submit",
+  "@buttonSubmit": {
+    "description": "Submit button label"
+  },
+
+  "buttonSave": "Save",
+  "@buttonSave": {
+    "description": "Save button label"
+  },
+
+  "buttonCancel": "Cancel",
+  "@buttonCancel": {
+    "description": "Cancel button label"
+  },
+
+  "buttonRetry": "Retry",
+  "@buttonRetry": {
+    "description": "Retry button label"
+  },
+
+  "buttonEdit": "Edit",
+  "@buttonEdit": {
+    "description": "Edit button label"
+  },
+
+  "buttonDelete": "Delete",
+  "@buttonDelete": {
+    "description": "Delete button label"
+  },
+
+  "buttonAdd": "Add",
+  "@buttonAdd": {
+    "description": "Add button label"
+  },
+
+  "navHome": "Home",
+  "@navHome": {
+    "description": "Bottom navigation home label"
+  },
+
+  "navSearch": "Search",
+  "@navSearch": {
+    "description": "Bottom navigation search label"
+  },
+
+  "navAppointments": "Appointments",
+  "@navAppointments": {
+    "description": "Bottom navigation appointments label"
+  },
+
+  "navProfile": "Profile",
+  "@navProfile": {
+    "description": "Bottom navigation profile label"
+  },
+
+  "navDashboard": "Dashboard",
+  "@navDashboard": {
+    "description": "Bottom navigation dashboard label for doctors"
+  },
+
+  "navPatients": "Patients",
+  "@navPatients": {
+    "description": "Bottom navigation patients label for doctors"
+  },
+
+  "homeTitle": "Home",
+  "@homeTitle": {
+    "description": "Home screen title"
+  },
+
+  "greetingMorning": "Good morning",
+  "@greetingMorning": {
+    "description": "Morning greeting message"
+  },
+
+  "greetingAfternoon": "Good afternoon",
+  "@greetingAfternoon": {
+    "description": "Afternoon greeting message"
+  },
+
+  "greetingEvening": "Good evening",
+  "@greetingEvening": {
+    "description": "Evening greeting message"
+  },
+
+  "quickActionsTitle": "Quick Actions",
+  "@quickActionsTitle": {
+    "description": "Quick actions section title"
+  },
+
+  "actionBookAppointment": "Book Appointment",
+  "@actionBookAppointment": {
+    "description": "Book appointment action label"
+  },
+
+  "actionFindDoctor": "Find Doctor",
+  "@actionFindDoctor": {
+    "description": "Find doctor action label"
+  },
+
+  "actionHealthProfile": "Health Profile",
+  "@actionHealthProfile": {
+    "description": "Health profile action label"
+  },
+
+  "actionMyAppointments": "My Appointments",
+  "@actionMyAppointments": {
+    "description": "My appointments action label"
+  },
+
+  "sectionUpcomingAppointments": "Upcoming Appointments",
+  "@sectionUpcomingAppointments": {
+    "description": "Upcoming appointments section title"
+  },
+
+  "searchDoctorsHint": "Search doctors...",
+  "@searchDoctorsHint": {
+    "description": "Search input placeholder text"
+  },
+
+  "searchDoctorsTitle": "Search for Doctors",
+  "@searchDoctorsTitle": {
+    "description": "Initial search screen title"
+  },
+
+  "noDoctorsFound": "No Doctors Found",
+  "@noDoctorsFound": {
+    "description": "Empty state message when no doctors match search"
+  },
+
+  "searchErrorMessage": "Something went wrong",
+  "@searchErrorMessage": {
+    "description": "Generic error message for search failures"
+  },
+
+  "buttonClearSearch": "Clear Search",
+  "@buttonClearSearch": {
+    "description": "Clear search button label"
+  },
+
+  "filtersTitle": "Filters",
+  "@filtersTitle": {
+    "description": "Filter sheet title"
+  },
+
+  "buttonApplyFilters": "Apply Filters",
+  "@buttonApplyFilters": {
+    "description": "Apply filters button label"
+  },
+
+  "buttonClearAll": "Clear All",
+  "@buttonClearAll": {
+    "description": "Clear all filters button label"
+  },
+
+  "filterPriceRange": "Price Range",
+  "@filterPriceRange": {
+    "description": "Price range filter label"
+  },
+
+  "filterLocation": "Location",
+  "@filterLocation": {
+    "description": "Location filter label"
+  },
+
+  "filterAvailability": "Availability",
+  "@filterAvailability": {
+    "description": "Availability filter label"
+  },
+
+  "filterLanguages": "Languages",
+  "@filterLanguages": {
+    "description": "Languages filter label"
+  },
+
+  "doctorDetailsAbout": "About",
+  "@doctorDetailsAbout": {
+    "description": "About section title on doctor detail screen"
+  },
+
+  "doctorDetailsSpecialties": "Specialties",
+  "@doctorDetailsSpecialties": {
+    "description": "Specialties section title"
+  },
+
+  "doctorDetailsLanguages": "Languages",
+  "@doctorDetailsLanguages": {
+    "description": "Languages section title"
+  },
+
+  "doctorDetailsWorkingHours": "Working Hours",
+  "@doctorDetailsWorkingHours": {
+    "description": "Working hours section title"
+  },
+
+  "doctorDetailsReviews": "Reviews",
+  "@doctorDetailsReviews": {
+    "description": "Reviews section title"
+  },
+
+  "buttonBookAppointment": "Book Appointment",
+  "@buttonBookAppointment": {
+    "description": "Book appointment button label"
+  },
+
+  "buttonCall": "Call",
+  "@buttonCall": {
+    "description": "Call button label"
+  },
+
+  "buttonMessage": "Message",
+  "@buttonMessage": {
+    "description": "Message button label"
+  },
+
+  "labelExperience": "Experience",
+  "@labelExperience": {
+    "description": "Experience label for doctor card"
+  },
+
+  "labelRating": "Rating",
+  "@labelRating": {
+    "description": "Rating label"
+  },
+
+  "labelAvailable": "Available",
+  "@labelAvailable": {
+    "description": "Available status label"
+  },
+
+  "labelUnavailable": "Unavailable",
+  "@labelUnavailable": {
+    "description": "Unavailable status label"
+  },
+
+  "buttonBookNow": "Book Now",
+  "@buttonBookNow": {
+    "description": "Book now button label on doctor card"
+  },
+
+  "noReviewsYet": "No reviews yet",
+  "@noReviewsYet": {
+    "description": "Message when doctor has no reviews"
+  },
+
+  "appointmentsTitle": "My Appointments",
+  "@appointmentsTitle": {
+    "description": "Appointments screen title"
+  },
+
+  "tabUpcoming": "Upcoming",
+  "@tabUpcoming": {
+    "description": "Upcoming appointments tab label"
+  },
+
+  "tabPast": "Past",
+  "@tabPast": {
+    "description": "Past appointments tab label"
+  },
+
+  "filterAll": "All",
+  "@filterAll": {
+    "description": "All filter option"
+  },
+
+  "statusScheduled": "Scheduled",
+  "@statusScheduled": {
+    "description": "Scheduled appointment status"
+  },
+
+  "statusCompleted": "Completed",
+  "@statusCompleted": {
+    "description": "Completed appointment status"
+  },
+
+  "statusCancelled": "Cancelled",
+  "@statusCancelled": {
+    "description": "Cancelled appointment status"
+  },
+
+  "statusPending": "Pending",
+  "@statusPending": {
+    "description": "Pending appointment status"
+  },
+
+  "noUpcomingAppointments": "No upcoming appointments",
+  "@noUpcomingAppointments": {
+    "description": "Empty state message for upcoming appointments"
+  },
+
+  "noPastAppointments": "No past appointments",
+  "@noPastAppointments": {
+    "description": "Empty state message for past appointments"
+  },
+
+  "bookAppointmentPrompt": "Book an appointment to get started",
+  "@bookAppointmentPrompt": {
+    "description": "Prompt message to book first appointment"
+  },
+
+  "appointmentDetailsTitle": "Appointment Details",
+  "@appointmentDetailsTitle": {
+    "description": "Appointment details screen title"
+  },
+
+  "sectionDoctorInfo": "Doctor Information",
+  "@sectionDoctorInfo": {
+    "description": "Doctor information section title"
+  },
+
+  "sectionAppointmentNotes": "Notes",
+  "@sectionAppointmentNotes": {
+    "description": "Appointment notes section title"
+  },
+
+  "buttonCancelAppointment": "Cancel Appointment",
+  "@buttonCancelAppointment": {
+    "description": "Cancel appointment button label"
+  },
+
+  "buttonReschedule": "Reschedule",
+  "@buttonReschedule": {
+    "description": "Reschedule button label"
+  },
+
+  "buttonStartVideoCall": "Start Video Call",
+  "@buttonStartVideoCall": {
+    "description": "Start video call button label"
+  },
+
+  "confirmCancelAppointment": "Are you sure you want to cancel this appointment?",
+  "@confirmCancelAppointment": {
+    "description": "Confirmation message for cancelling appointment"
+  },
+
+  "appointmentCancelledSuccess": "Appointment cancelled successfully",
+  "@appointmentCancelledSuccess": {
+    "description": "Success message after cancelling appointment"
+  },
+
+  "selectTimeSlotTitle": "Select Time Slot",
+  "@selectTimeSlotTitle": {
+    "description": "Time slot selection screen title"
+  },
+
+  "noAvailableSlots": "No available slots for selected date",
+  "@noAvailableSlots": {
+    "description": "Message when no time slots available"
+  },
+
+  "buttonConfirmBooking": "Confirm Booking",
+  "@buttonConfirmBooking": {
+    "description": "Confirm booking button label"
+  },
+
+  "appointmentBookedSuccess": "Appointment Booked Successfully!",
+  "@appointmentBookedSuccess": {
+    "description": "Success message after booking appointment"
+  },
+
+  "labelDoctor": "Doctor",
+  "@labelDoctor": {
+    "description": "Doctor label"
+  },
+
+  "labelDate": "Date",
+  "@labelDate": {
+    "description": "Date label"
+  },
+
+  "labelTime": "Time",
+  "@labelTime": {
+    "description": "Time label"
+  },
+
+  "labelLocation": "Location",
+  "@labelLocation": {
+    "description": "Location label"
+  },
+
+  "buttonViewAppointment": "View Appointment",
+  "@buttonViewAppointment": {
+    "description": "View appointment button label"
+  },
+
+  "buttonBackToHome": "Back to Home",
+  "@buttonBackToHome": {
+    "description": "Back to home button label"
+  },
+
+  "buttonAddToCalendar": "Add to Calendar",
+  "@buttonAddToCalendar": {
+    "description": "Add to calendar button label"
+  },
+
+  "healthProfileTitle": "Health Profile",
+  "@healthProfileTitle": {
+    "description": "Health profile screen title"
+  },
+
+  "sectionChronicConditions": "Chronic Conditions",
+  "@sectionChronicConditions": {
+    "description": "Chronic conditions section title"
+  },
+
+  "sectionAllergies": "Allergies",
+  "@sectionAllergies": {
+    "description": "Allergies section title"
+  },
+
+  "sectionMedications": "Current Medications",
+  "@sectionMedications": {
+    "description": "Current medications section title"
+  },
+
+  "sectionEmergencyContact": "Emergency Contact",
+  "@sectionEmergencyContact": {
+    "description": "Emergency contact section title"
+  },
+
+  "noChronicConditions": "No chronic conditions recorded",
+  "@noChronicConditions": {
+    "description": "Empty state message for chronic conditions"
+  },
+
+  "noAllergies": "No allergies recorded",
+  "@noAllergies": {
+    "description": "Empty state message for allergies"
+  },
+
+  "noMedications": "No current medications",
+  "@noMedications": {
+    "description": "Empty state message for medications"
+  },
+
+  "buttonEditProfile": "Edit Profile",
+  "@buttonEditProfile": {
+    "description": "Edit profile button label"
+  },
+
+  "buttonCreateHealthProfile": "Create Health Profile",
+  "@buttonCreateHealthProfile": {
+    "description": "Create health profile button label"
+  },
+
+  "editHealthProfileTitle": "Edit Health Profile",
+  "@editHealthProfileTitle": {
+    "description": "Edit health profile screen title"
+  },
+
+  "labelHeight": "Height",
+  "@labelHeight": {
+    "description": "Height label"
+  },
+
+  "labelWeight": "Weight",
+  "@labelWeight": {
+    "description": "Weight label"
+  },
+
+  "labelBloodPressure": "Blood Pressure",
+  "@labelBloodPressure": {
+    "description": "Blood pressure label"
+  },
+
+  "labelBloodType": "Blood Type",
+  "@labelBloodType": {
+    "description": "Blood type label"
+  },
+
+  "labelHeartRate": "Heart Rate",
+  "@labelHeartRate": {
+    "description": "Heart rate label"
+  },
+
+  "labelTemperature": "Temperature",
+  "@labelTemperature": {
+    "description": "Temperature label"
+  },
+
+  "unitCm": "cm",
+  "@unitCm": {
+    "description": "Centimeters unit"
+  },
+
+  "unitKg": "kg",
+  "@unitKg": {
+    "description": "Kilograms unit"
+  },
+
+  "unitMmHg": "mmHg",
+  "@unitMmHg": {
+    "description": "Millimeters of mercury unit"
+  },
+
+  "unitBpm": "bpm",
+  "@unitBpm": {
+    "description": "Beats per minute unit"
+  },
+
+  "unitCelsius": "°C",
+  "@unitCelsius": {
+    "description": "Celsius unit"
+  },
+
+  "vitalsTitle": "Vitals",
+  "@vitalsTitle": {
+    "description": "Vitals card title"
+  },
+
+  "labelBMI": "BMI",
+  "@labelBMI": {
+    "description": "BMI label"
+  },
+
+  "bmiUnderweight": "Underweight",
+  "@bmiUnderweight": {
+    "description": "BMI underweight category"
+  },
+
+  "bmiNormal": "Normal",
+  "@bmiNormal": {
+    "description": "BMI normal category"
+  },
+
+  "bmiOverweight": "Overweight",
+  "@bmiOverweight": {
+    "description": "BMI overweight category"
+  },
+
+  "bmiObese": "Obese",
+  "@bmiObese": {
+    "description": "BMI obese category"
+  },
+
+  "addChronicConditionTitle": "Add Chronic Condition",
+  "@addChronicConditionTitle": {
+    "description": "Add chronic condition screen title"
+  },
+
+  "editChronicConditionTitle": "Edit Chronic Condition",
+  "@editChronicConditionTitle": {
+    "description": "Edit chronic condition screen title"
+  },
+
+  "labelConditionName": "Condition Name",
+  "@labelConditionName": {
+    "description": "Condition name label"
+  },
+
+  "labelDiagnosedDate": "Diagnosed Date",
+  "@labelDiagnosedDate": {
+    "description": "Diagnosed date label"
+  },
+
+  "labelSeverity": "Severity",
+  "@labelSeverity": {
+    "description": "Severity label"
+  },
+
+  "labelNotes": "Notes",
+  "@labelNotes": {
+    "description": "Notes label"
+  },
+
+  "severityMild": "Mild",
+  "@severityMild": {
+    "description": "Mild severity option"
+  },
+
+  "severityModerate": "Moderate",
+  "@severityModerate": {
+    "description": "Moderate severity option"
+  },
+
+  "severitySevere": "Severe",
+  "@severitySevere": {
+    "description": "Severe severity option"
+  },
+
+  "labelDiagnosed": "Diagnosed",
+  "@labelDiagnosed": {
+    "description": "Diagnosed label prefix"
+  },
+
+  "confirmDeleteCondition": "Are you sure you want to delete this condition?",
+  "@confirmDeleteCondition": {
+    "description": "Confirmation message for deleting chronic condition"
+  },
+
+  "addAllergyTitle": "Add Allergy",
+  "@addAllergyTitle": {
+    "description": "Add allergy screen title"
+  },
+
+  "editAllergyTitle": "Edit Allergy",
+  "@editAllergyTitle": {
+    "description": "Edit allergy screen title"
+  },
+
+  "labelAllergen": "Allergen",
+  "@labelAllergen": {
+    "description": "Allergen label"
+  },
+
+  "labelReaction": "Reaction",
+  "@labelReaction": {
+    "description": "Reaction label"
+  },
+
+  "severityLifeThreatening": "Life-threatening",
+  "@severityLifeThreatening": {
+    "description": "Life-threatening severity option"
+  },
+
+  "confirmDeleteAllergy": "Are you sure you want to delete this allergy?",
+  "@confirmDeleteAllergy": {
+    "description": "Confirmation message for deleting allergy"
+  },
+
+  "doctorDashboardTitle": "Doctor Dashboard",
+  "@doctorDashboardTitle": {
+    "description": "Doctor dashboard screen title"
+  },
+
+  "statTodaysAppointments": "Today's Appointments",
+  "@statTodaysAppointments": {
+    "description": "Today's appointments stat label"
+  },
+
+  "statUpcoming": "Upcoming",
+  "@statUpcoming": {
+    "description": "Upcoming stat label"
+  },
+
+  "statTotalPatients": "Total Patients",
+  "@statTotalPatients": {
+    "description": "Total patients stat label"
+  },
+
+  "statPendingRequests": "Pending Requests",
+  "@statPendingRequests": {
+    "description": "Pending requests stat label"
+  },
+
+  "sectionTodaysSchedule": "Today's Schedule",
+  "@sectionTodaysSchedule": {
+    "description": "Today's schedule section title"
+  },
+
+  "sectionRecentPatients": "Recent Patients",
+  "@sectionRecentPatients": {
+    "description": "Recent patients section title"
+  },
+
+  "noAppointmentsToday": "No appointments today",
+  "@noAppointmentsToday": {
+    "description": "Empty state message for today's appointments"
+  },
+
+  "buttonAccept": "Accept",
+  "@buttonAccept": {
+    "description": "Accept button label"
+  },
+
+  "buttonReject": "Reject",
+  "@buttonReject": {
+    "description": "Reject button label"
+  },
+
+  "buttonComplete": "Complete",
+  "@buttonComplete": {
+    "description": "Complete button label"
+  },
+
+  "buttonAddNotes": "Add Notes",
+  "@buttonAddNotes": {
+    "description": "Add notes button label"
+  },
+
+  "confirmAcceptAppointment": "Accept this appointment request?",
+  "@confirmAcceptAppointment": {
+    "description": "Confirmation message for accepting appointment"
+  },
+
+  "confirmRejectAppointment": "Reject this appointment request?",
+  "@confirmRejectAppointment": {
+    "description": "Confirmation message for rejecting appointment"
+  },
+
+  "profileTitle": "Profile",
+  "@profileTitle": {
+    "description": "Profile screen title"
+  },
+
+  "sectionAccountInfo": "Account Information",
+  "@sectionAccountInfo": {
+    "description": "Account information section title"
+  },
+
+  "sectionSettings": "Settings",
+  "@sectionSettings": {
+    "description": "Settings section title"
+  },
+
+  "sectionPreferences": "Preferences",
+  "@sectionPreferences": {
+    "description": "Preferences section title"
+  },
+
+  "menuChangePassword": "Change Password",
+  "@menuChangePassword": {
+    "description": "Change password menu item"
+  },
+
+  "menuLanguage": "Language",
+  "@menuLanguage": {
+    "description": "Language menu item"
+  },
+
+  "menuTheme": "Theme",
+  "@menuTheme": {
+    "description": "Theme menu item"
+  },
+
+  "menuNotifications": "Notifications",
+  "@menuNotifications": {
+    "description": "Notifications menu item"
+  },
+
+  "menuPrivacy": "Privacy",
+  "@menuPrivacy": {
+    "description": "Privacy menu item"
+  },
+
+  "menuTerms": "Terms & Conditions",
+  "@menuTerms": {
+    "description": "Terms and conditions menu item"
+  },
+
+  "menuLogout": "Logout",
+  "@menuLogout": {
+    "description": "Logout menu item"
+  },
+
+  "confirmLogout": "Are you sure you want to logout?",
+  "@confirmLogout": {
+    "description": "Logout confirmation message"
+  },
+
+  "rolePatient": "Patient",
+  "@rolePatient": {
+    "description": "Patient role label"
+  },
+
+  "roleDoctor": "Doctor",
+  "@roleDoctor": {
+    "description": "Doctor role label"
+  },
+
+  "labelSwitchRole": "Switch Role",
+  "@labelSwitchRole": {
+    "description": "Switch role label"
+  },
+
+  "confirmSwitchRole": "Switch to {role}?",
+  "@confirmSwitchRole": {
+    "description": "Switch role confirmation message",
+    "placeholders": {
+      "role": {
+        "type": "String"
+      }
+    }
+  },
+
+  "uploadDocumentsTitle": "Upload Documents",
+  "@uploadDocumentsTitle": {
+    "description": "Upload documents widget title"
+  },
+
+  "buttonChooseFromGallery": "Choose from Gallery",
+  "@buttonChooseFromGallery": {
+    "description": "Choose from gallery button label"
+  },
+
+  "buttonTakePhoto": "Take Photo",
+  "@buttonTakePhoto": {
+    "description": "Take photo button label"
+  },
+
+  "buttonRemove": "Remove",
+  "@buttonRemove": {
+    "description": "Remove button label"
+  },
+
+  "statusUploading": "Uploading...",
+  "@statusUploading": {
+    "description": "Upload in progress status message"
+  },
+
+  "statusUploadSuccess": "Upload successful",
+  "@statusUploadSuccess": {
+    "description": "Upload success status message"
+  },
+
+  "statusUploadFailed": "Upload failed",
+  "@statusUploadFailed": {
+    "description": "Upload failed status message"
+  },
+
+  "verificationPending": "Verification Pending",
+  "@verificationPending": {
+    "description": "Verification pending status"
+  },
+
+  "verificationApproved": "Approved",
+  "@verificationApproved": {
+    "description": "Verification approved status"
+  },
+
+  "verificationRejected": "Rejected",
+  "@verificationRejected": {
+    "description": "Verification rejected status"
+  },
+
+  "verificationUnderReview": "Under Review",
+  "@verificationUnderReview": {
+    "description": "Verification under review status"
+  },
+
+  "verificationPendingMessage": "Your documents are being reviewed",
+  "@verificationPendingMessage": {
+    "description": "Message shown during verification pending"
+  },
+
+  "verificationCompleteMessage": "Verification complete! You can now access all features",
+  "@verificationCompleteMessage": {
+    "description": "Message shown when verification is complete"
+  },
+
+  "verificationRejectedMessage": "Please resubmit your documents",
+  "@verificationRejectedMessage": {
+    "description": "Message shown when verification is rejected"
+  },
+
+  "buttonResubmit": "Resubmit",
+  "@buttonResubmit": {
+    "description": "Resubmit button label"
+  },
+
+  "buttonViewDetails": "View Details",
+  "@buttonViewDetails": {
+    "description": "View details button label"
+  },
+
+  "errorNetwork": "Network error. Please check your connection.",
+  "@errorNetwork": {
+    "description": "Network error message"
+  },
+
+  "errorAuth": "Authentication failed. Please login again.",
+  "@errorAuth": {
+    "description": "Authentication error message"
+  },
+
+  "errorValidation": "Please check your input and try again.",
+  "@errorValidation": {
+    "description": "Validation error message"
+  },
+
+  "errorServer": "Server error. Please try again later.",
+  "@errorServer": {
+    "description": "Server error message"
+  },
+
+  "errorUnknown": "An unexpected error occurred.",
+  "@errorUnknown": {
+    "description": "Unknown error message"
+  },
+
+  "errorInvalidEmail": "Please enter a valid email address",
+  "@errorInvalidEmail": {
+    "description": "Invalid email validation error"
+  },
+
+  "errorInvalidPassword": "Password must be at least 8 characters",
+  "@errorInvalidPassword": {
+    "description": "Invalid password validation error"
+  },
+
+  "errorInvalidPhone": "Please enter a valid phone number",
+  "@errorInvalidPhone": {
+    "description": "Invalid phone validation error"
+  },
+
+  "errorRequiredField": "This field is required",
+  "@errorRequiredField": {
+    "description": "Required field validation error"
+  },
+
+  "loadingMessage": "Loading...",
+  "@loadingMessage": {
+    "description": "Generic loading message"
+  },
+
+  "emptyStateNoData": "No data available",
+  "@emptyStateNoData": {
+    "description": "Generic empty state message"
+  },
+
+  "emptyStateNoResults": "No results found",
+  "@emptyStateNoResults": {
+    "description": "Empty state message when search returns no results"
+  },
+
+  "languageEnglish": "English",
+  "@languageEnglish": {
+    "description": "English language option"
+  },
+
+  "languageArabic": "Arabic",
+  "@languageArabic": {
+    "description": "Arabic language option"
+  }
+}

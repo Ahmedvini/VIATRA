@@ -106,6 +106,7 @@ class AppTheme {
       backgroundColor: Color(0xFF2196F3),
       foregroundColor: Colors.white,
       elevation: 0,
+      centerTitle: true,
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
@@ -142,6 +143,8 @@ class AppTheme {
         borderRadius: BorderRadius.circular(12),
       ),
     ),
+    // RTL support
+    visualDensity: VisualDensity.adaptivePlatformDensity,
   );
 
   // Dark theme
@@ -153,6 +156,7 @@ class AppTheme {
       backgroundColor: Color(0xFF1E1E1E),
       foregroundColor: Colors.white,
       elevation: 0,
+      centerTitle: true,
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
@@ -190,5 +194,7 @@ class AppTheme {
       ),
       color: _darkColorScheme.surface,
     ),
+    // RTL support
+    visualDensity: VisualDensity.adaptivePlatformDensity,
   );
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'dart:io';
 import 'logger.dart';
 
 /// Global error handler for the application
@@ -58,6 +60,56 @@ class ErrorHandler {
   static String _getUserFriendlyMessage(Object error) {
     final errorString = error.toString().toLowerCase();
 
+    // Try to use localized messages if context is available
+    if (_context != null) {
+      try {
+        final l10n = AppLocalizations.of(_context!);
+        
+        if (error is SocketException || errorString.contains('network') || 
+            errorString.contains('connection') || errorString.contains('timeout') ||
+            errorString.contains('socket')) {
+          return l10n != null ? l10n.errorNetwork : 
+              'Network connection error. Please check your internet connection and try again.';
+        }
+
+        if (errorString.contains('unauthorized') || errorString.contains('401')) {
+          return l10n != null ? l10n.errorAuth : 
+              'Your session has expired. Please log in again.';
+        }
+
+        if (errorString.contains('forbidden') || errorString.contains('403')) {
+          return 'You don\'t have permission to perform this action.';
+        }
+
+        if (errorString.contains('not found') || errorString.contains('404')) {
+          return 'The requested resource was not found.';
+        }
+
+        if (errorString.contains('server error') || errorString.contains('500') ||
+            errorString.contains('502') || errorString.contains('503')) {
+          return l10n != null ? l10n.errorServer : 
+              'Server error occurred. Please try again later.';
+        }
+
+        if (errorString.contains('validation') || errorString.contains('invalid')) {
+          return l10n != null ? l10n.errorValidation : 
+              'Please check your input and try again.';
+        }
+
+        if (errorString.contains('storage') || errorString.contains('disk') ||
+            errorString.contains('space')) {
+          return 'Storage error occurred. Please free up some space and try again.';
+        }
+
+        // Generic error message
+        return l10n != null ? l10n.errorUnknown : 
+            'An unexpected error occurred. Please try again.';
+      } catch (e) {
+        // Fall through to non-localized messages
+      }
+    }
+
+    // Fallback non-localized messages
     if (errorString.contains('network') || 
         errorString.contains('connection') ||
         errorString.contains('timeout') ||

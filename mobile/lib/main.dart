@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'config/app_config.dart';
 import 'config/theme.dart';
@@ -191,10 +192,11 @@ class ViatraApp extends StatelessWidget {
             // Localization
             locale: localeProvider.locale,
             supportedLocales: const [
-              Locale('en', 'US'), // English
-              Locale('ar', 'SA'), // Arabic
+              Locale('en'), // English
+              Locale('ar'), // Arabic
             ],
             localizationsDelegates: const [
+              AppLocalizations.delegate,
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
