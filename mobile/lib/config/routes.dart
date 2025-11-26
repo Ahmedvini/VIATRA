@@ -14,6 +14,9 @@ import '../screens/doctor_search/doctor_search_screen.dart';
 import '../screens/doctor_search/doctor_detail_screen.dart';
 import '../screens/appointments/appointment_list_screen.dart';
 import '../screens/appointments/appointment_detail_screen.dart';
+import '../screens/doctor/doctor_dashboard_screen.dart';
+import '../screens/doctor/doctor_appointment_list_screen.dart';
+import '../screens/doctor/doctor_appointment_detail_screen.dart';
 
 /// Application router configuration
 class AppRouter {
@@ -151,6 +154,26 @@ class AppRouter {
         builder: (context, state) {
           final appointmentId = state.pathParameters['id']!;
           return AppointmentDetailScreen(appointmentId: appointmentId);
+        },
+      ),
+
+      // Doctor routes
+      GoRoute(
+        path: '/doctor/dashboard',
+        name: 'doctor-dashboard',
+        builder: (context, state) => const DoctorDashboardScreen(),
+      ),
+      GoRoute(
+        path: '/doctor/appointments',
+        name: 'doctor-appointments',
+        builder: (context, state) => const DoctorAppointmentListScreen(),
+      ),
+      GoRoute(
+        path: '/doctor/appointments/:id',
+        name: 'doctor-appointment-detail',
+        builder: (context, state) {
+          final appointmentId = state.pathParameters['id']!;
+          return DoctorAppointmentDetailScreen(appointmentId: appointmentId);
         },
       ),
     ],

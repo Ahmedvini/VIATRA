@@ -1077,6 +1077,195 @@ Rate limit: 30 requests per minute
 - Redis caching with 5-minute TTL for availability queries
 - Cache invalidation on appointment create/update/cancel
 
+### Doctor Appointment Management
+
+Doctor-specific endpoints for managing appointments. All endpoints require authentication and doctor role.
+
+#### Get Doctor's Appointments
+
+```
+GET /api/v1/appointments/doctor/me
+Query Parameters:
+- status: Filter by status (scheduled, confirmed, in_progress, completed, cancelled, no_show)
+- startDate: ISO date string - Filter appointments from this date
+- endDate: ISO date string - Filter appointments until this date
+- page: Page number (default: 1)
+- limit: Items per page (default: 20, max: 100)
+- sortBy: Sort field (scheduled_start, created_at, status)
+- sortOrder: Sort direction (ASC, DESC)
+
+Example Request:
+curl -X GET "http://localhost:8080/api/v1/appointments/doctor/me?status=scheduled&page=1&limit=20" \
+  -H "Authorization: Bearer <token>"
+
+Response:
+{
+  "success": true,
+  "message": "Appointments retrieved successfully",
+  "data": {
+    "appointments": [
+      {
+        "id": "uuid",
+        "patientId": "patient_uuid",
+        "appointmentType": "telehealth",
+        "scheduledStart": "2024-12-15T09:00:00.000Z",
+        "scheduledEnd": "2024-12-15T09:30:00.000Z",
+        "status": "scheduled",
+        "reasonForVisit": "Annual checkup",
+        "urgent": false,
+        "patient": {
+          "id": "patient_uuid",
+          "user": {
+            "firstName": "John",
+            "lastName": "Doe",
+            "email": "john@example.com",
+            "phone": "+1234567890"
+          }
+        }
+      }
+    ],
+    "pagination": {
+      "total": 45,
+      "page": 1,
+      "limit": 20,
+      "totalPages": 3
+    }
+  }
+}
+```
+
+Rate limit: 30 requests per minute
+
+**Authentication**: Requires JWT token and doctor role
+
+**Caching**: Results cached in Redis for 5 minutes
+
+#### Get Doctor Dashboard Statistics
+
+```
+GET /api/v1/appointments/doctor/dashboard
+
+Example Request:
+curl -X GET "http://localhost:8080/api/v1/appointments/doctor/dashboard" \
+  -H "Authorization: Bearer <token>"
+
+Response:
+{
+  "success": true,
+  "message": "Statistics retrieved successfully",
+  "data": {
+    "todayCount": 5,
+    "upcomingCount": 12,
+    "totalPatients": 87,
+    "pendingCount": 3
+  }
+}
+```
+
+**Statistics**:
+- `todayCount`: Number of appointments scheduled for today (excluding cancelled/no-show)
+- `upcomingCount`: Number of future scheduled or confirmed appointments
+- `totalPatients`: Total number of unique completed patients
+- `pendingCount`: Number of appointments in 'scheduled' status (not yet confirmed)
+
+Rate limit: 60 requests per minute
+
+**Authentication**: Requires JWT token and doctor role
+
+**Caching**: Results cached in Redis for 5 minutes
+
+#### Accept Appointment
+
+```
+POST /api/v1/appointments/:id/accept
+
+Example Request:
+curl -X POST "http://localhost:8080/api/v1/appointments/appointment_uuid/accept" \
+  -H "Authorization: Bearer <token>"
+
+Response:
+{
+  "success": true,
+  "message": "Appointment accepted successfully",
+  "data": {
+    "id": "uuid",
+    "status": "confirmed",
+    "scheduledStart": "2024-12-15T09:00:00.000Z",
+    "scheduledEnd": "2024-12-15T09:30:00.000Z"
+  }
+}
+```
+
+Rate limit: 10 requests per hour
+
+**Authentication**: Requires JWT token and doctor role
+
+**Validation**:
+- Appointment must belong to the authenticated doctor
+- Only appointments with status 'scheduled' can be accepted
+- Status will be changed to 'confirmed'
+
+**Error Responses**:
+- 400: Invalid appointment ID format
+- 403: Access denied (not your appointment)
+- 404: Appointment not found
+- 409: Cannot accept appointment (invalid status)
+
+#### Reschedule Appointment
+
+```
+POST /api/v1/appointments/:id/reschedule
+Content-Type: application/json
+
+Request Body:
+{
+  "scheduledStart": "2024-12-15T10:00:00.000Z",
+  "scheduledEnd": "2024-12-15T10:30:00.000Z"
+}
+
+Example Request:
+curl -X POST "http://localhost:8080/api/v1/appointments/appointment_uuid/reschedule" \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "scheduledStart": "2024-12-15T10:00:00.000Z",
+    "scheduledEnd": "2024-12-15T10:30:00.000Z"
+  }'
+
+Response:
+{
+  "success": true,
+  "message": "Appointment rescheduled successfully",
+  "data": {
+    "id": "uuid",
+    "scheduledStart": "2024-12-15T10:00:00.000Z",
+    "scheduledEnd": "2024-12-15T10:30:00.000Z",
+    "status": "scheduled"
+  }
+}
+```
+
+Rate limit: 10 requests per hour
+
+**Authentication**: Requires JWT token and doctor role
+
+**Validation**:
+- Appointment must belong to the authenticated doctor
+- Cannot reschedule completed, cancelled, or no-show appointments
+- New time slot must be within doctor's working hours
+- New time slot must not conflict with other appointments
+- End time must be after start time (minimum 15 minutes duration)
+
+**Availability Check**: Automatically validates that the new time slot is available using the same availability checking logic as appointment creation
+
+**Error Responses**:
+- 400: Invalid request body or time selection
+- 403: Access denied (not your appointment)
+- 404: Appointment not found
+- 409: Time slot not available or conflict detected
+
+**Cache Invalidation**: Clears appointment caches for doctor and patient when rescheduling succeeds
+
 ### Chat API
 
 All chat endpoints are prefixed with `/api/v1/chat` and require authentication.

@@ -71,6 +71,58 @@ router.get(
 );
 
 /**
+ * @route   GET /api/v1/appointments/doctor/me
+ * @desc    Get all appointments for authenticated doctor
+ * @access  Private (Doctor only)
+ */
+router.get(
+  '/doctor/me',
+  requireAuth,
+  requireRole(['doctor']),
+  listAppointmentsLimiter,
+  appointmentController.getDoctorAppointments
+);
+
+/**
+ * @route   GET /api/v1/appointments/doctor/dashboard
+ * @desc    Get doctor dashboard statistics
+ * @access  Private (Doctor only)
+ */
+router.get(
+  '/doctor/dashboard',
+  requireAuth,
+  requireRole(['doctor']),
+  detailsLimiter,
+  appointmentController.getDoctorDashboardStats
+);
+
+/**
+ * @route   POST /api/v1/appointments/:id/accept
+ * @desc    Accept and confirm appointment
+ * @access  Private (Doctor only)
+ */
+router.post(
+  '/:id/accept',
+  requireAuth,
+  requireRole(['doctor']),
+  updateAppointmentLimiter,
+  appointmentController.acceptAppointment
+);
+
+/**
+ * @route   POST /api/v1/appointments/:id/reschedule
+ * @desc    Reschedule appointment to new time
+ * @access  Private (Doctor only)
+ */
+router.post(
+  '/:id/reschedule',
+  requireAuth,
+  requireRole(['doctor']),
+  updateAppointmentLimiter,
+  appointmentController.rescheduleAppointment
+);
+
+/**
  * @route   GET /api/v1/appointments/:id
  * @desc    Get appointment by ID
  * @access  Private (Patient or Doctor)

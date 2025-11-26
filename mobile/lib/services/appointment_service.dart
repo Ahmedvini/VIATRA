@@ -249,4 +249,158 @@ class AppointmentService {
       );
     }
   }
+
+  /// Get doctor's appointments with filters
+  Future<ApiResponse<AppointmentListResult>> getDoctorAppointments({
+    String? status,
+    DateTime? startDate,
+    DateTime? endDate,
+    int page = 1,
+    int limit = 20,
+  }) async {
+    try {
+      final queryParams = <String, String>{
+        'page': page.toString(),
+        'limit': limit.toString(),
+      };
+
+      if (status != null) {
+        queryParams['status'] = status;
+      }
+
+      if (startDate != null) {
+        queryParams['startDate'] = startDate.toIso8601String();
+      }
+
+      if (endDate != null) {
+        queryParams['endDate'] = endDate.toIso8601String();
+      }
+
+      final response = await _apiService.get(
+        '/appointments/doctor/me',
+        queryParams: queryParams,
+      );
+
+      if (response.success && response.data != null) {
+        final data = response.data as Map<String, dynamic>;
+        final appointmentsList = (data['appointments'] as List)
+            .map((json) => Appointment.fromJson(json as Map<String, dynamic>))
+            .toList();
+
+        final paginationMetadata = PaginationMetadata.fromJson(
+          data['pagination'] as Map<String, dynamic>,
+        );
+
+        final result = AppointmentListResult(
+          appointments: appointmentsList,
+          pagination: paginationMetadata,
+        );
+
+        return ApiResponse.success(
+          result,
+          message: response.message ?? 'Appointments retrieved successfully',
+        );
+      }
+
+      return ApiResponse.error(
+        response.message ?? 'Failed to retrieve appointments',
+      );
+    } catch (e) {
+      return ApiResponse.error(
+        'An error occurred while fetching doctor appointments: $e',
+      );
+    }
+  }
+
+  /// Get doctor dashboard statistics
+  Future<ApiResponse<Map<String, dynamic>>> getDoctorDashboardStats() async {
+    try {
+      final response = await _apiService.get('/appointments/doctor/dashboard');
+
+      if (response.success && response.data != null) {
+        final stats = response.data as Map<String, dynamic>;
+
+        return ApiResponse.success(
+          stats,
+          message: response.message ?? 'Statistics retrieved successfully',
+        );
+      }
+
+      return ApiResponse.error(
+        response.message ?? 'Failed to retrieve statistics',
+      );
+    } catch (e) {
+      return ApiResponse.error(
+        'An error occurred while fetching dashboard statistics: $e',
+      );
+    }
+  }
+
+  /// Accept and confirm appointment
+  Future<ApiResponse<Appointment>> acceptAppointment(
+    String appointmentId,
+  ) async {
+    try {
+      final response = await _apiService.post(
+        '/appointments/$appointmentId/accept',
+      );
+
+      if (response.success && response.data != null) {
+        final appointment = Appointment.fromJson(
+          response.data as Map<String, dynamic>,
+        );
+
+        return ApiResponse.success(
+          appointment,
+          message: response.message ?? 'Appointment accepted successfully',
+        );
+      }
+
+      return ApiResponse.error(
+        response.message ?? 'Failed to accept appointment',
+      );
+    } catch (e) {
+      return ApiResponse.error(
+        'An error occurred while accepting appointment: $e',
+      );
+    }
+  }
+
+  /// Reschedule appointment to new time
+  Future<ApiResponse<Appointment>> rescheduleAppointment(
+    String appointmentId,
+    DateTime scheduledStart,
+    DateTime scheduledEnd,
+  ) async {
+    try {
+      final body = {
+        'scheduledStart': scheduledStart.toIso8601String(),
+        'scheduledEnd': scheduledEnd.toIso8601String(),
+      };
+
+      final response = await _apiService.post(
+        '/appointments/$appointmentId/reschedule',
+        body: body,
+      );
+
+      if (response.success && response.data != null) {
+        final appointment = Appointment.fromJson(
+          response.data as Map<String, dynamic>,
+        );
+
+        return ApiResponse.success(
+          appointment,
+          message: response.message ?? 'Appointment rescheduled successfully',
+        );
+      }
+
+      return ApiResponse.error(
+        response.message ?? 'Failed to reschedule appointment',
+      );
+    } catch (e) {
+      return ApiResponse.error(
+        'An error occurred while rescheduling appointment: $e',
+      );
+    }
+  }
 }

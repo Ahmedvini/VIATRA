@@ -409,3 +409,213 @@ export const getDoctorAvailability = async (req, res) => {
     });
   }
 };
+
+/**
+ * Get doctor's appointments with filters
+ */
+export const getDoctorAppointments = async (req, res) => {
+  try {
+    // Validate query parameters
+    const { error, value } = getAppointmentsQuerySchema.validate(req.query);
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid query parameters',
+        errors: error.details.map(detail => detail.message)
+      });
+    }
+
+    const doctorId = req.user.doctorId;
+    const filters = {
+      status: value.status,
+      startDate: value.startDate,
+      endDate: value.endDate,
+      page: value.page,
+      limit: value.limit,
+      sortBy: value.sortBy,
+      sortOrder: value.sortOrder
+    };
+
+    const result = await appointmentService.getDoctorAppointments(doctorId, filters);
+
+    logger.info(`Retrieved ${result.appointments.length} appointments for doctor ${doctorId}`);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Appointments retrieved successfully',
+      data: result
+    });
+  } catch (error) {
+    logger.error('Error in getDoctorAppointments controller:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve appointments',
+      error: error.message
+    });
+  }
+};
+
+/**
+ * Get doctor dashboard statistics
+ */
+export const getDoctorDashboardStats = async (req, res) => {
+  try {
+    const doctorId = req.user.doctorId;
+
+    const stats = await appointmentService.getDoctorStatistics(doctorId);
+
+    logger.info(`Retrieved dashboard statistics for doctor ${doctorId}`);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Statistics retrieved successfully',
+      data: stats
+    });
+  } catch (error) {
+    logger.error('Error in getDoctorDashboardStats controller:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve statistics',
+      error: error.message
+    });
+  }
+};
+
+/**
+ * Accept and confirm appointment
+ */
+export const acceptAppointment = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Validate UUID
+    const uuidSchema = Joi.string().uuid().required();
+    const { error } = uuidSchema.validate(id);
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid appointment ID format'
+      });
+    }
+
+    const doctorId = req.user.doctorId;
+
+    const appointment = await appointmentService.acceptAppointment(id, doctorId);
+
+    logger.info(`Appointment ${id} accepted by doctor ${doctorId}`);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Appointment accepted successfully',
+      data: appointment
+    });
+  } catch (error) {
+    logger.error('Error in acceptAppointment controller:', error);
+
+    if (error.message === 'Access denied') {
+      return res.status(403).json({
+        success: false,
+        message: 'You do not have permission to accept this appointment'
+      });
+    }
+
+    if (error.message === 'Appointment not found') {
+      return res.status(404).json({
+        success: false,
+        message: 'Appointment not found'
+      });
+    }
+
+    if (error.message.includes('status')) {
+      return res.status(409).json({
+        success: false,
+        message: error.message
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to accept appointment',
+      error: error.message
+    });
+  }
+};
+
+/**
+ * Reschedule appointment to new time
+ */
+export const rescheduleAppointment = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Validate UUID
+    const uuidSchema = Joi.string().uuid().required();
+    const { error: idError } = uuidSchema.validate(id);
+    if (idError) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid appointment ID format'
+      });
+    }
+
+    // Validate request body
+    const rescheduleSchema = Joi.object({
+      scheduledStart: Joi.date().iso().required(),
+      scheduledEnd: Joi.date().iso().greater(Joi.ref('scheduledStart')).required()
+    });
+
+    const { error, value } = rescheduleSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid request body',
+        errors: error.details.map(detail => detail.message)
+      });
+    }
+
+    const doctorId = req.user.doctorId;
+    const updateData = {
+      scheduled_start: value.scheduledStart,
+      scheduled_end: value.scheduledEnd
+    };
+
+    const appointment = await appointmentService.rescheduleAppointment(id, doctorId, updateData);
+
+    logger.info(`Appointment ${id} rescheduled by doctor ${doctorId}`);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Appointment rescheduled successfully',
+      data: appointment
+    });
+  } catch (error) {
+    logger.error('Error in rescheduleAppointment controller:', error);
+
+    if (error.message === 'Access denied') {
+      return res.status(403).json({
+        success: false,
+        message: 'You do not have permission to reschedule this appointment'
+      });
+    }
+
+    if (error.message === 'Appointment not found') {
+      return res.status(404).json({
+        success: false,
+        message: 'Appointment not found'
+      });
+    }
+
+    if (error.message.includes('not available') || error.message.includes('conflict')) {
+      return res.status(409).json({
+        success: false,
+        message: error.message
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to reschedule appointment',
+      error: error.message
+    });
+  }
+};

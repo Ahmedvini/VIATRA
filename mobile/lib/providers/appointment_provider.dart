@@ -66,6 +66,10 @@ class AppointmentProvider extends ChangeNotifier {
   String? _filterStatus;
   final Map<String, CachedAppointmentResult> _cachedResults = {};
 
+  // Doctor-specific state
+  Map<String, dynamic>? _doctorDashboardStats;
+  DateTime? _statsLastFetched;
+
   AppointmentProvider({
     required AppointmentService appointmentService,
     required StorageService storageService,
@@ -103,6 +107,16 @@ class AppointmentProvider extends ChangeNotifier {
 
   int get upcomingCount => upcomingAppointments.length;
   int get pastCount => pastAppointments.length;
+
+  // Doctor dashboard getters
+  Map<String, dynamic>? get doctorDashboardStats => _doctorDashboardStats;
+  int get todayAppointmentsCount => _doctorDashboardStats?['todayCount'] ?? 0;
+  int get upcomingAppointmentsCount => _doctorDashboardStats?['upcomingCount'] ?? 0;
+  int get totalPatientsCount => _doctorDashboardStats?['totalPatients'] ?? 0;
+  int get pendingRequestsCount => _doctorDashboardStats?['pendingCount'] ?? 0;
+  bool get isStatsExpired =>
+      _statsLastFetched == null ||
+      DateTime.now().difference(_statsLastFetched!).inMinutes >= 5;
 
   /// Generate cache key
   String _getCacheKey({String? status}) {
@@ -391,11 +405,15 @@ class AppointmentProvider extends ChangeNotifier {
   /// Clear all caches
   Future<void> clearCache() async {
     _cachedResults.clear();
+    _doctorDashboardStats = null;
+    _statsLastFetched = null;
 
     try {
       final keys = await _storageService.getKeys();
       for (final key in keys) {
-        if (key.startsWith('cache_appointments_')) {
+        if (key.startsWith('cache_appointments_') ||
+            key.startsWith('cache_doctor_appointments_') ||
+            key == 'cache_doctor_dashboard_stats') {
           await _storageService.remove(key);
         }
       }
@@ -472,5 +490,289 @@ class AppointmentProvider extends ChangeNotifier {
       throw Exception(_errorMessage ?? 'Failed to book appointment');
     }
     return appointment;
+  }
+
+  /// Load doctor's appointments with filters
+  Future<void> loadDoctorAppointments({
+    String? status,
+    bool refresh = false,
+  }) async {
+    if (!refresh) {
+      // Check cache first
+      final cacheKey = _getCacheKey(status: status);
+      final cachedResult = _cachedResults[cacheKey];
+
+      if (cachedResult != null &&
+          DateTime.now().difference(cachedResult.timestamp).inMinutes < 5) {
+        _appointments = cachedResult.appointments;
+        _currentPage = 1;
+        _totalPages = cachedResult.totalPages;
+        _totalResults = cachedResult.totalResults;
+        _filterStatus = status;
+        _state = AppointmentState.loaded;
+        notifyListeners();
+        return;
+      }
+    }
+
+    _state = AppointmentState.loading;
+    _errorMessage = null;
+    _filterStatus = status;
+    notifyListeners();
+
+    try {
+      final response = await _appointmentService.getDoctorAppointments(
+        status: status,
+        page: 1,
+        limit: 20,
+      );
+
+      if (response.success && response.data != null) {
+        _appointments = response.data!.appointments;
+        _currentPage = response.data!.pagination.page;
+        _totalPages = response.data!.pagination.totalPages;
+        _totalResults = response.data!.pagination.total;
+        _state = AppointmentState.loaded;
+
+        // Cache results
+        final cacheKey = _getCacheKey(status: status);
+        _cachedResults[cacheKey] = CachedAppointmentResult(
+          appointments: _appointments,
+          totalPages: _totalPages,
+          totalResults: _totalResults,
+          timestamp: DateTime.now(),
+        );
+
+        // Save to storage
+        await _storageService.setCacheData(
+          'doctor_appointments_$cacheKey',
+          _cachedResults[cacheKey]!.toJson(),
+        );
+      } else {
+        _state = AppointmentState.error;
+        _errorMessage = response.message ?? 'Failed to load appointments';
+      }
+    } catch (e) {
+      _state = AppointmentState.error;
+      _errorMessage = 'An error occurred: $e';
+    }
+
+    notifyListeners();
+  }
+
+  /// Load more doctor appointments (pagination)
+  Future<void> loadMoreDoctorAppointments() async {
+    if (!hasMore || isLoadingMore) return;
+
+    _state = AppointmentState.loadingMore;
+    notifyListeners();
+
+    try {
+      final nextPage = _currentPage + 1;
+      final response = await _appointmentService.getDoctorAppointments(
+        status: _filterStatus,
+        page: nextPage,
+        limit: 20,
+      );
+
+      if (response.success && response.data != null) {
+        _appointments.addAll(response.data!.appointments);
+        _currentPage = response.data!.pagination.page;
+        _totalPages = response.data!.pagination.totalPages;
+        _totalResults = response.data!.pagination.total;
+        _state = AppointmentState.loaded;
+      } else {
+        _state = AppointmentState.error;
+        _errorMessage = response.message ?? 'Failed to load more appointments';
+      }
+    } catch (e) {
+      _state = AppointmentState.error;
+      _errorMessage = 'An error occurred: $e';
+    }
+
+    notifyListeners();
+  }
+
+  /// Load doctor's appointments with filters
+  Future<void> loadDoctorAppointments({
+    String? status,
+    bool refresh = false,
+  }) async {
+    if (!refresh) {
+      // Check cache first
+      final cacheKey = _getCacheKey(status: status);
+      final cachedResult = _cachedResults[cacheKey];
+
+      if (cachedResult != null &&
+          DateTime.now().difference(cachedResult.timestamp).inMinutes < 5) {
+        _appointments = cachedResult.appointments;
+        _currentPage = 1;
+        _totalPages = cachedResult.totalPages;
+        _totalResults = cachedResult.totalResults;
+        _filterStatus = status;
+        _state = AppointmentState.loaded;
+        notifyListeners();
+        return;
+      }
+    }
+
+    _state = AppointmentState.loading;
+    _errorMessage = null;
+    _filterStatus = status;
+    notifyListeners();
+
+    try {
+      final response = await _appointmentService.getDoctorAppointments(
+        status: status,
+        page: 1,
+        limit: 20,
+      );
+
+      if (response.success && response.data != null) {
+        _appointments = response.data!.appointments;
+        _currentPage = response.data!.pagination.page;
+        _totalPages = response.data!.pagination.totalPages;
+        _totalResults = response.data!.pagination.total;
+        _state = AppointmentState.loaded;
+
+        // Cache results
+        final cacheKey = _getCacheKey(status: status);
+        _cachedResults[cacheKey] = CachedAppointmentResult(
+          appointments: _appointments,
+          totalPages: _totalPages,
+          totalResults: _totalResults,
+          timestamp: DateTime.now(),
+        );
+
+        // Save to storage
+        await _storageService.setCacheData(
+          'doctor_appointments_$cacheKey',
+          _cachedResults[cacheKey]!.toJson(),
+        );
+      } else {
+        _state = AppointmentState.error;
+        _errorMessage = response.message ?? 'Failed to load appointments';
+      }
+    } catch (e) {
+      _state = AppointmentState.error;
+      _errorMessage = 'An error occurred: $e';
+    }
+
+    notifyListeners();
+  }
+
+  /// Load doctor dashboard statistics
+  Future<void> loadDoctorDashboardStats({bool refresh = false}) async {
+    // Check if stats are expired or refresh is forced
+    if (!refresh && !isStatsExpired && _doctorDashboardStats != null) {
+      return;
+    }
+
+    _state = AppointmentState.loading;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final response = await _appointmentService.getDoctorDashboardStats();
+
+      if (response.success && response.data != null) {
+        _doctorDashboardStats = response.data;
+        _statsLastFetched = DateTime.now();
+        _state = AppointmentState.loaded;
+
+        // Cache stats in storage
+        await _storageService.setCacheData(
+          'doctor_dashboard_stats',
+          {
+            'stats': _doctorDashboardStats,
+            'timestamp': _statsLastFetched!.toIso8601String(),
+          },
+        );
+      } else {
+        _state = AppointmentState.error;
+        _errorMessage = response.message ?? 'Failed to load statistics';
+      }
+    } catch (e) {
+      _state = AppointmentState.error;
+      _errorMessage = 'An error occurred: $e';
+    }
+
+    notifyListeners();
+  }
+
+  /// Accept and confirm appointment
+  Future<bool> acceptAppointment(String appointmentId) async {
+    try {
+      final response = await _appointmentService.acceptAppointment(appointmentId);
+
+      if (response.success && response.data != null) {
+        // Update local appointment status to 'confirmed'
+        final index = _appointments.indexWhere((a) => a.id == appointmentId);
+        if (index != -1) {
+          _appointments[index] = response.data!;
+        }
+
+        if (_currentAppointment?.id == appointmentId) {
+          _currentAppointment = response.data;
+        }
+
+        // Invalidate caches
+        clearCache();
+        _doctorDashboardStats = null;
+        _statsLastFetched = null;
+        await _storageService.deleteCacheData('doctor_dashboard_stats');
+
+        notifyListeners();
+        return true;
+      } else {
+        _errorMessage = response.message ?? 'Failed to accept appointment';
+        return false;
+      }
+    } catch (e) {
+      _errorMessage = 'An error occurred: $e';
+      return false;
+    }
+  }
+
+  /// Reschedule appointment to new time
+  Future<bool> rescheduleAppointment(
+    String appointmentId,
+    DateTime scheduledStart,
+    DateTime scheduledEnd,
+  ) async {
+    try {
+      final response = await _appointmentService.rescheduleAppointment(
+        appointmentId,
+        scheduledStart,
+        scheduledEnd,
+      );
+
+      if (response.success && response.data != null) {
+        // Update local appointment times
+        final index = _appointments.indexWhere((a) => a.id == appointmentId);
+        if (index != -1) {
+          _appointments[index] = response.data!;
+        }
+
+        if (_currentAppointment?.id == appointmentId) {
+          _currentAppointment = response.data;
+        }
+
+        // Invalidate caches
+        clearCache();
+        _doctorDashboardStats = null;
+        _statsLastFetched = null;
+        await _storageService.deleteCacheData('doctor_dashboard_stats');
+
+        notifyListeners();
+        return true;
+      } else {
+        _errorMessage = response.message ?? 'Failed to reschedule appointment';
+        return false;
+      }
+    } catch (e) {
+      _errorMessage = 'An error occurred: $e';
+      return false;
+    }
   }
 }

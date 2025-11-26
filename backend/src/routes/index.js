@@ -63,7 +63,11 @@ router.get('/', (req, res) => {
         getMyAppointments: 'GET /appointments',
         getAppointmentById: 'GET /appointments/:id',
         updateAppointment: 'PATCH /appointments/:id',
-        cancelAppointment: 'POST /appointments/:id/cancel'
+        cancelAppointment: 'POST /appointments/:id/cancel',
+        getDoctorAppointments: 'GET /appointments/doctor/me',
+        getDoctorDashboard: 'GET /appointments/doctor/dashboard',
+        acceptAppointment: 'POST /appointments/:id/accept',
+        rescheduleAppointment: 'POST /appointments/:id/reschedule'
       }
     },
     rateLimits: {
@@ -92,7 +96,11 @@ router.get('/', (req, res) => {
         list: '30 per minute',
         details: '60 per minute',
         update: '10 per hour',
-        cancel: '10 per hour'
+        cancel: '10 per hour',
+        doctorList: '30 per minute',
+        doctorDashboard: '60 per minute',
+        accept: '10 per hour',
+        reschedule: '10 per hour'
       }
     }
   });

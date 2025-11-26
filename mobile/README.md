@@ -398,6 +398,173 @@ Complete appointment lifecycle management with availability checking and cancell
   - Available time slots state
   - Loading/error states
   - Create appointment action
+  - Update/cancel appointment actions
+  - Cache management with TTL
+  - Pagination state
+
+### Doctor Features
+
+Doctor-specific screens and features for managing appointments and viewing dashboard statistics.
+
+**Screens**:
+- **Doctor Dashboard** (`/doctor/dashboard`): Overview screen showing key statistics and today's schedule
+  - Statistics Cards Grid (2x2):
+    - Today's Appointments count (blue, with navigation)
+    - Upcoming Appointments count (green, with navigation)
+    - Total Patients count (orange, with navigation)
+    - Pending Requests count (red, with navigation to filtered list)
+  - Today's Schedule section:
+    - List of appointments scheduled for today
+    - Shows patient name, time, type, status
+    - Tap to view appointment details
+    - Empty state if no appointments today
+  - Pull-to-refresh support
+  - Refresh button in app bar
+  - Loading and error states
+
+- **Doctor Appointments List** (`/doctor/appointments`): Filterable list of all doctor's appointments
+  - Filter by status (All, Scheduled, Confirmed, In Progress, Completed, Cancelled)
+  - Filter button in app bar (opens bottom sheet with status chips)
+  - DoctorAppointmentCard for each item:
+    - Time and date on left
+    - Patient name (bold)
+    - Reason for visit (preview)
+    - Status badge (colored chip)
+    - Urgent indicator (red badge if urgent)
+    - Type icon (telehealth/in-person/phone)
+  - Pull-to-refresh support
+  - Infinite scroll pagination
+  - Loading states (initial, pagination)
+  - Empty state with icon and message
+  - Error state with retry button
+
+- **Doctor Appointment Detail** (`/doctor/appointments/:id`): Detailed view with patient info and action buttons
+  - Patient Information Card:
+    - Profile picture (CircleAvatar)
+    - Patient full name
+    - Contact info (email, phone)
+  - Appointment Details Card:
+    - Type with icon
+    - Date (formatted: "Wednesday, December 15, 2024")
+    - Time range (formatted: "9:00 AM - 9:30 AM")
+    - Duration in minutes
+    - Status badge (colored chip)
+    - Urgent badge (if applicable, red)
+    - Reason for visit
+    - Chief complaint (if present)
+  - Consultation Notes Section:
+    - Multiline TextField (5 lines)
+    - Save button to update notes
+    - Success/error feedback
+  - Action Buttons (bottom sticky bar):
+    - **Accept Button** (green, visible if status = 'scheduled'):
+      - Changes status to 'confirmed'
+      - Shows loading indicator during API call
+      - Success/error SnackBar feedback
+    - **Reschedule Button** (orange, visible if status = 'scheduled' or 'confirmed'):
+      - Opens date picker → time picker flow
+      - Validates new times (end > start, min 15 min duration)
+      - Confirmation dialog with new date/time
+      - Checks doctor availability
+      - Success/error SnackBar feedback
+    - **Cancel Button** (red, visible if canBeCancelled):
+      - Opens confirmation dialog
+      - Requires cancellation reason (TextField, max 500 chars)
+      - Success/error SnackBar feedback
+  - Disabled states during actions
+  - Responsive layout (buttons in Row on large screens, Column on small)
+  - Loading and error states
+
+**Widgets**:
+- `DashboardStatCard`: Reusable stat card for dashboard
+  - CircleAvatar with icon (colored background with opacity)
+  - Large bold count number (headline medium)
+  - Small grey label text (body medium)
+  - Tap handler for navigation
+  - Card with rounded corners (12px) and elevation 2
+  - Responsive sizing based on screen width
+  - Semantics label for accessibility
+
+- `DoctorAppointmentCard`: Appointment card for doctor's list view
+  - Left section (80px width):
+    - Time (bold, large)
+    - Date (small, grey)
+    - Type icon (colored)
+  - Middle section (expanded):
+    - Patient name (bold, truncated)
+    - Reason for visit (grey, truncated to 1 line)
+    - Status badge (colored chip)
+    - Urgent indicator (red 'URGENT' badge in corner if urgent)
+  - Right section:
+    - Chevron right icon (grey)
+  - InkWell for tap effect
+  - Card elevation 1, padding 12px
+  - Semantics label describing appointment details
+
+- `AppointmentActionButtons`: Action buttons for appointment detail
+  - State management for loading indicators per button
+  - Accept button (ElevatedButton, green):
+    - Calls onAccept callback
+    - Shows CircularProgressIndicator when loading
+    - Disabled when any action in progress
+  - Reschedule button (OutlinedButton, orange):
+    - Shows date/time picker dialogs sequentially
+    - Validates new time selection
+    - Confirmation dialog before saving
+    - Shows CircularProgressIndicator when loading
+  - Cancel button (TextButton, red):
+    - Shows confirmation dialog with reason input
+    - Validates reason is provided
+    - Shows CircularProgressIndicator when loading
+  - Responsive layout (Row on wide screens, Column on narrow)
+  - All buttons disabled during any action
+
+**Provider Methods**:
+- `loadDoctorAppointments({ String? status, bool refresh })`:
+  - Fetches doctor's appointments with optional status filter
+  - Implements 5-minute cache (checks cache first unless refresh = true)
+  - Updates `_appointments`, `_currentPage`, `_totalPages`, `_totalResults`
+  - Caches results in memory and storage
+  - Handles loading/error states
+  - Notifies listeners
+
+- `loadDoctorDashboardStats({ bool refresh })`:
+  - Fetches dashboard statistics (today, upcoming, total patients, pending)
+  - Implements 5-minute cache expiry check (`isStatsExpired` getter)
+  - Returns early if cached and not expired
+  - Updates `_doctorDashboardStats` and `_statsLastFetched`
+  - Caches in storage
+  - Handles loading/error states
+  - Notifies listeners
+
+- `acceptAppointment(String appointmentId)`:
+  - Calls API to change appointment status to 'confirmed'
+  - Updates local appointment in `_appointments` list
+  - Updates `_currentAppointment` if IDs match
+  - Invalidates all caches (appointments + stats)
+  - Notifies listeners
+  - Returns bool (true on success, false on failure)
+  - Sets `_errorMessage` on failure
+
+- `rescheduleAppointment(String appointmentId, DateTime scheduledStart, DateTime scheduledEnd)`:
+  - Calls API to update appointment times
+  - Updates local appointment times in `_appointments` and `_currentAppointment`
+  - Invalidates all caches
+  - Notifies listeners
+  - Returns bool (true on success, false on failure)
+  - Sets `_errorMessage` on failure
+
+**Navigation**:
+- Direct routes (no role-based redirection in this phase):
+  - `context.push('/doctor/dashboard')` - Doctor dashboard
+  - `context.push('/doctor/appointments')` - Doctor appointments list
+  - `context.push('/doctor/appointments/$appointmentId')` - Appointment detail
+- Routes defined in `lib/config/routes.dart`
+- Accessible via GoRouter navigation
+
+**Note**: Role-based navigation (automatic routing based on user role) will be implemented in the next phase. For now, doctor screens are accessible via direct routes.
+
+**State Management**:
   - Update appointment action
   - Cancel appointment action
   - Fetch availability action

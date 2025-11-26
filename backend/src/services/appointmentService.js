@@ -568,3 +568,311 @@ export const cancelAppointment = async (appointmentId, userId, userRole, reason)
     throw error;
   }
 };
+
+/**
+ * Get doctor's appointments with filters
+ */
+export const getDoctorAppointments = async (doctorId, filters = {}) => {
+  try {
+    // Check cache
+    const cacheKey = `doctor_appointments:${doctorId}:${JSON.stringify(filters)}`;
+    const cachedData = await redisClient.get(cacheKey);
+    
+    if (cachedData) {
+      logger.info('Doctor appointments retrieved from cache');
+      return JSON.parse(cachedData);
+    }
+
+    // Build query
+    const whereClause = { doctor_id: doctorId };
+
+    if (filters.status) {
+      whereClause.status = filters.status;
+    }
+
+    if (filters.startDate || filters.endDate) {
+      whereClause.scheduled_start = {};
+      if (filters.startDate) {
+        whereClause.scheduled_start[Op.gte] = filters.startDate;
+      }
+      if (filters.endDate) {
+        whereClause.scheduled_start[Op.lte] = filters.endDate;
+      }
+    }
+
+    const page = filters.page || 1;
+    const limit = filters.limit || 20;
+    const offset = (page - 1) * limit;
+    const sortBy = filters.sortBy || 'scheduled_start';
+    const sortOrder = filters.sortOrder || 'DESC';
+
+    const { count, rows: appointments } = await Appointment.findAndCountAll({
+      where: whereClause,
+      include: [
+        {
+          model: Patient,
+          as: 'patient',
+          include: [{
+            model: User,
+            as: 'user',
+            attributes: ['id', 'first_name', 'last_name', 'email', 'phone', 'profile_image']
+          }]
+        }
+      ],
+      order: [[sortBy, sortOrder]],
+      limit: parseInt(limit),
+      offset: offset,
+      distinct: true
+    });
+
+    // Convert appointments to plain objects for consistent serialization
+    const plainAppointments = appointments.map(apt => apt.toJSON());
+
+    const result = {
+      appointments: plainAppointments,
+      pagination: {
+        total: count,
+        page: parseInt(page),
+        limit: parseInt(limit),
+        totalPages: Math.ceil(count / limit)
+      }
+    };
+
+    // Cache result
+    await redisClient.setEx(cacheKey, 300, JSON.stringify(result)); // 5 min TTL
+
+    return result;
+  } catch (error) {
+    logger.error('Error fetching doctor appointments:', error);
+    throw error;
+  }
+};
+
+/**
+ * Get doctor dashboard statistics
+ */
+export const getDoctorStatistics = async (doctorId) => {
+  try {
+    // Check cache
+    const cacheKey = `doctor_stats:${doctorId}`;
+    const cachedData = await redisClient.get(cacheKey);
+    
+    if (cachedData) {
+      logger.info('Doctor statistics retrieved from cache');
+      return JSON.parse(cachedData);
+    }
+
+    // Get today's date range
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    // Today's appointments count
+    const todayCount = await Appointment.count({
+      where: {
+        doctor_id: doctorId,
+        scheduled_start: {
+          [Op.gte]: today,
+          [Op.lt]: tomorrow
+        },
+        status: {
+          [Op.notIn]: ['cancelled', 'no_show']
+        }
+      }
+    });
+
+    // Upcoming appointments count
+    const now = new Date();
+    const upcomingCount = await Appointment.count({
+      where: {
+        doctor_id: doctorId,
+        scheduled_start: {
+          [Op.gt]: now
+        },
+        status: {
+          [Op.in]: ['scheduled', 'confirmed']
+        }
+      }
+    });
+
+    // Total unique patients count
+    const totalPatients = await Appointment.count({
+      where: {
+        doctor_id: doctorId,
+        status: 'completed'
+      },
+      distinct: true,
+      col: 'patient_id'
+    });
+
+    // Pending requests count (scheduled but not yet confirmed)
+    const pendingCount = await Appointment.count({
+      where: {
+        doctor_id: doctorId,
+        status: 'scheduled'
+      }
+    });
+
+    const stats = {
+      todayCount,
+      upcomingCount,
+      totalPatients,
+      pendingCount
+    };
+
+    // Cache result
+    await redisClient.setEx(cacheKey, 300, JSON.stringify(stats)); // 5 min TTL
+
+    logger.info(`Doctor statistics retrieved for doctor ${doctorId}`);
+    return stats;
+  } catch (error) {
+    logger.error('Error fetching doctor statistics:', error);
+    throw error;
+  }
+};
+
+/**
+ * Accept and confirm appointment
+ */
+export const acceptAppointment = async (appointmentId, doctorId) => {
+  const transaction = await sequelize.transaction();
+  
+  try {
+    // Fetch appointment
+    const appointment = await Appointment.findByPk(appointmentId);
+    if (!appointment) {
+      throw new Error('Appointment not found');
+    }
+
+    // Verify doctor ownership
+    if (appointment.doctor_id !== doctorId) {
+      throw new Error('Access denied');
+    }
+
+    // Check status is 'scheduled'
+    if (appointment.status !== 'scheduled') {
+      throw new Error(`Cannot accept appointment with status: ${appointment.status}. Only 'scheduled' appointments can be accepted.`);
+    }
+
+    // Update status to 'confirmed'
+    await appointment.update({
+      status: 'confirmed'
+    }, { transaction });
+
+    await transaction.commit();
+
+    // Invalidate caches
+    await invalidateAppointmentCache(appointmentId, appointment.patient_id, appointment.doctor_id);
+
+    // Fetch updated appointment with associations
+    const updatedAppointment = await Appointment.findByPk(appointmentId, {
+      include: [
+        {
+          model: Doctor,
+          as: 'doctor',
+          include: [{
+            model: User,
+            as: 'user',
+            attributes: ['id', 'first_name', 'last_name', 'email', 'phone', 'profile_image']
+          }]
+        },
+        {
+          model: Patient,
+          as: 'patient',
+          include: [{
+            model: User,
+            as: 'user',
+            attributes: ['id', 'first_name', 'last_name', 'email', 'phone']
+          }]
+        }
+      ]
+    });
+
+    logger.info(`Appointment accepted: ${appointmentId} by doctor ${doctorId}`);
+    return updatedAppointment.toJSON();
+  } catch (error) {
+    await transaction.rollback();
+    logger.error('Error accepting appointment:', error);
+    throw error;
+  }
+};
+
+/**
+ * Reschedule appointment to new time
+ */
+export const rescheduleAppointment = async (appointmentId, doctorId, updateData) => {
+  const transaction = await sequelize.transaction();
+  
+  try {
+    // Fetch appointment
+    const appointment = await Appointment.findByPk(appointmentId);
+    if (!appointment) {
+      throw new Error('Appointment not found');
+    }
+
+    // Verify doctor ownership
+    if (appointment.doctor_id !== doctorId) {
+      throw new Error('Access denied');
+    }
+
+    // Check status allows rescheduling
+    if (['cancelled', 'completed', 'no_show'].includes(appointment.status)) {
+      throw new Error(`Cannot reschedule appointment with status: ${appointment.status}`);
+    }
+
+    // Check doctor availability at new time
+    const availability = await checkDoctorAvailability(
+      doctorId,
+      updateData.scheduled_start,
+      updateData.scheduled_end,
+      appointmentId
+    );
+
+    if (!availability.available) {
+      throw new Error(`Time slot not available: ${availability.reason}`);
+    }
+
+    // Update appointment times
+    await appointment.update({
+      scheduled_start: updateData.scheduled_start,
+      scheduled_end: updateData.scheduled_end
+    }, { transaction });
+
+    await transaction.commit();
+
+    // Invalidate caches
+    await invalidateAppointmentCache(appointmentId, appointment.patient_id, appointment.doctor_id);
+
+    // Fetch updated appointment with associations
+    const updatedAppointment = await Appointment.findByPk(appointmentId, {
+      include: [
+        {
+          model: Doctor,
+          as: 'doctor',
+          include: [{
+            model: User,
+            as: 'user',
+            attributes: ['id', 'first_name', 'last_name', 'email', 'phone', 'profile_image']
+          }]
+        },
+        {
+          model: Patient,
+          as: 'patient',
+          include: [{
+            model: User,
+            as: 'user',
+            attributes: ['id', 'first_name', 'last_name', 'email', 'phone']
+          }]
+        }
+      ]
+    });
+
+    logger.info(`Appointment rescheduled: ${appointmentId} by doctor ${doctorId}`);
+    return updatedAppointment.toJSON();
+  } catch (error) {
+    await transaction.rollback();
+    logger.error('Error rescheduling appointment:', error);
+    throw error;
+  }
+};
