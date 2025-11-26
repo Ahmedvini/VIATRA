@@ -73,6 +73,13 @@ export default (sequelize, DataTypes) => {
     last_login: {
       type: DataTypes.DATE
     },
+    profile_image: {
+      type: DataTypes.STRING
+    },
+    fcm_token: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
     created_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW

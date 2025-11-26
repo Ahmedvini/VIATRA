@@ -1076,3 +1076,366 @@ Rate limit: 30 requests per minute
 - Index on `(scheduled_start, scheduled_end)` for conflict detection
 - Redis caching with 5-minute TTL for availability queries
 - Cache invalidation on appointment create/update/cancel
+
+### Chat API
+
+All chat endpoints are prefixed with `/api/v1/chat` and require authentication.
+
+#### Get Conversations
+```
+GET /api/v1/chat/conversations?page=1&limit=20&type=direct
+Authorization: Bearer <access_token>
+
+Query parameters:
+- page: Page number (default: 1)
+- limit: Items per page (default: 20, max: 50)
+- type: Conversation type (direct, group, channel)
+
+Response:
+{
+  "success": true,
+  "data": {
+    "conversations": [
+      {
+        "id": "uuid",
+        "type": "direct",
+        "participant_ids": ["user1_id", "user2_id"],
+        "created_by": "user1_id",
+        "last_message_at": "2025-11-26T10:00:00Z",
+        "metadata": {},
+        "unread_count": 3,
+        "participants": [
+          {
+            "id": "user2_id",
+            "first_name": "John",
+            "last_name": "Doe",
+            "profile_picture": "url"
+          }
+        ],
+        "last_message": {
+          "id": "uuid",
+          "content": "Hello!",
+          "sender_id": "user2_id",
+          "created_at": "2025-11-26T10:00:00Z"
+        }
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 20,
+      "total": 45,
+      "pages": 3
+    }
+  }
+}
+```
+
+Rate limit: 30 requests per minute
+
+#### Get or Create Conversation
+```
+POST /api/v1/chat/conversations
+Authorization: Bearer <access_token>
+Content-Type: application/json
+
+{
+  "type": "direct",  // or "group", "channel"
+  "participant_ids": ["user2_id"],
+  "metadata": {
+    "name": "Support Group",  // optional for group/channel
+    "description": "Description"  // optional
+  }
+}
+
+Response: Same structure as conversation object above
+```
+
+Rate limit: 20 requests per minute
+
+#### Get Conversation Messages
+```
+GET /api/v1/chat/conversations/:conversationId/messages?page=1&limit=50
+Authorization: Bearer <access_token>
+
+Response:
+{
+  "success": true,
+  "data": {
+    "messages": [
+      {
+        "id": "uuid",
+        "conversation_id": "conversation_uuid",
+        "sender_id": "user_id",
+        "parent_message_id": null,
+        "message_type": "text",  // text, image, file, system
+        "content": "Hello!",
+        "metadata": {},
+        "read_by": ["user1_id"],
+        "delivered_to": ["user1_id", "user2_id"],
+        "is_edited": false,
+        "is_deleted": false,
+        "created_at": "2025-11-26T10:00:00Z",
+        "updated_at": "2025-11-26T10:00:00Z",
+        "sender": {
+          "id": "user_id",
+          "first_name": "Jane",
+          "last_name": "Smith"
+        }
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 50,
+      "total": 150,
+      "pages": 3
+    }
+  }
+}
+```
+
+Rate limit: 60 requests per minute
+
+#### Send Message
+```
+POST /api/v1/chat/conversations/:conversationId/messages
+Authorization: Bearer <access_token>
+Content-Type: application/json
+
+{
+  "message_type": "text",
+  "content": "Hello there!",
+  "parent_message_id": "uuid",  // optional for replies
+  "metadata": {
+    "attachment_url": "https://...",  // optional
+    "file_name": "document.pdf",
+    "file_size": 1024
+  }
+}
+
+Response: Message object (same structure as above)
+```
+
+Rate limit: 60 requests per minute
+
+#### Mark Messages as Read
+```
+POST /api/v1/chat/conversations/:conversationId/read
+Authorization: Bearer <access_token>
+Content-Type: application/json
+
+{
+  "message_ids": ["message1_id", "message2_id"]
+}
+
+Response:
+{
+  "success": true,
+  "message": "Messages marked as read"
+}
+```
+
+Rate limit: 60 requests per minute
+
+#### Delete Message
+```
+DELETE /api/v1/chat/messages/:messageId
+Authorization: Bearer <access_token>
+
+Response:
+{
+  "success": true,
+  "message": "Message deleted successfully"
+}
+```
+
+Rate limit: 30 requests per minute
+
+#### Update FCM Token
+```
+POST /api/v1/auth/fcm-token
+Authorization: Bearer <access_token>
+Content-Type: application/json
+
+{
+  "fcm_token": "firebase_cloud_messaging_token"
+}
+
+Response:
+{
+  "success": true,
+  "message": "FCM token updated successfully"
+}
+```
+
+Rate limit: 10 requests per minute
+
+### Socket.io Real-time Events
+
+Connect to the WebSocket server using Socket.io client:
+
+```javascript
+const socket = io('http://localhost:8080', {
+  auth: {
+    token: 'your_jwt_token'
+  }
+});
+```
+
+#### Client → Server Events
+
+**join_conversation**
+```javascript
+socket.emit('join_conversation', { conversationId: 'uuid' });
+```
+
+**leave_conversation**
+```javascript
+socket.emit('leave_conversation', { conversationId: 'uuid' });
+```
+
+**send_message**
+```javascript
+socket.emit('send_message', {
+  conversationId: 'uuid',
+  message_type: 'text',
+  content: 'Hello!',
+  parent_message_id: 'uuid',  // optional
+  metadata: {}
+});
+```
+
+**typing_start**
+```javascript
+socket.emit('typing_start', { conversationId: 'uuid' });
+```
+
+**typing_stop**
+```javascript
+socket.emit('typing_stop', { conversationId: 'uuid' });
+```
+
+**mark_delivered**
+```javascript
+socket.emit('mark_delivered', {
+  conversationId: 'uuid',
+  messageIds: ['msg1', 'msg2']
+});
+```
+
+**mark_read**
+```javascript
+socket.emit('mark_read', {
+  conversationId: 'uuid',
+  messageIds: ['msg1', 'msg2']
+});
+```
+
+#### Server → Client Events
+
+**new_message**
+```javascript
+socket.on('new_message', (message) => {
+  console.log('New message:', message);
+  // Message structure: { id, conversation_id, sender_id, content, ... }
+});
+```
+
+**message_delivered**
+```javascript
+socket.on('message_delivered', ({ messageId, userId }) => {
+  console.log('Message delivered to:', userId);
+});
+```
+
+**message_read**
+```javascript
+socket.on('message_read', ({ messageId, userId }) => {
+  console.log('Message read by:', userId);
+});
+```
+
+**user_typing**
+```javascript
+socket.on('user_typing', ({ conversationId, userId, isTyping }) => {
+  console.log('User typing:', userId, isTyping);
+});
+```
+
+**user_online**
+```javascript
+socket.on('user_online', ({ userId }) => {
+  console.log('User online:', userId);
+});
+```
+
+**user_offline**
+```javascript
+socket.on('user_offline', ({ userId, lastSeen }) => {
+  console.log('User offline:', userId, 'Last seen:', lastSeen);
+});
+```
+
+**error**
+```javascript
+socket.on('error', ({ message }) => {
+  console.error('Socket error:', message);
+});
+```
+
+### Push Notifications
+
+The backend sends Firebase Cloud Messaging (FCM) push notifications when:
+- A user receives a new message while offline
+- A user receives a message in a conversation they haven't joined
+
+Notification payload:
+```json
+{
+  "notification": {
+    "title": "John Doe",
+    "body": "Hello there!"
+  },
+  "data": {
+    "type": "new_message",
+    "conversation_id": "uuid",
+    "message_id": "uuid",
+    "sender_id": "uuid"
+  }
+}
+```
+
+## Real-time Features
+
+### Chat System
+
+The chat system provides:
+- **Direct messaging** between two users
+- **Group conversations** with multiple participants
+- **Real-time messaging** via Socket.io WebSockets
+- **Message delivery & read receipts**
+- **Typing indicators**
+- **Online/offline presence tracking**
+- **Push notifications** for offline users via FCM
+- **Message history** with pagination
+- **Redis caching** for conversations and messages
+
+**Database Schema**:
+- `conversations`: Stores conversation metadata with GIN index on participant_ids
+- `messages`: Stores messages with composite index on (conversation_id, created_at)
+- `users.fcm_token`: Stores FCM tokens for push notifications
+
+**Performance Features**:
+- Redis caching with 10-minute TTL for conversations
+- Redis caching with 5-minute TTL for messages
+- Efficient pagination with cursor-based loading
+- Background push notification delivery
+- Connection pooling for Socket.io
+
+**Security Features**:
+- JWT authentication for Socket.io connections
+- Participant verification before message access
+- Rate limiting on all endpoints
+- Content validation and sanitization
+- SQL injection prevention via Sequelize ORM
+
+For detailed implementation guide, see [CHAT_IMPLEMENTATION_GUIDE.md](./CHAT_IMPLEMENTATION_GUIDE.md).

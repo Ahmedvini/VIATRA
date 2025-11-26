@@ -8,7 +8,8 @@ import {
   verifyEmailHandler,
   requestPasswordResetHandler,
   resetPasswordHandler,
-  getCurrentUser
+  getCurrentUser,
+  updateFcmToken
 } from '../controllers/authController.js';
 import {
   registerSchema,
@@ -204,6 +205,26 @@ router.get('/validate-token',
       }
     });
   }
+);
+
+/**
+ * @route   POST /api/v1/auth/fcm-token
+ * @desc    Register or update user's FCM token for push notifications
+ * @access  Private
+ * @headers Authorization: Bearer <token>
+ * @body    { token }
+ */
+router.post('/fcm-token',
+  authenticate,
+  rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 10,
+    message: {
+      error: 'Too many requests',
+      message: 'Too many FCM token update attempts'
+    }
+  }),
+  updateFcmToken
 );
 
 export default router;

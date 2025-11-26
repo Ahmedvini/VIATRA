@@ -8,6 +8,8 @@ import PatientModel from './Patient.js';
 import AppointmentModel from './Appointment.js';
 import HealthProfileModel from './HealthProfile.js';
 import VerificationModel from './Verification.js';
+import ConversationModel from './Conversation.js';
+import MessageModel from './Message.js';
 
 // Initialize models
 const initModels = () => {
@@ -20,6 +22,8 @@ const initModels = () => {
   const Appointment = AppointmentModel(sequelize, DataTypes);
   const HealthProfile = HealthProfileModel(sequelize, DataTypes);
   const Verification = VerificationModel(sequelize, DataTypes);
+  const Conversation = ConversationModel(sequelize, DataTypes);
+  const Message = MessageModel(sequelize, DataTypes);
   
   // Define associations
   
@@ -49,6 +53,13 @@ const initModels = () => {
   Verification.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
   Verification.belongsTo(Doctor, { foreignKey: 'doctor_id', as: 'doctor' });
   
+  // Conversation associations
+  Conversation.hasMany(Message, { foreignKey: 'conversation_id', as: 'messages' });
+  
+  // Message associations
+  Message.belongsTo(Conversation, { foreignKey: 'conversation_id', as: 'conversation' });
+  Message.belongsTo(User, { foreignKey: 'sender_id', as: 'sender' });
+  
   // Return all models
   return {
     User,
@@ -57,6 +68,8 @@ const initModels = () => {
     Appointment,
     HealthProfile,
     Verification,
+    Conversation,
+    Message,
     sequelize
   };
 };

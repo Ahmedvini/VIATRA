@@ -364,3 +364,46 @@ export const getCurrentUser = async (req, res) => {
     });
   }
 };
+
+/**
+ * Update user's FCM token for push notifications
+ */
+export const updateFcmToken = async (req, res) => {
+  try {
+    const { token } = req.body;
+    const userId = req.user.id;
+    
+    if (!token || typeof token !== 'string') {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid FCM token'
+      });
+    }
+    
+    // Import User model
+    const { User } = await import('../models/index.js');
+    
+    // Update user's FCM token
+    await User.update(
+      { fcm_token: token },
+      { where: { id: userId } }
+    );
+    
+    logger.info(`FCM token updated for user ${userId}`);
+    
+    res.status(200).json({
+      success: true,
+      message: 'FCM token registered successfully'
+    });
+  } catch (error) {
+    logger.error('Update FCM token failed:', error, {
+      userId: req.user?.id
+    });
+    
+    res.status(500).json({
+      success: false,
+      message: 'Failed to register FCM token',
+      error: error.message
+    });
+  }
+};

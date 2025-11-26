@@ -1,5 +1,6 @@
 import 'express-async-errors';
 import express from 'express';
+import { createServer } from 'http';
 import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
@@ -11,8 +12,10 @@ import { connectRedis, disconnectRedis } from './config/redis.js';
 import logger, { requestLogger } from './config/logger.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import { authenticate, authorize } from './middleware/auth.js';
+import { initializeSocketServer } from './socket/index.js';
 
 const app = express();
+const httpServer = createServer(app);
 
 // Trust proxy for Cloud Run
 app.set('trust proxy', true);
@@ -100,10 +103,19 @@ app.use(notFoundHandler);
 app.use(errorHandler);
 
 // Graceful shutdown handler
+let io = null;
+
 const gracefulShutdown = async (signal) => {
   logger.info(`Received ${signal}. Starting graceful shutdown...`);
   
   try {
+    // Close Socket.io connections
+    if (io) {
+      io.close(() => {
+        logger.info('Socket.io server closed');
+      });
+    }
+    
     await closeSequelize();
     await disconnectDatabase();
     await disconnectRedis();
@@ -144,18 +156,25 @@ const startServer = async () => {
     // Initialize Sequelize ORM
     await initializeSequelize();
     
+    // Initialize Socket.io server
+    io = initializeSocketServer(httpServer);
+    
+    // Make io instance available to routes
+    app.set('io', io);
+    
     // Start HTTP server
-    const server = app.listen(config.port, '0.0.0.0', () => {
+    httpServer.listen(config.port, '0.0.0.0', () => {
       logger.info(`Server running on port ${config.port} in ${config.nodeEnv} mode`);
+      logger.info(`WebSocket server ready for connections`);
     });
     
     // Handle server errors
-    server.on('error', (error) => {
+    httpServer.on('error', (error) => {
       logger.error('Server error:', error);
       process.exit(1);
     });
     
-    return server;
+    return httpServer;
   } catch (error) {
     logger.error('Failed to start server:', error);
     process.exit(1);

@@ -4,6 +4,7 @@ import verificationRoutes from './verification.js';
 import healthProfileRoutes from './healthProfile.js';
 import doctorRoutes from './doctor.js';
 import appointmentRoutes from './appointment.js';
+import chatRoutes from './chat.js';
 
 const router = express.Router();
 
@@ -103,6 +104,7 @@ router.use('/verification', verificationRoutes);
 router.use('/health-profiles', healthProfileRoutes);
 router.use('/doctors', doctorRoutes);
 router.use('/appointments', appointmentRoutes);
+router.use('/chat', chatRoutes);
 
 // API status endpoint
 router.get('/status', (req, res) => {

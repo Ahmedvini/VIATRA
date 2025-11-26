@@ -67,6 +67,13 @@ dependencies:
   
   # JSON Annotation
   json_annotation: ^4.8.1
+  
+  # Real-time Communication
+  socket_io_client: ^2.0.3+1
+  
+  # Push Notifications
+  firebase_core: ^2.24.2
+  firebase_messaging: ^14.7.9
 
 dev_dependencies:
   flutter_test:
