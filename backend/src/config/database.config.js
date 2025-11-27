@@ -72,6 +72,3 @@ const dbConfig = {
 };
 
 export default dbConfig;
-
-// For Sequelize CLI compatibility (CommonJS)
-module.exports = dbConfig;

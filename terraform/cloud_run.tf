@@ -76,10 +76,10 @@ resource "google_cloud_run_service" "backend" {
         # This provides a cleaner, single-source configuration approach
         env {
           name = "DATABASE_URL"
-          value_source {
+          value_from {
             secret_key_ref {
-              secret  = google_secret_manager_secret.database_url.secret_id
-              version = "latest"
+              name = google_secret_manager_secret.database_url.secret_id
+              key  = "latest"
             }
           }
         }
@@ -103,10 +103,10 @@ resource "google_cloud_run_service" "backend" {
         
         env {
           name = "DATABASE_PASSWORD"
-          value_source {
+          value_from {
             secret_key_ref {
-              secret  = google_secret_manager_secret.db_password.secret_id
-              version = "latest"
+              name = google_secret_manager_secret.db_password.secret_id
+              key  = "latest"
             }
           }
         }
@@ -124,10 +124,10 @@ resource "google_cloud_run_service" "backend" {
         
         env {
           name = "REDIS_AUTH"
-          value_source {
+          value_from {
             secret_key_ref {
-              secret  = google_secret_manager_secret.redis_auth.secret_id
-              version = "latest"
+              name = google_secret_manager_secret.redis_auth.secret_id
+              key  = "latest"
             }
           }
         }
@@ -141,10 +141,10 @@ resource "google_cloud_run_service" "backend" {
         # JWT secret from Secret Manager
         env {
           name = "JWT_SECRET"
-          value_source {
+          value_from {
             secret_key_ref {
-              secret  = google_secret_manager_secret.jwt_secret.secret_id
-              version = "latest"
+              name = google_secret_manager_secret.jwt_secret.secret_id
+              key  = "latest"
             }
           }
         }
