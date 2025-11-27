@@ -3,21 +3,6 @@ import '../../models/verification_model.dart';
 import '../../utils/constants.dart';
 
 class VerificationStatusCard extends StatelessWidget {
-  final List<Verification> verifica                  ),
-                ],
-                if (verification?.comments?.isNotEmpty == true) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    verification!.comments!,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurface.withOpacity(0.7),
-                      fontStyle: FontStyle.italic,
-                    ),
-                  ),
-                ],al String userRole;
-  final bool isLoading;
-  final VoidCallback? onRefresh;
-  final void Function(String documentType)? onResubmit;
 
   const VerificationStatusCard({
     Key? key,
@@ -27,6 +12,11 @@ class VerificationStatusCard extends StatelessWidget {
     this.onRefresh,
     this.onResubmit,
   }) : super(key: key);
+  final List<Verification> verifications;
+  final String userRole;
+  final bool isLoading;
+  final VoidCallback? onRefresh;
+  final void Function(String documentType)? onResubmit;
 
   @override
   Widget build(BuildContext context) {
@@ -291,9 +281,9 @@ class VerificationStatusCard extends StatelessWidget {
       return VerificationStatus.notSubmitted;
     }
 
-    bool hasRejected = false;
-    bool hasPending = false;
-    int approvedCount = 0;
+    var hasRejected = false;
+    var hasPending = false;
+    var approvedCount = 0;
 
     for (final docType in requiredDocuments) {
       final verification = verifications

@@ -13,11 +13,11 @@ class ChatProvider with ChangeNotifier {
 
   // State
   List<Conversation> _conversations = [];
-  Map<String, List<Message>> _messagesByConversation = {};
-  Map<String, bool> _isLoadingMessages = {};
-  Map<String, bool> _hasMoreMessages = {};
-  Map<String, int> _currentPages = {};
-  Map<String, Set<String>> _typingUsers = {};
+  final Map<String, List<Message>> _messagesByConversation = {};
+  final Map<String, bool> _isLoadingMessages = {};
+  final Map<String, bool> _hasMoreMessages = {};
+  final Map<String, int> _currentPages = {};
+  final Map<String, Set<String>> _typingUsers = {};
   String? _currentUserId;
   bool _isLoadingConversations = false;
   bool _hasMoreConversations = true;
@@ -38,21 +38,13 @@ class ChatProvider with ChangeNotifier {
   String? get error => _error;
   bool get isSocketConnected => _socketService.isConnected;
 
-  List<Message> getMessages(String conversationId) {
-    return _messagesByConversation[conversationId] ?? [];
-  }
+  List<Message> getMessages(String conversationId) => _messagesByConversation[conversationId] ?? [];
 
-  bool isLoadingMessages(String conversationId) {
-    return _isLoadingMessages[conversationId] ?? false;
-  }
+  bool isLoadingMessages(String conversationId) => _isLoadingMessages[conversationId] ?? false;
 
-  bool hasMoreMessages(String conversationId) {
-    return _hasMoreMessages[conversationId] ?? true;
-  }
+  bool hasMoreMessages(String conversationId) => _hasMoreMessages[conversationId] ?? true;
 
-  Set<String> getTypingUsers(String conversationId) {
-    return _typingUsers[conversationId] ?? {};
-  }
+  Set<String> getTypingUsers(String conversationId) => _typingUsers[conversationId] ?? {};
 
   /// Initialize the provider
   Future<void> initialize(String authToken, String userId) async {
@@ -71,22 +63,14 @@ class ChatProvider with ChangeNotifier {
 
   /// Subscribe to socket events
   void _subscribeToSocketEvents() {
-    _newMessageSubscription = _socketService.onNewMessage.listen((message) {
-      _handleNewMessage(message);
-    });
+    _newMessageSubscription = _socketService.onNewMessage.listen(_handleNewMessage);
 
     _messageDeliveredSubscription =
-        _socketService.onMessageDelivered.listen((data) {
-      _handleMessageDelivered(data);
-    });
+        _socketService.onMessageDelivered.listen(_handleMessageDelivered);
 
-    _messageReadSubscription = _socketService.onMessageRead.listen((data) {
-      _handleMessageRead(data);
-    });
+    _messageReadSubscription = _socketService.onMessageRead.listen(_handleMessageRead);
 
-    _typingSubscription = _socketService.onUserTyping.listen((data) {
-      _handleUserTyping(data);
-    });
+    _typingSubscription = _socketService.onUserTyping.listen(_handleUserTyping);
 
     _connectionSubscription =
         _socketService.onConnectionChange.listen((connected) {
@@ -258,9 +242,7 @@ class ChatProvider with ChangeNotifier {
         isPending: false,
         isFailed: true,
       );
-      final updatedMessages = messages.map((m) {
-        return m.id == pendingMessage.id ? failedMessage : m;
-      }).toList();
+      final updatedMessages = messages.map((m) => m.id == pendingMessage.id ? failedMessage : m).toList();
       _messagesByConversation[conversationId] = updatedMessages;
       _error = e.toString();
       notifyListeners();
@@ -275,11 +257,9 @@ class ChatProvider with ChangeNotifier {
     try {
       // Update locally
       final messages = _messagesByConversation[conversationId] ?? [];
-      _messagesByConversation[conversationId] = messages.map((m) {
-        return messageIds.contains(m.id) && _currentUserId != null
+      _messagesByConversation[conversationId] = messages.map((m) => messageIds.contains(m.id) && _currentUserId != null
             ? m.markAsReadBy(_currentUserId!)
-            : m;
-      }).toList();
+            : m).toList();
       notifyListeners();
 
       // Send to server via REST API - server will broadcast via socket
@@ -347,9 +327,7 @@ class ChatProvider with ChangeNotifier {
 
     for (final conversationId in _messagesByConversation.keys) {
       final messages = _messagesByConversation[conversationId]!;
-      _messagesByConversation[conversationId] = messages.map((m) {
-        return m.id == messageId ? m.markAsDeliveredTo(userId) : m;
-      }).toList();
+      _messagesByConversation[conversationId] = messages.map((m) => m.id == messageId ? m.markAsDeliveredTo(userId) : m).toList();
     }
 
     notifyListeners();
@@ -362,9 +340,7 @@ class ChatProvider with ChangeNotifier {
 
     for (final conversationId in _messagesByConversation.keys) {
       final messages = _messagesByConversation[conversationId]!;
-      _messagesByConversation[conversationId] = messages.map((m) {
-        return m.id == messageId ? m.markAsReadBy(userId) : m;
-      }).toList();
+      _messagesByConversation[conversationId] = messages.map((m) => m.id == messageId ? m.markAsReadBy(userId) : m).toList();
     }
 
     notifyListeners();

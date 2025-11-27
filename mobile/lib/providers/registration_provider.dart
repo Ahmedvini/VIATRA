@@ -19,11 +19,11 @@ enum RegistrationStep {
 }
 
 class RegistrationProvider with ChangeNotifier {
+
+  RegistrationProvider(this._authService, this._verificationService);
   final AuthService _authService;
   final VerificationService _verificationService;
   AuthProvider? _authProvider;
-
-  RegistrationProvider(this._authService, this._verificationService);
 
   // Set auth provider for accessing tokens
   void setAuthProvider(AuthProvider authProvider) {
@@ -72,11 +72,9 @@ class RegistrationProvider with ChangeNotifier {
     }
   }
 
-  bool get canGoBack {
-    return _currentStep != RegistrationStep.roleSelection && 
+  bool get canGoBack => _currentStep != RegistrationStep.roleSelection && 
            _currentStep != RegistrationStep.verification &&
            _currentStep != RegistrationStep.complete;
-  }
 
   int get totalSteps {
     if (_selectedRole == UserRole.doctor) {
@@ -197,14 +195,12 @@ class RegistrationProvider with ChangeNotifier {
   }
 
   // Validation methods
-  bool _validateBasicInfo() {
-    return _formData['firstName']?.toString().isNotEmpty == true &&
+  bool _validateBasicInfo() => _formData['firstName']?.toString().isNotEmpty == true &&
            _formData['lastName']?.toString().isNotEmpty == true &&
            _formData['email']?.toString().isNotEmpty == true &&
            _formData['password']?.toString().isNotEmpty == true &&
            _formData['phone']?.toString().isNotEmpty == true &&
            _formData['dateOfBirth'] != null;
-  }
 
   bool _validateProfessionalInfo() {
     if (_selectedRole != UserRole.doctor) return true;
@@ -215,13 +211,11 @@ class RegistrationProvider with ChangeNotifier {
            _formData['hospitalAffiliation']?.toString().isNotEmpty == true;
   }
 
-  bool _validateAddressInfo() {
-    return _formData['addressLine1']?.toString().isNotEmpty == true &&
+  bool _validateAddressInfo() => _formData['addressLine1']?.toString().isNotEmpty == true &&
            _formData['city']?.toString().isNotEmpty == true &&
            _formData['state']?.toString().isNotEmpty == true &&
            _formData['country']?.toString().isNotEmpty == true &&
            _formData['postalCode']?.toString().isNotEmpty == true;
-  }
 
   bool _validateDocuments() {
     if (_selectedRole == UserRole.doctor) {
@@ -241,7 +235,7 @@ class RegistrationProvider with ChangeNotifier {
 
     try {
       // Create user data based on role
-      Map<String, dynamic> userData = {
+      var userData = <String, dynamic>{
         'firstName': _formData['firstName'],
         'lastName': _formData['lastName'],
         'email': _formData['email'],

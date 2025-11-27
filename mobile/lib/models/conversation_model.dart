@@ -7,6 +7,24 @@ part 'conversation_model.g.dart';
 /// Represents a conversation in the chat system
 @JsonSerializable(explicitToJson: true)
 class Conversation {
+
+  Conversation({
+    required this.id,
+    required this.type,
+    required this.participantIds,
+    required this.createdBy,
+    this.lastMessageAt,
+    this.metadata,
+    required this.createdAt,
+    required this.updatedAt,
+    this.unreadCount,
+    this.participants,
+    this.lastMessage,
+  });
+
+  /// Creates a Conversation from JSON
+  factory Conversation.fromJson(Map<String, dynamic> json) =>
+      _$ConversationFromJson(json);
   final String id;
   final String type; // 'direct', 'group', 'channel'
   
@@ -36,24 +54,6 @@ class Conversation {
   @JsonKey(name: 'last_message')
   final Message? lastMessage;
 
-  Conversation({
-    required this.id,
-    required this.type,
-    required this.participantIds,
-    required this.createdBy,
-    this.lastMessageAt,
-    this.metadata,
-    required this.createdAt,
-    required this.updatedAt,
-    this.unreadCount,
-    this.participants,
-    this.lastMessage,
-  });
-
-  /// Creates a Conversation from JSON
-  factory Conversation.fromJson(Map<String, dynamic> json) =>
-      _$ConversationFromJson(json);
-
   /// Converts Conversation to JSON
   Map<String, dynamic> toJson() => _$ConversationToJson(this);
 
@@ -70,8 +70,7 @@ class Conversation {
     int? unreadCount,
     List<User>? participants,
     Message? lastMessage,
-  }) {
-    return Conversation(
+  }) => Conversation(
       id: id ?? this.id,
       type: type ?? this.type,
       participantIds: participantIds ?? this.participantIds,
@@ -84,7 +83,6 @@ class Conversation {
       participants: participants ?? this.participants,
       lastMessage: lastMessage ?? this.lastMessage,
     );
-  }
 
   /// Gets the conversation name based on type and participants
   String getName(String currentUserId) {
@@ -152,9 +150,7 @@ class Conversation {
   }
 
   /// Checks if current user is a participant
-  bool isParticipant(String userId) {
-    return participantIds.contains(userId);
-  }
+  bool isParticipant(String userId) => participantIds.contains(userId);
 
   /// Gets the number of participants
   int get participantCount => participantIds.length;

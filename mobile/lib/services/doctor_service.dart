@@ -4,10 +4,6 @@ import '../models/doctor_search_filter.dart';
 import 'api_service.dart';
 
 class ApiResponse<T> {
-  final bool success;
-  final String? message;
-  final T? data;
-  final dynamic error;
 
   ApiResponse({
     required this.success,
@@ -15,13 +11,13 @@ class ApiResponse<T> {
     this.data,
     this.error,
   });
+  final bool success;
+  final String? message;
+  final T? data;
+  final dynamic error;
 }
 
 class PaginationMetadata {
-  final int total;
-  final int page;
-  final int limit;
-  final int totalPages;
 
   PaginationMetadata({
     required this.total,
@@ -38,22 +34,26 @@ class PaginationMetadata {
       totalPages: json['totalPages'] ?? json['total_pages'] ?? 0,
     );
   }
+  final int total;
+  final int page;
+  final int limit;
+  final int totalPages;
 }
 
 class DoctorSearchResult {
-  final List<Doctor> doctors;
-  final PaginationMetadata pagination;
 
   DoctorSearchResult({
     required this.doctors,
     required this.pagination,
   });
+  final List<Doctor> doctors;
+  final PaginationMetadata pagination;
 }
 
 class DoctorService {
-  final ApiService _apiService;
 
   DoctorService(this._apiService);
+  final ApiService _apiService;
 
   /// Search doctors with filters and pagination
   Future<ApiResponse<DoctorSearchResult>> searchDoctors(

@@ -1,17 +1,4 @@
 class DoctorSearchFilter {
-  final String? searchQuery;
-  final String? specialty;
-  final String? subSpecialty;
-  final String? city;
-  final String? state;
-  final String? zipCode;
-  final double? minFee;
-  final double? maxFee;
-  final List<String>? languages;
-  final bool? isAcceptingPatients;
-  final bool? telehealthEnabled;
-  final String sortBy;
-  final String sortOrder;
 
   DoctorSearchFilter({
     this.searchQuery,
@@ -28,6 +15,45 @@ class DoctorSearchFilter {
     this.sortBy = 'created_at',
     this.sortOrder = 'DESC',
   });
+
+  /// Create filter from JSON
+  factory DoctorSearchFilter.fromJson(Map<String, dynamic> json) {
+    return DoctorSearchFilter(
+      searchQuery: json['searchQuery'],
+      specialty: json['specialty'],
+      subSpecialty: json['subSpecialty'],
+      city: json['city'],
+      state: json['state'],
+      zipCode: json['zipCode'],
+      minFee: json['minFee']?.toDouble(),
+      maxFee: json['maxFee']?.toDouble(),
+      languages: json['languages'] != null
+          ? List<String>.from(json['languages'])
+          : null,
+      isAcceptingPatients: json['isAcceptingPatients'],
+      telehealthEnabled: json['telehealthEnabled'],
+      sortBy: json['sortBy'] ?? 'created_at',
+      sortOrder: json['sortOrder'] ?? 'DESC',
+    );
+  }
+
+  /// Create an empty filter
+  factory DoctorSearchFilter.clear() {
+    return DoctorSearchFilter();
+  }
+  final String? searchQuery;
+  final String? specialty;
+  final String? subSpecialty;
+  final String? city;
+  final String? state;
+  final String? zipCode;
+  final double? minFee;
+  final double? maxFee;
+  final List<String>? languages;
+  final bool? isAcceptingPatients;
+  final bool? telehealthEnabled;
+  final String sortBy;
+  final String sortOrder;
 
   /// Convert filter to query parameters for API
   Map<String, String> toQueryParams() {
@@ -73,30 +99,8 @@ class DoctorSearchFilter {
     return params;
   }
 
-  /// Create filter from JSON
-  factory DoctorSearchFilter.fromJson(Map<String, dynamic> json) {
-    return DoctorSearchFilter(
-      searchQuery: json['searchQuery'],
-      specialty: json['specialty'],
-      subSpecialty: json['subSpecialty'],
-      city: json['city'],
-      state: json['state'],
-      zipCode: json['zipCode'],
-      minFee: json['minFee']?.toDouble(),
-      maxFee: json['maxFee']?.toDouble(),
-      languages: json['languages'] != null
-          ? List<String>.from(json['languages'])
-          : null,
-      isAcceptingPatients: json['isAcceptingPatients'],
-      telehealthEnabled: json['telehealthEnabled'],
-      sortBy: json['sortBy'] ?? 'created_at',
-      sortOrder: json['sortOrder'] ?? 'DESC',
-    );
-  }
-
   /// Convert filter to JSON
-  Map<String, dynamic> toJson() {
-    return {
+  Map<String, dynamic> toJson() => {
       'searchQuery': searchQuery,
       'specialty': specialty,
       'subSpecialty': subSpecialty,
@@ -111,7 +115,6 @@ class DoctorSearchFilter {
       'sortBy': sortBy,
       'sortOrder': sortOrder,
     };
-  }
 
   /// Create a copy with updated fields
   DoctorSearchFilter copyWith({
@@ -128,8 +131,7 @@ class DoctorSearchFilter {
     bool? telehealthEnabled,
     String? sortBy,
     String? sortOrder,
-  }) {
-    return DoctorSearchFilter(
+  }) => DoctorSearchFilter(
       searchQuery: searchQuery ?? this.searchQuery,
       specialty: specialty ?? this.specialty,
       subSpecialty: subSpecialty ?? this.subSpecialty,
@@ -144,16 +146,9 @@ class DoctorSearchFilter {
       sortBy: sortBy ?? this.sortBy,
       sortOrder: sortOrder ?? this.sortOrder,
     );
-  }
-
-  /// Create an empty filter
-  factory DoctorSearchFilter.clear() {
-    return DoctorSearchFilter();
-  }
 
   /// Check if any filter is active
-  bool get hasActiveFilters {
-    return specialty != null ||
+  bool get hasActiveFilters => specialty != null ||
         subSpecialty != null ||
         city != null ||
         state != null ||
@@ -163,11 +158,10 @@ class DoctorSearchFilter {
         (languages != null && languages!.isNotEmpty) ||
         isAcceptingPatients != null ||
         telehealthEnabled != null;
-  }
 
   /// Count active filters
   int get activeFilterCount {
-    int count = 0;
+    var count = 0;
     if (specialty != null) count++;
     if (subSpecialty != null) count++;
     if (city != null) count++;

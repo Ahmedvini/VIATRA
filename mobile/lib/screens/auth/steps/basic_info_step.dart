@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../../../providers/registration_provider.dart';
-import '../../../widgets/common/custom_text_field.dart';
-import '../../../widgets/common/custom_button.dart';
 import '../../../utils/validators.dart';
+import '../../../widgets/common/custom_button.dart';
+import '../../../widgets/common/custom_text_field.dart';
 
 class BasicInfoStep extends StatefulWidget {
   const BasicInfoStep({Key? key}) : super(key: key);

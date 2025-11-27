@@ -2,20 +2,16 @@ import '../models/appointment_model.dart';
 import 'api_service.dart';
 
 class AppointmentListResult {
-  final List<Appointment> appointments;
-  final PaginationMetadata pagination;
 
   AppointmentListResult({
     required this.appointments,
     required this.pagination,
   });
+  final List<Appointment> appointments;
+  final PaginationMetadata pagination;
 }
 
 class PaginationMetadata {
-  final int total;
-  final int page;
-  final int limit;
-  final int totalPages;
 
   PaginationMetadata({
     required this.total,
@@ -32,12 +28,16 @@ class PaginationMetadata {
       totalPages: json['totalPages'] as int,
     );
   }
+  final int total;
+  final int page;
+  final int limit;
+  final int totalPages;
 }
 
 class AppointmentService {
-  final ApiService _apiService;
 
   AppointmentService(this._apiService);
+  final ApiService _apiService;
 
   /// Create new appointment
   Future<ApiResponse<Appointment>> createAppointment(

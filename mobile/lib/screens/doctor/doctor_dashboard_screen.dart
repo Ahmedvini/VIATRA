@@ -42,8 +42,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(
         title: const Text('Doctor Dashboard'),
         actions: [
@@ -195,5 +194,4 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
         },
       ),
     );
-  }
 }

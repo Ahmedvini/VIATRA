@@ -3,10 +3,6 @@ import 'doctor_model.dart';
 import 'patient_model.dart';
 
 class AuthResponse {
-  final User user;
-  final dynamic profile; // Can be Doctor or Patient
-  final AuthTokens tokens;
-  final bool? emailSent;
 
   AuthResponse({
     required this.user,
@@ -45,6 +41,10 @@ class AuthResponse {
       emailSent: json['data']?['emailSent'] ?? json['emailSent'],
     );
   }
+  final User user;
+  final dynamic profile; // Can be Doctor or Patient
+  final AuthTokens tokens;
+  final bool? emailSent;
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> profileJson;
@@ -73,14 +73,10 @@ class AuthResponse {
   bool get isPharmacy => user.role == UserRole.pharmacy;
 
   @override
-  String toString() {
-    return 'AuthResponse(user: ${user.fullName}, role: ${user.role}, hasTokens: ${tokens.accessToken.isNotEmpty})';
-  }
+  String toString() => 'AuthResponse(user: ${user.fullName}, role: ${user.role}, hasTokens: ${tokens.accessToken.isNotEmpty})';
 }
 
 class AuthTokens {
-  final String accessToken;
-  final String refreshToken;
 
   AuthTokens({
     required this.accessToken,
@@ -93,18 +89,16 @@ class AuthTokens {
       refreshToken: json['refreshToken'] ?? json['refresh_token'] ?? '',
     );
   }
+  final String accessToken;
+  final String refreshToken;
 
-  Map<String, dynamic> toJson() {
-    return {
+  Map<String, dynamic> toJson() => {
       'accessToken': accessToken,
       'refreshToken': refreshToken,
     };
-  }
 
   bool get hasValidTokens => accessToken.isNotEmpty && refreshToken.isNotEmpty;
 
   @override
-  String toString() {
-    return 'AuthTokens(hasAccessToken: ${accessToken.isNotEmpty}, hasRefreshToken: ${refreshToken.isNotEmpty})';
-  }
+  String toString() => 'AuthTokens(hasAccessToken: ${accessToken.isNotEmpty}, hasRefreshToken: ${refreshToken.isNotEmpty})';
 }

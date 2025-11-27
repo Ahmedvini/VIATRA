@@ -1,11 +1,4 @@
 class Patient {
-  final String id;
-  final String userId;
-  final DateTime? dateOfBirth;
-  final String? gender;
-  final String? bloodType;
-  final EmergencyContact? emergencyContact;
-  final Address? address;
 
   Patient({
     required this.id,
@@ -36,9 +29,15 @@ class Patient {
       address: json['address'] != null ? Address.fromJson(json['address']) : null,
     );
   }
+  final String id;
+  final String userId;
+  final DateTime? dateOfBirth;
+  final String? gender;
+  final String? bloodType;
+  final EmergencyContact? emergencyContact;
+  final Address? address;
 
-  Map<String, dynamic> toJson() {
-    return {
+  Map<String, dynamic> toJson() => {
       'id': id,
       'userId': userId,
       'dateOfBirth': dateOfBirth?.toIso8601String(),
@@ -47,7 +46,6 @@ class Patient {
       'emergencyContact': emergencyContact?.toJson(),
       'address': address?.toJson(),
     };
-  }
 
   Patient copyWith({
     String? id,
@@ -57,8 +55,7 @@ class Patient {
     String? bloodType,
     EmergencyContact? emergencyContact,
     Address? address,
-  }) {
-    return Patient(
+  }) => Patient(
       id: id ?? this.id,
       userId: userId ?? this.userId,
       dateOfBirth: dateOfBirth ?? this.dateOfBirth,
@@ -67,12 +64,11 @@ class Patient {
       emergencyContact: emergencyContact ?? this.emergencyContact,
       address: address ?? this.address,
     );
-  }
 
   int? get age {
     if (dateOfBirth == null) return null;
     final now = DateTime.now();
-    int age = now.year - dateOfBirth!.year;
+    var age = now.year - dateOfBirth!.year;
     if (now.month < dateOfBirth!.month ||
         (now.month == dateOfBirth!.month && now.day < dateOfBirth!.day)) {
       age--;
@@ -81,9 +77,7 @@ class Patient {
   }
 
   @override
-  String toString() {
-    return 'Patient(id: $id, age: $age, gender: $gender, bloodType: $bloodType)';
-  }
+  String toString() => 'Patient(id: $id, age: $age, gender: $gender, bloodType: $bloodType)';
 
   @override
   bool operator ==(Object other) {
@@ -96,9 +90,6 @@ class Patient {
 }
 
 class EmergencyContact {
-  final String name;
-  final String phone;
-  final String relationship;
 
   EmergencyContact({
     required this.name,
@@ -113,38 +104,31 @@ class EmergencyContact {
       relationship: json['relationship'] ?? '',
     );
   }
+  final String name;
+  final String phone;
+  final String relationship;
 
-  Map<String, dynamic> toJson() {
-    return {
+  Map<String, dynamic> toJson() => {
       'name': name,
       'phone': phone,
       'relationship': relationship,
     };
-  }
 
   EmergencyContact copyWith({
     String? name,
     String? phone,
     String? relationship,
-  }) {
-    return EmergencyContact(
+  }) => EmergencyContact(
       name: name ?? this.name,
       phone: phone ?? this.phone,
       relationship: relationship ?? this.relationship,
     );
-  }
 
   @override
-  String toString() {
-    return 'EmergencyContact(name: $name, phone: $phone, relationship: $relationship)';
-  }
+  String toString() => 'EmergencyContact(name: $name, phone: $phone, relationship: $relationship)';
 }
 
 class Address {
-  final String street;
-  final String city;
-  final String country;
-  final String postalCode;
 
   Address({
     required this.street,
@@ -161,34 +145,32 @@ class Address {
       postalCode: json['postalCode'] ?? json['postal_code'] ?? '',
     );
   }
+  final String street;
+  final String city;
+  final String country;
+  final String postalCode;
 
-  Map<String, dynamic> toJson() {
-    return {
+  Map<String, dynamic> toJson() => {
       'street': street,
       'city': city,
       'country': country,
       'postalCode': postalCode,
     };
-  }
 
   Address copyWith({
     String? street,
     String? city,
     String? country,
     String? postalCode,
-  }) {
-    return Address(
+  }) => Address(
       street: street ?? this.street,
       city: city ?? this.city,
       country: country ?? this.country,
       postalCode: postalCode ?? this.postalCode,
     );
-  }
 
   String get fullAddress => '$street, $city, $country $postalCode';
 
   @override
-  String toString() {
-    return 'Address($fullAddress)';
-  }
+  String toString() => 'Address($fullAddress)';
 }

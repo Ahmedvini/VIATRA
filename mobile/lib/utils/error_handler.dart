@@ -227,10 +227,9 @@ class ErrorHandler {
 
   /// Handle validation errors
   static void handleValidationError(Map<String, dynamic> validationErrors) {
-    final message = 'Please correct the following errors:\n' +
-        validationErrors.entries
+    final message = 'Please correct the following errors:\n${validationErrors.entries
             .map((entry) => '• ${entry.key}: ${entry.value}')
-            .join('\n');
+            .join('\n')}';
     
     logError('Validation Error', null, validationErrors);
     

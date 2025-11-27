@@ -1,29 +1,6 @@
 import 'package:flutter/material.dart';
 
 class CustomDropdown<T> extends StatefulWidget {
-  final String? label;
-  final String? hint;
-  final T? value;
-  final List<DropdownItem<T>> items;
-  final void Function(T?)? onChanged;
-  final void Function(T?)? onSaved;
-  final String? Function(T?)? validator;
-  final bool enabled;
-  final bool isExpanded;
-  final Widget? prefixIcon;
-  final Color? fillColor;
-  final EdgeInsetsGeometry? contentPadding;
-  final TextStyle? style;
-  final TextStyle? labelStyle;
-  final TextStyle? hintStyle;
-  final InputBorder? border;
-  final InputBorder? focusedBorder;
-  final InputBorder? enabledBorder;
-  final InputBorder? errorBorder;
-  final double? dropdownMaxHeight;
-  final bool searchable;
-  final String? searchHint;
-  final FocusNode? focusNode;
 
   const CustomDropdown({
     Key? key,
@@ -51,6 +28,29 @@ class CustomDropdown<T> extends StatefulWidget {
     this.searchHint,
     this.focusNode,
   }) : super(key: key);
+  final String? label;
+  final String? hint;
+  final T? value;
+  final List<DropdownItem<T>> items;
+  final void Function(T?)? onChanged;
+  final void Function(T?)? onSaved;
+  final String? Function(T?)? validator;
+  final bool enabled;
+  final bool isExpanded;
+  final Widget? prefixIcon;
+  final Color? fillColor;
+  final EdgeInsetsGeometry? contentPadding;
+  final TextStyle? style;
+  final TextStyle? labelStyle;
+  final TextStyle? hintStyle;
+  final InputBorder? border;
+  final InputBorder? focusedBorder;
+  final InputBorder? enabledBorder;
+  final InputBorder? errorBorder;
+  final double? dropdownMaxHeight;
+  final bool searchable;
+  final String? searchHint;
+  final FocusNode? focusNode;
 
   @override
   State<CustomDropdown<T>> createState() => _CustomDropdownState<T>();
@@ -120,15 +120,12 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>> {
           ),
           const SizedBox(height: 8),
         ],
-        widget.searchable
-            ? _buildSearchableDropdown(theme, colorScheme)
-            : _buildRegularDropdown(theme, colorScheme),
+        if (widget.searchable) _buildSearchableDropdown(theme, colorScheme) else _buildRegularDropdown(theme, colorScheme),
       ],
     );
   }
 
-  Widget _buildRegularDropdown(ThemeData theme, ColorScheme colorScheme) {
-    return DropdownButtonFormField<T>(
+  Widget _buildRegularDropdown(ThemeData theme, ColorScheme colorScheme) => DropdownButtonFormField<T>(
       value: widget.value,
       items: widget.items.map((item) {
         return DropdownMenuItem<T>(
@@ -182,10 +179,8 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>> {
       ),
       menuMaxHeight: widget.dropdownMaxHeight ?? 300,
     );
-  }
 
-  Widget _buildSearchableDropdown(ThemeData theme, ColorScheme colorScheme) {
-    return Column(
+  Widget _buildSearchableDropdown(ThemeData theme, ColorScheme colorScheme) => Column(
       children: [
         GestureDetector(
           onTap: widget.enabled ? _showSearchableDropdown : null,
@@ -232,7 +227,6 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>> {
         ),
       ],
     );
-  }
 
   String? _getSelectedText() {
     if (widget.value == null) return null;
@@ -248,8 +242,7 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>> {
     
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
+      builder: (BuildContext context) => StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
               title: widget.label != null ? Text(widget.label!) : null,
@@ -313,57 +306,44 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>> {
               ],
             );
           },
-        );
-      },
+        ),
     );
   }
 
-  InputBorder _getDefaultBorder(ColorScheme colorScheme) {
-    return OutlineInputBorder(
+  InputBorder _getDefaultBorder(ColorScheme colorScheme) => OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),
       borderSide: BorderSide(
         color: colorScheme.outline.withOpacity(0.5),
         width: 1,
       ),
     );
-  }
 
-  InputBorder _getFocusedBorder(ColorScheme colorScheme) {
-    return OutlineInputBorder(
+  InputBorder _getFocusedBorder(ColorScheme colorScheme) => OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),
       borderSide: BorderSide(
         color: colorScheme.primary,
         width: 2,
       ),
     );
-  }
 
-  InputBorder _getErrorBorder(ColorScheme colorScheme) {
-    return OutlineInputBorder(
+  InputBorder _getErrorBorder(ColorScheme colorScheme) => OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),
       borderSide: BorderSide(
         color: colorScheme.error,
         width: 1,
       ),
     );
-  }
 
-  InputBorder _getFocusedErrorBorder(ColorScheme colorScheme) {
-    return OutlineInputBorder(
+  InputBorder _getFocusedErrorBorder(ColorScheme colorScheme) => OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),
       borderSide: BorderSide(
         color: colorScheme.error,
         width: 2,
       ),
     );
-  }
 }
 
 class DropdownItem<T> {
-  final T value;
-  final String text;
-  final Widget? icon;
-  final bool enabled;
 
   const DropdownItem({
     required this.value,
@@ -371,6 +351,10 @@ class DropdownItem<T> {
     this.icon,
     this.enabled = true,
   });
+  final T value;
+  final String text;
+  final Widget? icon;
+  final bool enabled;
 }
 
 // Extension for convenience
@@ -380,13 +364,6 @@ extension ListExtension<T> on List<T> {
 
 // Specialized dropdown variants
 class CountryDropdown extends StatelessWidget {
-  final String? label;
-  final String? value;
-  final List<String> countries;
-  final void Function(String?)? onChanged;
-  final void Function(String?)? onSaved;
-  final String? Function(String?)? validator;
-  final bool enabled;
 
   const CountryDropdown({
     Key? key,
@@ -398,10 +375,16 @@ class CountryDropdown extends StatelessWidget {
     this.validator,
     this.enabled = true,
   }) : super(key: key);
+  final String? label;
+  final String? value;
+  final List<String> countries;
+  final void Function(String?)? onChanged;
+  final void Function(String?)? onSaved;
+  final String? Function(String?)? validator;
+  final bool enabled;
 
   @override
-  Widget build(BuildContext context) {
-    return CustomDropdown<String>(
+  Widget build(BuildContext context) => CustomDropdown<String>(
       label: label,
       hint: 'Select country',
       value: value,
@@ -420,17 +403,9 @@ class CountryDropdown extends StatelessWidget {
       searchHint: 'Search countries...',
       prefixIcon: const Icon(Icons.public),
     );
-  }
 }
 
 class SpecializationDropdown extends StatelessWidget {
-  final String? label;
-  final String? value;
-  final List<String> specializations;
-  final void Function(String?)? onChanged;
-  final void Function(String?)? onSaved;
-  final String? Function(String?)? validator;
-  final bool enabled;
 
   const SpecializationDropdown({
     Key? key,
@@ -442,10 +417,16 @@ class SpecializationDropdown extends StatelessWidget {
     this.validator,
     this.enabled = true,
   }) : super(key: key);
+  final String? label;
+  final String? value;
+  final List<String> specializations;
+  final void Function(String?)? onChanged;
+  final void Function(String?)? onSaved;
+  final String? Function(String?)? validator;
+  final bool enabled;
 
   @override
-  Widget build(BuildContext context) {
-    return CustomDropdown<String>(
+  Widget build(BuildContext context) => CustomDropdown<String>(
       label: label,
       hint: 'Select specialization',
       value: value,
@@ -464,17 +445,9 @@ class SpecializationDropdown extends StatelessWidget {
       searchHint: 'Search specializations...',
       prefixIcon: const Icon(Icons.medical_services),
     );
-  }
 }
 
 class BloodTypeDropdown extends StatelessWidget {
-  final String? label;
-  final String? value;
-  final List<String> bloodTypes;
-  final void Function(String?)? onChanged;
-  final void Function(String?)? onSaved;
-  final String? Function(String?)? validator;
-  final bool enabled;
 
   const BloodTypeDropdown({
     Key? key,
@@ -486,10 +459,16 @@ class BloodTypeDropdown extends StatelessWidget {
     this.validator,
     this.enabled = true,
   }) : super(key: key);
+  final String? label;
+  final String? value;
+  final List<String> bloodTypes;
+  final void Function(String?)? onChanged;
+  final void Function(String?)? onSaved;
+  final String? Function(String?)? validator;
+  final bool enabled;
 
   @override
-  Widget build(BuildContext context) {
-    return CustomDropdown<String>(
+  Widget build(BuildContext context) => CustomDropdown<String>(
       label: label,
       hint: 'Select blood type',
       value: value,
@@ -506,5 +485,4 @@ class BloodTypeDropdown extends StatelessWidget {
       enabled: enabled,
       prefixIcon: const Icon(Icons.bloodtype),
     );
-  }
 }

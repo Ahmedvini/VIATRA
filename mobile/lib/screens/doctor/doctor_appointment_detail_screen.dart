@@ -7,12 +7,12 @@ import '../../widgets/doctor/appointment_action_buttons.dart';
 import '../../widgets/common/custom_button.dart';
 
 class DoctorAppointmentDetailScreen extends StatefulWidget {
-  final String appointmentId;
 
   const DoctorAppointmentDetailScreen({
     super.key,
     required this.appointmentId,
   });
+  final String appointmentId;
 
   @override
   State<DoctorAppointmentDetailScreen> createState() => _DoctorAppointmentDetailScreenState();
@@ -91,8 +91,7 @@ class _DoctorAppointmentDetailScreenState extends State<DoctorAppointmentDetailS
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(
         title: const Text('Appointment Details'),
       ),
@@ -349,10 +348,8 @@ class _DoctorAppointmentDetailScreenState extends State<DoctorAppointmentDetailS
         },
       ),
     );
-  }
 
-  Widget _buildDetailRow(BuildContext context, String label, String value, IconData icon) {
-    return Padding(
+  Widget _buildDetailRow(BuildContext context, String label, String value, IconData icon) => Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         children: [
@@ -378,5 +375,4 @@ class _DoctorAppointmentDetailScreenState extends State<DoctorAppointmentDetailS
         ],
       ),
     );
-  }
 }

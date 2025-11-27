@@ -4,9 +4,6 @@ import '../../config/theme.dart';
 
 /// User information card widget
 class UserInfoCard extends StatelessWidget {
-  final User user;
-  final VoidCallback? onEditPressed;
-  final UserRole? activeRole;
 
   const UserInfoCard({
     super.key,
@@ -14,10 +11,12 @@ class UserInfoCard extends StatelessWidget {
     this.onEditPressed,
     this.activeRole,
   });
+  final User user;
+  final VoidCallback? onEditPressed;
+  final UserRole? activeRole;
 
   @override
-  Widget build(BuildContext context) {
-    return Card(
+  Widget build(BuildContext context) => Card(
       elevation: 2,
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -87,7 +86,6 @@ class UserInfoCard extends StatelessWidget {
         ),
       ),
     );
-  }
 
   Widget _buildRoleBadge(UserRole role) {
     Color badgeColor;
@@ -130,8 +128,7 @@ class UserInfoCard extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoRow(IconData icon, String text) {
-    return Row(
+  Widget _buildInfoRow(IconData icon, String text) => Row(
       children: [
         Icon(icon, size: 20, color: Colors.grey[600]),
         const SizedBox(width: 12),
@@ -146,10 +143,8 @@ class UserInfoCard extends StatelessWidget {
         ),
       ],
     );
-  }
 
-  Widget _buildVerificationStatus(bool isVerified) {
-    return Row(
+  Widget _buildVerificationStatus(bool isVerified) => Row(
       children: [
         Icon(
           isVerified ? Icons.verified : Icons.warning,
@@ -169,7 +164,6 @@ class UserInfoCard extends StatelessWidget {
         ),
       ],
     );
-  }
 
   String _getInitials(String fullName) {
     final names = fullName.trim().split(' ');

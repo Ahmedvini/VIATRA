@@ -3,10 +3,6 @@ import 'package:intl/intl.dart';
 import '../../models/appointment_model.dart';
 
 class TimeSlotPicker extends StatelessWidget {
-  final List<TimeSlot> slots;
-  final TimeSlot? selectedSlot;
-  final Function(TimeSlot) onSlotSelected;
-  final int slotsPerRow;
 
   const TimeSlotPicker({
     Key? key,
@@ -15,6 +11,10 @@ class TimeSlotPicker extends StatelessWidget {
     required this.onSlotSelected,
     this.slotsPerRow = 3,
   }) : super(key: key);
+  final List<TimeSlot> slots;
+  final TimeSlot? selectedSlot;
+  final Function(TimeSlot) onSlotSelected;
+  final int slotsPerRow;
 
   @override
   Widget build(BuildContext context) {
@@ -35,8 +35,7 @@ class TimeSlotPicker extends StatelessWidget {
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: groupedSlots.entries.map((entry) {
-        return Column(
+      children: groupedSlots.entries.map((entry) => Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Period Header
@@ -123,19 +122,18 @@ class TimeSlotPicker extends StatelessWidget {
             
             const SizedBox(height: 16),
           ],
-        );
-      }).toList(),
+        )).toList(),
     );
   }
 
   Map<String, List<TimeSlot>> _groupSlotsByPeriod(List<TimeSlot> slots) {
-    final Map<String, List<TimeSlot>> grouped = {
+    final grouped = <String, List<TimeSlot>>{
       'Morning': [],
       'Afternoon': [],
       'Evening': [],
     };
 
-    for (var slot in slots) {
+    for (final slot in slots) {
       final hour = slot.start.hour;
       if (hour < 12) {
         grouped['Morning']!.add(slot);

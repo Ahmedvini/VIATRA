@@ -3,9 +3,9 @@ import '../services/api_service.dart';
 import '../models/verification_model.dart';
 
 class VerificationService {
-  final ApiService _apiService;
 
   VerificationService(this._apiService);
+  final ApiService _apiService;
 
   /// Submit document for verification
   Future<ApiResponse<Verification>> submitDocument(

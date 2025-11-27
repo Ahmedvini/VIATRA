@@ -234,38 +234,33 @@ class ForgotPasswordScreen extends StatelessWidget {
   const ForgotPasswordScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(title: const Text('Forgot Password')),
       body: const Center(
         child: Text('Forgot Password Screen - TODO: Implement'),
       ),
     );
-  }
 }
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(title: const Text('Settings')),
       body: const Center(
         child: Text('Settings Screen - TODO: Implement'),
       ),
     );
-  }
 }
 
 class ErrorScreen extends StatelessWidget {
-  final Object? error;
   
   const ErrorScreen({super.key, this.error});
+  final Object? error;
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(title: const Text('Error')),
       body: Center(
         child: Column(
@@ -295,5 +290,4 @@ class ErrorScreen extends StatelessWidget {
         ),
       ),
     );
-  }
 }

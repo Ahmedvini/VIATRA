@@ -39,8 +39,7 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
         automaticallyImplyLeading: false,
       ),
       body: Consumer<RegistrationProvider>(
-        builder: (context, registrationProvider, child) {
-          return RefreshIndicator(
+        builder: (context, registrationProvider, child) => RefreshIndicator(
             onRefresh: _refreshStatus,
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
@@ -272,8 +271,7 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
                 ],
               ),
             ),
-          );
-        },
+          ),
       ),
     );
   }

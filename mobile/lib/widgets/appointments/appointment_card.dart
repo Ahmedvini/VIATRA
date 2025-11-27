@@ -3,10 +3,6 @@ import 'package:intl/intl.dart';
 import '../../models/appointment_model.dart';
 
 class AppointmentCard extends StatelessWidget {
-  final Appointment appointment;
-  final VoidCallback? onTap;
-  final VoidCallback? onCancel;
-  final VoidCallback? onReschedule;
 
   const AppointmentCard({
     Key? key,
@@ -15,6 +11,10 @@ class AppointmentCard extends StatelessWidget {
     this.onCancel,
     this.onReschedule,
   }) : super(key: key);
+  final Appointment appointment;
+  final VoidCallback? onTap;
+  final VoidCallback? onCancel;
+  final VoidCallback? onReschedule;
 
   @override
   Widget build(BuildContext context) {
@@ -75,16 +75,15 @@ class AppointmentCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 4),
-                        if (appointment.specialty != null)
-                          Text(
-                            appointment.specialty!,
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.grey[600],
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                        Text(
+                          appointment.specialty!,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey[600],
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                         const SizedBox(height: 4),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -200,38 +199,38 @@ class AppointmentCard extends StatelessWidget {
               ],
 
               // Reason for Visit
-              if (appointment.reasonForVisit != null) ...[
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(
-                        Icons.info_outline,
-                        size: 16,
-                        color: Colors.grey[600],
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          appointment.reasonForVisit!,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.grey[800],
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
+              ...[
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(8),
                 ),
-              ],
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      Icons.info_outline,
+                      size: 16,
+                      color: Colors.grey[600],
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        appointment.reasonForVisit!,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey[800],
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
 
               // Action Buttons for Upcoming Appointments
               if (isUpcoming && (appointment.canBeCancelled() || appointment.canBeRescheduled())) ...[

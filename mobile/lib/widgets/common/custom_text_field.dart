@@ -2,38 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class CustomTextField extends StatefulWidget {
-  final String? label;
-  final String? hint;
-  final String? initialValue;
-  final TextEditingController? controller;
-  final String? Function(String?)? validator;
-  final void Function(String)? onChanged;
-  final void Function(String?)? onSaved;
-  final void Function()? onTap;
-  final bool obscureText;
-  final bool readOnly;
-  final bool enabled;
-  final TextInputType keyboardType;
-  final TextInputAction textInputAction;
-  final List<TextInputFormatter>? inputFormatters;
-  final Widget? suffixIcon;
-  final Widget? prefixIcon;
-  final int? maxLines;
-  final int? minLines;
-  final int? maxLength;
-  final FocusNode? focusNode;
-  final String? helperText;
-  final Color? fillColor;
-  final EdgeInsetsGeometry? contentPadding;
-  final TextStyle? style;
-  final TextStyle? labelStyle;
-  final TextStyle? hintStyle;
-  final InputBorder? border;
-  final InputBorder? focusedBorder;
-  final InputBorder? enabledBorder;
-  final InputBorder? errorBorder;
-  final bool autofocus;
-  final TextCapitalization textCapitalization;
 
   const CustomTextField({
     Key? key,
@@ -70,6 +38,38 @@ class CustomTextField extends StatefulWidget {
     this.autofocus = false,
     this.textCapitalization = TextCapitalization.none,
   }) : super(key: key);
+  final String? label;
+  final String? hint;
+  final String? initialValue;
+  final TextEditingController? controller;
+  final String? Function(String?)? validator;
+  final void Function(String)? onChanged;
+  final void Function(String?)? onSaved;
+  final void Function()? onTap;
+  final bool obscureText;
+  final bool readOnly;
+  final bool enabled;
+  final TextInputType keyboardType;
+  final TextInputAction textInputAction;
+  final List<TextInputFormatter>? inputFormatters;
+  final Widget? suffixIcon;
+  final Widget? prefixIcon;
+  final int? maxLines;
+  final int? minLines;
+  final int? maxLength;
+  final FocusNode? focusNode;
+  final String? helperText;
+  final Color? fillColor;
+  final EdgeInsetsGeometry? contentPadding;
+  final TextStyle? style;
+  final TextStyle? labelStyle;
+  final TextStyle? hintStyle;
+  final InputBorder? border;
+  final InputBorder? focusedBorder;
+  final InputBorder? enabledBorder;
+  final InputBorder? errorBorder;
+  final bool autofocus;
+  final TextCapitalization textCapitalization;
 
   @override
   State<CustomTextField> createState() => _CustomTextFieldState();
@@ -195,57 +195,41 @@ class _CustomTextFieldState extends State<CustomTextField> {
     return widget.suffixIcon;
   }
 
-  InputBorder _getDefaultBorder(ColorScheme colorScheme) {
-    return OutlineInputBorder(
+  InputBorder _getDefaultBorder(ColorScheme colorScheme) => OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),
       borderSide: BorderSide(
         color: colorScheme.outline.withOpacity(0.5),
         width: 1,
       ),
     );
-  }
 
-  InputBorder _getFocusedBorder(ColorScheme colorScheme) {
-    return OutlineInputBorder(
+  InputBorder _getFocusedBorder(ColorScheme colorScheme) => OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),
       borderSide: BorderSide(
         color: colorScheme.primary,
         width: 2,
       ),
     );
-  }
 
-  InputBorder _getErrorBorder(ColorScheme colorScheme) {
-    return OutlineInputBorder(
+  InputBorder _getErrorBorder(ColorScheme colorScheme) => OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),
       borderSide: BorderSide(
         color: colorScheme.error,
         width: 1,
       ),
     );
-  }
 
-  InputBorder _getFocusedErrorBorder(ColorScheme colorScheme) {
-    return OutlineInputBorder(
+  InputBorder _getFocusedErrorBorder(ColorScheme colorScheme) => OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),
       borderSide: BorderSide(
         color: colorScheme.error,
         width: 2,
       ),
     );
-  }
 }
 
 // Specialized text field variants
 class EmailTextField extends StatelessWidget {
-  final String? label;
-  final String? initialValue;
-  final TextEditingController? controller;
-  final String? Function(String?)? validator;
-  final void Function(String)? onChanged;
-  final void Function(String?)? onSaved;
-  final bool enabled;
-  final FocusNode? focusNode;
 
   const EmailTextField({
     Key? key,
@@ -258,10 +242,17 @@ class EmailTextField extends StatelessWidget {
     this.enabled = true,
     this.focusNode,
   }) : super(key: key);
+  final String? label;
+  final String? initialValue;
+  final TextEditingController? controller;
+  final String? Function(String?)? validator;
+  final void Function(String)? onChanged;
+  final void Function(String?)? onSaved;
+  final bool enabled;
+  final FocusNode? focusNode;
 
   @override
-  Widget build(BuildContext context) {
-    return CustomTextField(
+  Widget build(BuildContext context) => CustomTextField(
       label: label,
       hint: 'Enter your email address',
       initialValue: initialValue,
@@ -276,19 +267,9 @@ class EmailTextField extends StatelessWidget {
       prefixIcon: const Icon(Icons.email_outlined),
       textCapitalization: TextCapitalization.none,
     );
-  }
 }
 
 class PasswordTextField extends StatelessWidget {
-  final String? label;
-  final String? hint;
-  final TextEditingController? controller;
-  final String? Function(String?)? validator;
-  final void Function(String)? onChanged;
-  final void Function(String?)? onSaved;
-  final bool enabled;
-  final FocusNode? focusNode;
-  final TextInputAction textInputAction;
 
   const PasswordTextField({
     Key? key,
@@ -302,10 +283,18 @@ class PasswordTextField extends StatelessWidget {
     this.focusNode,
     this.textInputAction = TextInputAction.done,
   }) : super(key: key);
+  final String? label;
+  final String? hint;
+  final TextEditingController? controller;
+  final String? Function(String?)? validator;
+  final void Function(String)? onChanged;
+  final void Function(String?)? onSaved;
+  final bool enabled;
+  final FocusNode? focusNode;
+  final TextInputAction textInputAction;
 
   @override
-  Widget build(BuildContext context) {
-    return CustomTextField(
+  Widget build(BuildContext context) => CustomTextField(
       label: label,
       hint: hint,
       controller: controller,
@@ -319,17 +308,9 @@ class PasswordTextField extends StatelessWidget {
       textInputAction: textInputAction,
       prefixIcon: const Icon(Icons.lock_outline),
     );
-  }
 }
 
 class PhoneTextField extends StatelessWidget {
-  final String? label;
-  final TextEditingController? controller;
-  final String? Function(String?)? validator;
-  final void Function(String)? onChanged;
-  final void Function(String?)? onSaved;
-  final bool enabled;
-  final FocusNode? focusNode;
 
   const PhoneTextField({
     Key? key,
@@ -341,10 +322,16 @@ class PhoneTextField extends StatelessWidget {
     this.enabled = true,
     this.focusNode,
   }) : super(key: key);
+  final String? label;
+  final TextEditingController? controller;
+  final String? Function(String?)? validator;
+  final void Function(String)? onChanged;
+  final void Function(String?)? onSaved;
+  final bool enabled;
+  final FocusNode? focusNode;
 
   @override
-  Widget build(BuildContext context) {
-    return CustomTextField(
+  Widget build(BuildContext context) => CustomTextField(
       label: label,
       hint: 'Enter your phone number',
       controller: controller,
@@ -360,16 +347,9 @@ class PhoneTextField extends StatelessWidget {
         FilteringTextInputFormatter.allow(RegExp(r'[\d\s\-\(\)\+]')),
       ],
     );
-  }
 }
 
 class SearchTextField extends StatelessWidget {
-  final String? hint;
-  final TextEditingController? controller;
-  final void Function(String)? onChanged;
-  final void Function()? onClear;
-  final bool enabled;
-  final FocusNode? focusNode;
 
   const SearchTextField({
     Key? key,
@@ -380,10 +360,15 @@ class SearchTextField extends StatelessWidget {
     this.enabled = true,
     this.focusNode,
   }) : super(key: key);
+  final String? hint;
+  final TextEditingController? controller;
+  final void Function(String)? onChanged;
+  final void Function()? onClear;
+  final bool enabled;
+  final FocusNode? focusNode;
 
   @override
-  Widget build(BuildContext context) {
-    return CustomTextField(
+  Widget build(BuildContext context) => CustomTextField(
       hint: hint,
       controller: controller,
       onChanged: onChanged,
@@ -402,5 +387,4 @@ class SearchTextField extends StatelessWidget {
             )
           : null,
     );
-  }
 }

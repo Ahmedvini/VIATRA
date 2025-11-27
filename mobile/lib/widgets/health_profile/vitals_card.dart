@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import '../../models/health_profile_model.dart';
 
 class VitalsCard extends StatelessWidget {
-  final HealthProfile healthProfile;
 
   const VitalsCard({
     Key? key,
     required this.healthProfile,
   }) : super(key: key);
+  final HealthProfile healthProfile;
 
   @override
   Widget build(BuildContext context) {

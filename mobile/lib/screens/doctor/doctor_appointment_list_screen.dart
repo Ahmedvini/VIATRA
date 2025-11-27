@@ -96,8 +96,7 @@ class _DoctorAppointmentListScreenState extends State<DoctorAppointmentListScree
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(
         title: const Text('My Appointments'),
         actions: [
@@ -182,5 +181,4 @@ class _DoctorAppointmentListScreenState extends State<DoctorAppointmentListScree
         },
       ),
     );
-  }
 }

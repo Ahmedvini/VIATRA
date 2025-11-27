@@ -5,12 +5,12 @@ import '../../utils/validators.dart';
 
 /// Screen for adding or editing an allergy
 class AllergyFormScreen extends StatefulWidget {
-  final Map<String, dynamic>? existingAllergy;
 
   const AllergyFormScreen({
     super.key,
     this.existingAllergy,
   });
+  final Map<String, dynamic>? existingAllergy;
 
   @override
   State<AllergyFormScreen> createState() => _AllergyFormScreenState();
@@ -112,8 +112,7 @@ class _AllergyFormScreenState extends State<AllergyFormScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(
         title: Text(
           widget.existingAllergy == null 
@@ -314,10 +313,8 @@ class _AllergyFormScreenState extends State<AllergyFormScreen> {
         ),
       ),
     );
-  }
 
-  Widget _buildSeverityInfo(String title, String description) {
-    return Padding(
+  Widget _buildSeverityInfo(String title, String description) => Padding(
       padding: const EdgeInsets.only(left: 24, top: 4),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -340,5 +337,4 @@ class _AllergyFormScreenState extends State<AllergyFormScreen> {
         ],
       ),
     );
-  }
 }

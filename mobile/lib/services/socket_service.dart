@@ -6,9 +6,9 @@ import '../models/user_model.dart';
 
 /// Service for managing Socket.io WebSocket connections
 class SocketService {
-  static final SocketService _instance = SocketService._internal();
   factory SocketService() => _instance;
   SocketService._internal();
+  static final SocketService _instance = SocketService._internal();
 
   IO.Socket? _socket;
   String? _currentUserId;

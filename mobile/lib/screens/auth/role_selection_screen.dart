@@ -121,12 +121,6 @@ class RoleSelectionScreen extends StatelessWidget {
 }
 
 class _RoleCard extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final IconData icon;
-  final List<String> features;
-  final UserRole role;
-  final Color color;
 
   const _RoleCard({
     Key? key,
@@ -137,6 +131,12 @@ class _RoleCard extends StatelessWidget {
     required this.role,
     required this.color,
   }) : super(key: key);
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final List<String> features;
+  final UserRole role;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
@@ -144,8 +144,7 @@ class _RoleCard extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return Consumer<RegistrationProvider>(
-      builder: (context, registrationProvider, child) {
-        return GestureDetector(
+      builder: (context, registrationProvider, child) => GestureDetector(
           onTap: () => _selectRole(context, registrationProvider),
           child: Container(
             width: double.infinity,
@@ -263,8 +262,7 @@ class _RoleCard extends StatelessWidget {
               ],
             ),
           ),
-        );
-      },
+        ),
     );
   }
 
@@ -277,12 +275,12 @@ class _RoleCard extends StatelessWidget {
 
 // Alternative minimal role selection for quick setup
 class MinimalRoleSelection extends StatelessWidget {
-  final void Function(UserRole role)? onRoleSelected;
 
   const MinimalRoleSelection({
     Key? key,
     this.onRoleSelected,
   }) : super(key: key);
+  final void Function(UserRole role)? onRoleSelected;
 
   @override
   Widget build(BuildContext context) {

@@ -15,10 +15,6 @@ enum DoctorSearchState {
 }
 
 class CachedSearchResult {
-  final List<Doctor> doctors;
-  final int totalPages;
-  final int totalResults;
-  final DateTime timestamp;
 
   CachedSearchResult({
     required this.doctors,
@@ -26,22 +22,6 @@ class CachedSearchResult {
     required this.totalResults,
     required this.timestamp,
   });
-
-  bool get isExpired {
-    final now = DateTime.now();
-    final diff = now.difference(timestamp);
-    return diff.inMinutes >= DoctorSearchConstants.cacheExpirationMinutes;
-  }
-
-  /// Convert to JSON for storage
-  Map<String, dynamic> toJson() {
-    return {
-      'doctors': doctors.map((d) => d.toJson()).toList(),
-      'totalPages': totalPages,
-      'totalResults': totalResults,
-      'timestamp': timestamp.toIso8601String(),
-    };
-  }
 
   /// Create from JSON from storage
   factory CachedSearchResult.fromJson(Map<String, dynamic> json) {
@@ -54,9 +34,35 @@ class CachedSearchResult {
       timestamp: DateTime.parse(json['timestamp'] as String),
     );
   }
+  final List<Doctor> doctors;
+  final int totalPages;
+  final int totalResults;
+  final DateTime timestamp;
+
+  bool get isExpired {
+    final now = DateTime.now();
+    final diff = now.difference(timestamp);
+    return diff.inMinutes >= DoctorSearchConstants.cacheExpirationMinutes;
+  }
+
+  /// Convert to JSON for storage
+  Map<String, dynamic> toJson() => {
+      'doctors': doctors.map((d) => d.toJson()).toList(),
+      'totalPages': totalPages,
+      'totalResults': totalResults,
+      'timestamp': timestamp.toIso8601String(),
+    };
 }
 
 class DoctorSearchProvider extends ChangeNotifier {
+
+  DoctorSearchProvider({
+    required DoctorService doctorService,
+    required StorageService storageService,
+  })  : _doctorService = doctorService,
+        _storageService = storageService {
+    _loadFromStorage();
+  }
   final DoctorService _doctorService;
   final StorageService _storageService;
 
@@ -68,14 +74,6 @@ class DoctorSearchProvider extends ChangeNotifier {
   int _totalResults = 0;
   String? _errorMessage;
   final Map<String, CachedSearchResult> _cachedResults = {};
-
-  DoctorSearchProvider({
-    required DoctorService doctorService,
-    required StorageService storageService,
-  })  : _doctorService = doctorService,
-        _storageService = storageService {
-    _loadFromStorage();
-  }
 
   /// Load cached results from storage on initialization
   Future<void> _loadFromStorage() async {
@@ -120,9 +118,7 @@ class DoctorSearchProvider extends ChangeNotifier {
   bool get isLoadingMore => _state == DoctorSearchState.loadingMore;
 
   /// Generate cache key from filter
-  String _getCacheKey() {
-    return json.encode(_filter.toJson());
-  }
+  String _getCacheKey() => json.encode(_filter.toJson());
 
   /// Check cache for results
   CachedSearchResult? _getCachedResults() {
@@ -159,7 +155,7 @@ class DoctorSearchProvider extends ChangeNotifier {
       await _storageService.setCacheData(
         'doctor_search_$key',
         cachedResult.toJson(),
-        ttl: Duration(minutes: DoctorSearchConstants.cacheTTLMinutes),
+        ttl: const Duration(minutes: DoctorSearchConstants.cacheTTLMinutes),
       );
     } catch (e) {
       // Silently fail if storage fails, in-memory cache still works

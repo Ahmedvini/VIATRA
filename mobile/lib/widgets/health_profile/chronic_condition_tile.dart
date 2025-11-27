@@ -3,9 +3,6 @@ import '../../models/health_profile_model.dart';
 
 /// Widget for displaying a chronic condition in a tile format
 class ChronicConditionTile extends StatelessWidget {
-  final ChronicCondition condition;
-  final VoidCallback? onTap;
-  final VoidCallback? onDelete;
 
   const ChronicConditionTile({
     super.key,
@@ -13,6 +10,9 @@ class ChronicConditionTile extends StatelessWidget {
     this.onTap,
     this.onDelete,
   });
+  final ChronicCondition condition;
+  final VoidCallback? onTap;
+  final VoidCallback? onDelete;
 
   Color _getSeverityColor() {
     switch (condition.severity.toLowerCase()) {

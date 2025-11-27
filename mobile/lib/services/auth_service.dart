@@ -3,9 +3,9 @@ import '../models/auth_response_model.dart';
 import '../models/user_model.dart';
 
 class AuthService {
-  final ApiService _apiService;
 
   AuthService(this._apiService);
+  final ApiService _apiService;
 
   /// Register a new user
   Future<ApiResponse<AuthResponse>> register(Map<String, dynamic> userData) async {

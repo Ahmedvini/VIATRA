@@ -3,14 +3,14 @@ import 'package:intl/intl.dart';
 import '../../models/appointment_model.dart';
 
 class DoctorAppointmentCard extends StatelessWidget {
-  final Appointment appointment;
-  final VoidCallback? onTap;
 
   const DoctorAppointmentCard({
     super.key,
     required this.appointment,
     this.onTap,
   });
+  final Appointment appointment;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {

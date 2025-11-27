@@ -1,25 +1,4 @@
 class HealthProfile {
-  final String id;
-  final String patientId;
-  final String? bloodType;
-  final double? height;
-  final double? weight;
-  final int? bloodPressureSystolic;
-  final int? bloodPressureDiastolic;
-  final int? heartRate;
-  final double? bloodGlucose;
-  final int? oxygenSaturation;
-  final List<Allergy> allergies;
-  final List<ChronicCondition> chronicConditions;
-  final List<Medication> currentMedications;
-  final List<String> familyHistory;
-  final Lifestyle? lifestyle;
-  final EmergencyContact? emergencyContact;
-  final String? preferredPharmacy;
-  final Insurance? insurance;
-  final String? notes;
-  final DateTime createdAt;
-  final DateTime updatedAt;
 
   HealthProfile({
     required this.id,
@@ -104,9 +83,29 @@ class HealthProfile {
           json['updated_at'] ?? json['updatedAt'] ?? DateTime.now().toIso8601String()),
     );
   }
+  final String id;
+  final String patientId;
+  final String? bloodType;
+  final double? height;
+  final double? weight;
+  final int? bloodPressureSystolic;
+  final int? bloodPressureDiastolic;
+  final int? heartRate;
+  final double? bloodGlucose;
+  final int? oxygenSaturation;
+  final List<Allergy> allergies;
+  final List<ChronicCondition> chronicConditions;
+  final List<Medication> currentMedications;
+  final List<String> familyHistory;
+  final Lifestyle? lifestyle;
+  final EmergencyContact? emergencyContact;
+  final String? preferredPharmacy;
+  final Insurance? insurance;
+  final String? notes;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
-  Map<String, dynamic> toJson() {
-    return {
+  Map<String, dynamic> toJson() => {
       'id': id,
       'patientId': patientId,
       'bloodType': bloodType,
@@ -132,7 +131,6 @@ class HealthProfile {
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
     };
-  }
 
   HealthProfile copyWith({
     String? id,
@@ -156,8 +154,7 @@ class HealthProfile {
     String? notes,
     DateTime? createdAt,
     DateTime? updatedAt,
-  }) {
-    return HealthProfile(
+  }) => HealthProfile(
       id: id ?? this.id,
       patientId: patientId ?? this.patientId,
       bloodType: bloodType ?? this.bloodType,
@@ -180,7 +177,6 @@ class HealthProfile {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
-  }
 
   double? calculateBMI() {
     if (height == null || weight == null || height! <= 0) {
@@ -199,22 +195,14 @@ class HealthProfile {
     return 'Obese';
   }
 
-  bool hasAllergy(String allergen) {
-    return allergies.any((a) =>
+  bool hasAllergy(String allergen) => allergies.any((a) =>
         a.allergen.toLowerCase().contains(allergen.toLowerCase()));
-  }
 
-  bool hasChronicCondition(String name) {
-    return chronicConditions
+  bool hasChronicCondition(String name) => chronicConditions
         .any((c) => c.name.toLowerCase().contains(name.toLowerCase()));
-  }
 }
 
 class Allergy {
-  final String allergen;
-  final String severity;
-  final String? notes;
-  final DateTime dateAdded;
 
   Allergy({
     required this.allergen,
@@ -233,24 +221,20 @@ class Allergy {
           : DateTime.now(),
     );
   }
+  final String allergen;
+  final String severity;
+  final String? notes;
+  final DateTime dateAdded;
 
-  Map<String, dynamic> toJson() {
-    return {
+  Map<String, dynamic> toJson() => {
       'allergen': allergen,
       'severity': severity,
       'notes': notes,
       'dateAdded': dateAdded.toIso8601String(),
     };
-  }
 }
 
 class ChronicCondition {
-  final String id;
-  final String name;
-  final DateTime? diagnosedDate;
-  final String severity;
-  final List<String> medications;
-  final String? notes;
 
   ChronicCondition({
     String? id,
@@ -276,9 +260,14 @@ class ChronicCondition {
       notes: json['notes'],
     );
   }
+  final String id;
+  final String name;
+  final DateTime? diagnosedDate;
+  final String severity;
+  final List<String> medications;
+  final String? notes;
 
-  Map<String, dynamic> toJson() {
-    return {
+  Map<String, dynamic> toJson() => {
       'id': id,
       'name': name,
       'diagnosedDate': diagnosedDate?.toIso8601String(),
@@ -286,16 +275,9 @@ class ChronicCondition {
       'medications': medications,
       'notes': notes,
     };
-  }
 }
 
 class Medication {
-  final String name;
-  final String? dosage;
-  final String? frequency;
-  final DateTime? startDate;
-  final DateTime? endDate;
-  final String? prescribedBy;
 
   Medication({
     required this.name,
@@ -320,9 +302,14 @@ class Medication {
       prescribedBy: json['prescribed_by'] ?? json['prescribedBy'],
     );
   }
+  final String name;
+  final String? dosage;
+  final String? frequency;
+  final DateTime? startDate;
+  final DateTime? endDate;
+  final String? prescribedBy;
 
-  Map<String, dynamic> toJson() {
-    return {
+  Map<String, dynamic> toJson() => {
       'name': name,
       'dosage': dosage,
       'frequency': frequency,
@@ -330,14 +317,9 @@ class Medication {
       'endDate': endDate?.toIso8601String(),
       'prescribedBy': prescribedBy,
     };
-  }
 }
 
 class Lifestyle {
-  final String? smoking;
-  final String? alcohol;
-  final String? exerciseFrequency;
-  final String? diet;
 
   Lifestyle({
     this.smoking,
@@ -354,50 +336,48 @@ class Lifestyle {
       diet: json['diet'],
     );
   }
+  final String? smoking;
+  final String? alcohol;
+  final String? exerciseFrequency;
+  final String? diet;
 
-  Map<String, dynamic> toJson() {
-    return {
+  Map<String, dynamic> toJson() => {
       'smoking': smoking,
       'alcohol': alcohol,
       'exerciseFrequency': exerciseFrequency,
       'diet': diet,
     };
-  }
 }
 
 class EmergencyContact {
-  final String? name;
-  final String? phone;
-  final String? relationship;
 
   EmergencyContact({
     this.name,
     this.phone,
     this.relationship,
   });
+  final String? name;
+  final String? phone;
+  final String? relationship;
 
-  Map<String, dynamic> toJson() {
-    return {
+  Map<String, dynamic> toJson() => {
       'name': name,
       'phone': phone,
       'relationship': relationship,
     };
-  }
 }
 
 class Insurance {
-  final String? provider;
-  final String? insuranceId;
 
   Insurance({
     this.provider,
     this.insuranceId,
   });
+  final String? provider;
+  final String? insuranceId;
 
-  Map<String, dynamic> toJson() {
-    return {
+  Map<String, dynamic> toJson() => {
       'provider': provider,
       'insuranceId': insuranceId,
     };
-  }
 }

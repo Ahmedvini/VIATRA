@@ -72,8 +72,7 @@ class ViatraApp extends StatelessWidget {
   const ViatraApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MultiProvider(
+  Widget build(BuildContext context) => MultiProvider(
       providers: [
         // Core services
         Provider<ApiService>(
@@ -223,7 +222,6 @@ class ViatraApp extends StatelessWidget {
         },
       ),
     );
-  }
 }
 
 /// Global error handler for uncaught exceptions

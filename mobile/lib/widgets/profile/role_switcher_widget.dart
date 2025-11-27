@@ -4,9 +4,6 @@ import '../../config/theme.dart';
 
 /// Reusable role switcher widget
 class RoleSwitcherWidget extends StatelessWidget {
-  final List<UserRole> availableRoles;
-  final UserRole activeRole;
-  final Function(UserRole) onRoleChanged;
 
   const RoleSwitcherWidget({
     super.key,
@@ -14,10 +11,12 @@ class RoleSwitcherWidget extends StatelessWidget {
     required this.activeRole,
     required this.onRoleChanged,
   });
+  final List<UserRole> availableRoles;
+  final UserRole activeRole;
+  final Function(UserRole) onRoleChanged;
 
   @override
-  Widget build(BuildContext context) {
-    return Card(
+  Widget build(BuildContext context) => Card(
       elevation: 2,
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -43,7 +42,6 @@ class RoleSwitcherWidget extends StatelessWidget {
         ),
       ),
     );
-  }
 
   Widget _buildRoleChip(BuildContext context, UserRole role, bool isActive) {
     final icon = _getRoleIcon(role);

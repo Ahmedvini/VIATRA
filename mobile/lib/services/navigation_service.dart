@@ -3,9 +3,9 @@ import 'package:go_router/go_router.dart';
 
 /// Navigation service for centralized navigation management
 class NavigationService {
-  static final NavigationService _instance = NavigationService._internal();
   factory NavigationService() => _instance;
   NavigationService._internal();
+  static final NavigationService _instance = NavigationService._internal();
 
   /// Global navigator key for accessing navigation context
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();

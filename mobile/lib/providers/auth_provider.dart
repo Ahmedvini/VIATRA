@@ -16,6 +16,16 @@ enum AuthState {
 
 /// Authentication provider for managing user state
 class AuthProvider extends ChangeNotifier {
+
+  AuthProvider({
+    required AuthService authService,
+    required StorageService storageService,
+    required ApiService apiService,
+  })  : _authService = authService,
+        _storageService = storageService,
+        _apiService = apiService {
+    _initialize();
+  }
   final AuthService _authService;
   final StorageService _storageService;
   final ApiService _apiService;
@@ -27,16 +37,6 @@ class AuthProvider extends ChangeNotifier {
   String? _refreshToken;
   AuthResponse? _lastAuthResponse;
   UserRole? _activeRole;
-
-  AuthProvider({
-    required AuthService authService,
-    required StorageService storageService,
-    required ApiService apiService,
-  })  : _authService = authService,
-        _storageService = storageService,
-        _apiService = apiService {
-    _initialize();
-  }
 
   // Getters
   AuthState get state => _state;

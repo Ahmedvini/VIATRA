@@ -6,12 +6,12 @@ import '../../utils/validators.dart';
 
 /// Screen for editing the user's health profile
 class HealthProfileEditScreen extends StatefulWidget {
-  final HealthProfile? profile;
 
   const HealthProfileEditScreen({
     super.key,
     this.profile,
   });
+  final HealthProfile? profile;
 
   @override
   State<HealthProfileEditScreen> createState() => _HealthProfileEditScreenState();
@@ -150,8 +150,7 @@ class _HealthProfileEditScreenState extends State<HealthProfileEditScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(
         title: Text(widget.profile == null ? 'Create Health Profile' : 'Edit Health Profile'),
         actions: [
@@ -367,15 +366,12 @@ class _HealthProfileEditScreenState extends State<HealthProfileEditScreen> {
         ),
       ),
     );
-  }
 
-  Widget _buildSectionHeader(String title) {
-    return Text(
+  Widget _buildSectionHeader(String title) => Text(
       title,
       style: Theme.of(context).textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.bold,
             color: Theme.of(context).primaryColor,
           ),
     );
-  }
 }

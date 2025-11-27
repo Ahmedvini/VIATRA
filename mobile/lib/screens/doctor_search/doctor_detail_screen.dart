@@ -5,12 +5,12 @@ import '../../services/doctor_service.dart';
 import '../appointments/time_slot_selection_screen.dart';
 
 class DoctorDetailScreen extends StatefulWidget {
-  final String doctorId;
 
   const DoctorDetailScreen({
     Key? key,
     required this.doctorId,
   }) : super(key: key);
+  final String doctorId;
 
   @override
   State<DoctorDetailScreen> createState() => _DoctorDetailScreenState();
@@ -433,8 +433,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
     );
   }
 
-  Widget _buildInfoRow(IconData icon, String text, {IconData? actionIcon}) {
-    return Row(
+  Widget _buildInfoRow(IconData icon, String text, {IconData? actionIcon}) => Row(
       children: [
         Icon(icon, size: 16, color: Colors.grey.shade600),
         const SizedBox(width: 8),
@@ -445,7 +444,6 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
           Icon(actionIcon, size: 16, color: Colors.grey.shade600),
       ],
     );
-  }
 
   List<Widget> _buildWorkingHours(Map<String, dynamic> workingHours) {
     final days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
@@ -456,7 +454,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
       final label = dayLabels[index];
       final hours = workingHours[day];
       
-      String hoursText = 'Closed';
+      var hoursText = 'Closed';
       if (hours != null && hours is Map && hours['open'] != null) {
         hoursText = '${hours['open']} - ${hours['close']}';
       }
@@ -482,8 +480,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
     });
   }
 
-  Widget _buildBadge(String label, IconData icon, Color color) {
-    return Container(
+  Widget _buildBadge(String label, IconData icon, Color color) => Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
@@ -505,7 +502,6 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
         ],
       ),
     );
-  }
 
   String _getInitials(String name) {
     if (name.isEmpty) return 'D';

@@ -3,9 +3,6 @@ import '../../models/health_profile_model.dart';
 
 /// Widget for displaying an allergy in a tile format
 class AllergyTile extends StatelessWidget {
-  final Allergy allergy;
-  final VoidCallback? onTap;
-  final VoidCallback? onDelete;
 
   const AllergyTile({
     super.key,
@@ -13,6 +10,9 @@ class AllergyTile extends StatelessWidget {
     this.onTap,
     this.onDelete,
   });
+  final Allergy allergy;
+  final VoidCallback? onTap;
+  final VoidCallback? onDelete;
 
   Color _getSeverityColor() {
     switch (allergy.severity.toLowerCase()) {

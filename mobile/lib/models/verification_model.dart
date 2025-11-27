@@ -1,15 +1,6 @@
 enum VerificationStatus { pending, approved, rejected, notSubmitted }
 
 class Verification {
-  final String id;
-  final String userId;
-  final String documentType;  // Changed from enum to String
-  final String? documentUrl;
-  final VerificationStatus status;
-  final DateTime submittedAt;
-  final DateTime? reviewedAt;
-  final String? reviewedBy;
-  final String? comments;
 
   Verification({
     required this.id,
@@ -35,10 +26,21 @@ class Verification {
       reviewedBy: json['reviewedBy'] ?? json['reviewed_by'],
       comments: json['comments'] ?? json['admin_notes'],
     );
-  }
+  } VerificationStatus.rejected:
+       VerificationStatus.rejected:
+        return 'rejected'; VerificationStatus.notSubmitted:
+        return 'not_submitted';
+  final String id;
+  final String userId;
+  final String documentType;  // Changed from enum to String
+  final String? documentUrl;
+  final VerificationStatus status;
+  final DateTime submittedAt;
+  final DateTime? reviewedAt;
+  final String? reviewedBy;
+  final String? comments;
 
-  Map<String, dynamic> toJson() {
-    return {
+  Map<String, dynamic> toJson() => {
       'id': id,
       'userId': userId,
       'documentType': documentType,
@@ -49,7 +51,6 @@ class Verification {
       'reviewedBy': reviewedBy,
       'comments': comments,
     };
-  }
 
   Verification copyWith({
     String? id,
@@ -61,8 +62,7 @@ class Verification {
     DateTime? reviewedAt,
     String? reviewedBy,
     String? comments,
-  }) {
-    return Verification(
+  }) => Verification(
       id: id ?? this.id,
       userId: userId ?? this.userId,
       documentType: documentType ?? this.documentType,
@@ -73,7 +73,6 @@ class Verification {
       reviewedBy: reviewedBy ?? this.reviewedBy,
       comments: comments ?? this.comments,
     );
-  }
 
   String get statusDisplayText {
     switch (status) {
@@ -122,15 +121,12 @@ class Verification {
         return 'not_submitted';
     }
   }
-      case VerificationStatus.rejected:
-      case VerificationStatus.rejected:
-        return 'rejected';
-      case VerificationStatus.notSubmitted:
-        return 'not_submitted';
+      casecase
+      case
     }
   }
 
-  static DateTime _parseDateTime(dynamic dateTime) {
+  DateTime _parseDateTime(dynamic dateTime) {
     if (dateTime == null) return DateTime.now();
     if (dateTime is DateTime) return dateTime;
     if (dateTime is String) {
@@ -144,9 +140,7 @@ class Verification {
   }
 
   @override
-  String toString() {
-    return 'Verification(id: $id, type: $documentType, status: $status)';
-  }
+  String toString() => 'Verification(id: $id, type: $documentType, status: $status)';
 
   @override
   bool operator ==(Object other) {

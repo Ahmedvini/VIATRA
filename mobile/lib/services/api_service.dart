@@ -5,11 +5,6 @@ import '../config/app_config.dart';
 
 /// HTTP response wrapper
 class ApiResponse<T> {
-  final bool success;
-  final T? data;
-  final String? message;
-  final int? statusCode;
-  final Map<String, dynamic>? error;
 
   ApiResponse({
     required this.success,
@@ -36,18 +31,23 @@ class ApiResponse<T> {
       error: error,
     );
   }
+  final bool success;
+  final T? data;
+  final String? message;
+  final int? statusCode;
+  final Map<String, dynamic>? error;
 }
 
 /// API service for handling HTTP requests
 class ApiService {
-  late final http.Client _client;
-  late final String _baseUrl;
-  String? _accessToken;
 
   ApiService() {
     _client = http.Client();
     _baseUrl = AppConfig.apiBaseUrl;
   }
+  late final http.Client _client;
+  late final String _baseUrl;
+  String? _accessToken;
 
   /// Set authentication token
   void setAccessToken(String? token) {
@@ -206,7 +206,7 @@ class ApiService {
   /// Handle HTTP response
   ApiResponse<T> _handleResponse<T>(http.Response response) {
     try {
-      final Map<String, dynamic> responseData = response.body.isNotEmpty
+      final responseData = response.body.isNotEmpty
           ? jsonDecode(response.body) as Map<String, dynamic>
           : {};
 
@@ -242,9 +242,7 @@ class ApiService {
   }
 
   /// Health check
-  Future<ApiResponse<Map<String, dynamic>>> healthCheck() async {
-    return get<Map<String, dynamic>>('/health');
-  }
+  Future<ApiResponse<Map<String, dynamic>>> healthCheck() async => get<Map<String, dynamic>>('/health');
 
   /// Dispose resources
   void dispose() {

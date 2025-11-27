@@ -1,38 +1,4 @@
 class Doctor {
-  final String id;
-  final String userId;
-  final String licenseNumber;
-  final String specialty;
-  final String? subSpecialty;
-  final String title;
-  final String? npiNumber;
-  final String? deaNumber;
-  final int? yearsOfExperience;
-  final String? bio;
-  final String? education;
-  final List<String>? certifications;
-  final double? consultationFee;
-  final List<String>? availableSchedule;
-  final List<String>? languagesSpoken;
-  final bool? telehealthEnabled;
-  final bool? isAcceptingPatients;
-  final String? officeAddressLine1;
-  final String? officeAddressLine2;
-  final String? officeCity;
-  final String? officeState;
-  final String? officeZipCode;
-  final String? officePhone;
-  final Map<String, dynamic>? workingHours;
-  final double? rating;
-  final int? totalReviews;
-  final bool isVerified;
-  final String? firstName;
-  final String? lastName;
-  final String? email;
-  final String? phone;
-  final String? profileImage;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
 
   Doctor({
     required this.id,
@@ -130,9 +96,42 @@ class Doctor {
               : null,
     );
   }
+  final String id;
+  final String userId;
+  final String licenseNumber;
+  final String specialty;
+  final String? subSpecialty;
+  final String title;
+  final String? npiNumber;
+  final String? deaNumber;
+  final int? yearsOfExperience;
+  final String? bio;
+  final String? education;
+  final List<String>? certifications;
+  final double? consultationFee;
+  final List<String>? availableSchedule;
+  final List<String>? languagesSpoken;
+  final bool? telehealthEnabled;
+  final bool? isAcceptingPatients;
+  final String? officeAddressLine1;
+  final String? officeAddressLine2;
+  final String? officeCity;
+  final String? officeState;
+  final String? officeZipCode;
+  final String? officePhone;
+  final Map<String, dynamic>? workingHours;
+  final double? rating;
+  final int? totalReviews;
+  final bool isVerified;
+  final String? firstName;
+  final String? lastName;
+  final String? email;
+  final String? phone;
+  final String? profileImage;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
 
-  Map<String, dynamic> toJson() {
-    return {
+  Map<String, dynamic> toJson() => {
       'id': id,
       'userId': userId,
       'licenseNumber': licenseNumber,
@@ -168,7 +167,6 @@ class Doctor {
       'createdAt': createdAt?.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
     };
-  }
 
   Doctor copyWith({
     String? id,
@@ -205,8 +203,7 @@ class Doctor {
     String? profileImage,
     DateTime? createdAt,
     DateTime? updatedAt,
-  }) {
-    return Doctor(
+  }) => Doctor(
       id: id ?? this.id,
       userId: userId ?? this.userId,
       licenseNumber: licenseNumber ?? this.licenseNumber,
@@ -242,7 +239,6 @@ class Doctor {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
-  }
 
   String get fullName {
     final first = firstName ?? '';
@@ -281,9 +277,7 @@ class Doctor {
   }
 
   @override
-  String toString() {
-    return 'Doctor(id: $id, licenseNumber: $licenseNumber, specialty: $specialty, isVerified: $isVerified)';
-  }
+  String toString() => 'Doctor(id: $id, licenseNumber: $licenseNumber, specialty: $specialty, isVerified: $isVerified)';
 
   @override
   bool operator ==(Object other) {

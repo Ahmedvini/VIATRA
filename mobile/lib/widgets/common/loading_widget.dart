@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class LoadingWidget extends StatelessWidget {
-  final String? message;
-  final double size;
-  final Color? color;
 
   const LoadingWidget({
     super.key,
@@ -12,6 +9,9 @@ class LoadingWidget extends StatelessWidget {
     this.size = 40.0,
     this.color,
   });
+  final String? message;
+  final double size;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -59,9 +59,6 @@ class LoadingWidget extends StatelessWidget {
 }
 
 class LoadingOverlay extends StatelessWidget {
-  final bool isLoading;
-  final Widget child;
-  final String? message;
 
   const LoadingOverlay({
     super.key,
@@ -69,10 +66,12 @@ class LoadingOverlay extends StatelessWidget {
     required this.child,
     this.message,
   });
+  final bool isLoading;
+  final Widget child;
+  final String? message;
 
   @override
-  Widget build(BuildContext context) {
-    return Stack(
+  Widget build(BuildContext context) => Stack(
       children: [
         child,
         if (isLoading)
@@ -82,20 +81,18 @@ class LoadingOverlay extends StatelessWidget {
           ),
       ],
     );
-  }
 }
 
 class SmallLoadingIndicator extends StatelessWidget {
-  final Color? color;
 
   const SmallLoadingIndicator({
     super.key,
     this.color,
   });
+  final Color? color;
 
   @override
-  Widget build(BuildContext context) {
-    return SizedBox(
+  Widget build(BuildContext context) => SizedBox(
       width: 20,
       height: 20,
       child: CircularProgressIndicator(
@@ -105,5 +102,4 @@ class SmallLoadingIndicator extends StatelessWidget {
         strokeWidth: 2.0,
       ),
     );
-  }
 }

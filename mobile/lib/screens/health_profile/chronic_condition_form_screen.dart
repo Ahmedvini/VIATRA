@@ -5,14 +5,14 @@ import '../../utils/validators.dart';
 
 /// Screen for adding or editing a chronic condition
 class ChronicConditionFormScreen extends StatefulWidget {
-  final String? existingCondition;
-  final int? conditionIndex;
 
   const ChronicConditionFormScreen({
     super.key,
     this.existingCondition,
     this.conditionIndex,
   });
+  final String? existingCondition;
+  final int? conditionIndex;
 
   @override
   State<ChronicConditionFormScreen> createState() => _ChronicConditionFormScreenState();
@@ -88,8 +88,7 @@ class _ChronicConditionFormScreenState extends State<ChronicConditionFormScreen>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(
         title: Text(
           widget.existingCondition == null 
@@ -214,5 +213,4 @@ class _ChronicConditionFormScreenState extends State<ChronicConditionFormScreen>
         ),
       ),
     );
-  }
 }

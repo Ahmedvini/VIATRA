@@ -6,6 +6,53 @@ part 'message_model.g.dart';
 /// Represents a message in a conversation
 @JsonSerializable(explicitToJson: true)
 class Message {
+
+  Message({
+    required this.id,
+    required this.conversationId,
+    required this.senderId,
+    this.parentMessageId,
+    required this.messageType,
+    this.content,
+    this.metadata,
+    this.readBy = const [],
+    this.deliveredTo = const [],
+    this.isEdited = false,
+    this.isDeleted = false,
+    required this.createdAt,
+    required this.updatedAt,
+    this.sender,
+    this.isPending = false,
+    this.isFailed = false,
+  });
+
+  /// Creates a Message from JSON
+  factory Message.fromJson(Map<String, dynamic> json) =>
+      _$MessageFromJson(json);
+
+  /// Creates a temporary message for optimistic updates
+  factory Message.pending({
+    required String conversationId,
+    required String senderId,
+    required String messageType,
+    String? content,
+    Map<String, dynamic>? metadata,
+    String? parentMessageId,
+  }) {
+    final now = DateTime.now();
+    return Message(
+      id: 'pending_${now.millisecondsSinceEpoch}',
+      conversationId: conversationId,
+      senderId: senderId,
+      messageType: messageType,
+      content: content,
+      metadata: metadata,
+      parentMessageId: parentMessageId,
+      createdAt: now,
+      updatedAt: now,
+      isPending: true,
+    );
+  }
   final String id;
   
   @JsonKey(name: 'conversation_id')
@@ -52,29 +99,6 @@ class Message {
   @JsonKey(includeFromJson: false, includeToJson: false)
   final bool isFailed;
 
-  Message({
-    required this.id,
-    required this.conversationId,
-    required this.senderId,
-    this.parentMessageId,
-    required this.messageType,
-    this.content,
-    this.metadata,
-    this.readBy = const [],
-    this.deliveredTo = const [],
-    this.isEdited = false,
-    this.isDeleted = false,
-    required this.createdAt,
-    required this.updatedAt,
-    this.sender,
-    this.isPending = false,
-    this.isFailed = false,
-  });
-
-  /// Creates a Message from JSON
-  factory Message.fromJson(Map<String, dynamic> json) =>
-      _$MessageFromJson(json);
-
   /// Converts Message to JSON
   Map<String, dynamic> toJson() => _$MessageToJson(this);
 
@@ -96,8 +120,7 @@ class Message {
     User? sender,
     bool? isPending,
     bool? isFailed,
-  }) {
-    return Message(
+  }) => Message(
       id: id ?? this.id,
       conversationId: conversationId ?? this.conversationId,
       senderId: senderId ?? this.senderId,
@@ -115,31 +138,6 @@ class Message {
       isPending: isPending ?? this.isPending,
       isFailed: isFailed ?? this.isFailed,
     );
-  }
-
-  /// Creates a temporary message for optimistic updates
-  factory Message.pending({
-    required String conversationId,
-    required String senderId,
-    required String messageType,
-    String? content,
-    Map<String, dynamic>? metadata,
-    String? parentMessageId,
-  }) {
-    final now = DateTime.now();
-    return Message(
-      id: 'pending_${now.millisecondsSinceEpoch}',
-      conversationId: conversationId,
-      senderId: senderId,
-      messageType: messageType,
-      content: content,
-      metadata: metadata,
-      parentMessageId: parentMessageId,
-      createdAt: now,
-      updatedAt: now,
-      isPending: true,
-    );
-  }
 
   /// Checks if the message was sent by the given user
   bool isSentBy(String userId) => senderId == userId;

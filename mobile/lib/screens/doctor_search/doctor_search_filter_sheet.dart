@@ -83,8 +83,7 @@ class _DoctorSearchFilterSheetState extends State<DoctorSearchFilterSheet> {
       initialChildSize: 0.7,
       minChildSize: 0.5,
       maxChildSize: 0.95,
-      builder: (context, scrollController) {
-        return Container(
+      builder: (context, scrollController) => Container(
           decoration: BoxDecoration(
             color: theme.scaffoldBackgroundColor,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
@@ -319,13 +318,11 @@ class _DoctorSearchFilterSheetState extends State<DoctorSearchFilterSheet> {
               ),
             ],
           ),
-        );
-      },
+        ),
     );
   }
 
-  Widget _buildSectionHeader(String title, IconData icon) {
-    return Row(
+  Widget _buildSectionHeader(String title, IconData icon) => Row(
       children: [
         Icon(icon, size: 20),
         const SizedBox(width: 8),
@@ -337,7 +334,6 @@ class _DoctorSearchFilterSheetState extends State<DoctorSearchFilterSheet> {
         ),
       ],
     );
-  }
 
   void _clearFilters() {
     setState(() {

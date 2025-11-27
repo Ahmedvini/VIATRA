@@ -1061,6 +1061,11 @@
     "description": "Generic loading message"
   },
 
+  "loadingPleaseWait": "Please wait...",
+  "@loadingPleaseWait": {
+    "description": "Loading message asking user to wait"
+  },
+
   "emptyStateNoData": "No data available",
   "@emptyStateNoData": {
     "description": "Generic empty state message"
@@ -1069,6 +1074,26 @@
   "emptyStateNoResults": "No results found",
   "@emptyStateNoResults": {
     "description": "Empty state message when search returns no results"
+  },
+
+  "filterConfirmed": "Confirmed",
+  "@filterConfirmed": {
+    "description": "Confirmed filter option for appointments"
+  },
+
+  "consultationTypeInPerson": "In-Person",
+  "@consultationTypeInPerson": {
+    "description": "In-person consultation type"
+  },
+
+  "consultationTypeVideo": "Video Call",
+  "@consultationTypeVideo": {
+    "description": "Video consultation type"
+  },
+
+  "consultationTypePhone": "Phone Call",
+  "@consultationTypePhone": {
+    "description": "Phone consultation type"
   },
 
   "languageEnglish": "English",

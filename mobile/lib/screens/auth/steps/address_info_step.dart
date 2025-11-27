@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../../../providers/registration_provider.dart';
-import '../../../widgets/common/custom_text_field.dart';
+import '../../../utils/validators.dart';
 import '../../../widgets/common/custom_button.dart';
 import '../../../widgets/common/custom_dropdown.dart';
-import '../../../utils/validators.dart';
+import '../../../widgets/common/custom_text_field.dart';
 
 class AddressInfoStep extends StatefulWidget {
   const AddressInfoStep({Key? key}) : super(key: key);

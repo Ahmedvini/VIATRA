@@ -55,7 +55,7 @@ class Logger {
     final levelName = level.name.toUpperCase();
     
     // Format the log message
-    String logMessage = '[$timestamp] [$levelName] $message';
+    var logMessage = '[$timestamp] [$levelName] $message';
     
     // Add context if provided
     if (context != null && context.isNotEmpty) {
@@ -273,9 +273,7 @@ class Logger {
   }
 
   /// Create a logger for a specific class or module
-  static ModuleLogger module(String moduleName) {
-    return ModuleLogger(moduleName);
-  }
+  static ModuleLogger module(String moduleName) => ModuleLogger(moduleName);
 
   // TODO: Implement external logging service integration
   // static void _sendToExternalService(
@@ -290,9 +288,9 @@ class Logger {
 
 /// Module-specific logger for better organization
 class ModuleLogger {
-  final String _moduleName;
 
   ModuleLogger(this._moduleName);
+  final String _moduleName;
 
   void debug(String message, [Map<String, dynamic>? context]) {
     Logger._log(LogLevel.debug, '[$_moduleName] $message', null, context);

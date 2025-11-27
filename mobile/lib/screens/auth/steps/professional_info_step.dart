@@ -259,8 +259,7 @@ class _ProfessionalInfoStepState extends State<ProfessionalInfoStep> {
     );
   }
 
-  Widget _buildLanguagesSelector(ThemeData theme, ColorScheme colorScheme) {
-    return Column(
+  Widget _buildLanguagesSelector(ThemeData theme, ColorScheme colorScheme) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
@@ -322,5 +321,4 @@ class _ProfessionalInfoStepState extends State<ProfessionalInfoStep> {
           ),
       ],
     );
-  }
 }

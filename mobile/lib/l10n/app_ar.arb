@@ -212,8 +212,13 @@
   "errorInvalidPhone": "يرجى إدخال رقم هاتف صحيح",
   "errorRequiredField": "هذا الحقل مطلوب",
   "loadingMessage": "جاري التحميل...",
+  "loadingPleaseWait": "يرجى الانتظار...",
   "emptyStateNoData": "لا توجد بيانات متاحة",
   "emptyStateNoResults": "لم يتم العثور على نتائج",
+  "filterConfirmed": "مؤكد",
+  "consultationTypeInPerson": "حضوري",
+  "consultationTypeVideo": "مكالمة فيديو",
+  "consultationTypePhone": "مكالمة هاتفية",
   "languageEnglish": "الإنجليزية",
   "languageArabic": "العربية"
 }

@@ -11,6 +11,12 @@ enum HealthProfileState {
 }
 
 class HealthProfileProvider extends ChangeNotifier {
+
+  HealthProfileProvider({
+    required HealthProfileService healthProfileService,
+    required StorageService storageService,
+  })  : _healthProfileService = healthProfileService,
+        _storageService = storageService;
   final HealthProfileService _healthProfileService;
   final StorageService _storageService;
 
@@ -21,12 +27,6 @@ class HealthProfileProvider extends ChangeNotifier {
 
   static const String _cacheKey = 'health_profile_cache';
   static const Duration _cacheDuration = Duration(minutes: 5);
-
-  HealthProfileProvider({
-    required HealthProfileService healthProfileService,
-    required StorageService storageService,
-  })  : _healthProfileService = healthProfileService,
-        _storageService = storageService;
 
   // Getters
   HealthProfileState get state => _state;

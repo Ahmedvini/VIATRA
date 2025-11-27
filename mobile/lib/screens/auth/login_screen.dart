@@ -117,6 +117,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 
                 // Email field
                 EmailTextField(
+                  key: const Key('email_field'),
                   controller: _emailController,
                   validator: Validators.validateEmail,
                 ),
@@ -125,6 +126,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 
                 // Password field
                 PasswordTextField(
+                  key: const Key('password_field'),
                   controller: _passwordController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -169,15 +171,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 
                 // Login button
                 Consumer<AuthProvider>(
-                  builder: (context, authProvider, child) {
-                    return PrimaryButton(
+                  builder: (context, authProvider, child) => PrimaryButton(
+                      key: const Key('login_button'),
                       text: 'Sign In',
                       onPressed: _handleLogin,
                       isLoading: authProvider.isLoading,
                       size: ButtonSize.large,
                       width: double.infinity,
-                    );
-                  },
+                    ),
                 ),
                 
                 const SizedBox(height: 24),

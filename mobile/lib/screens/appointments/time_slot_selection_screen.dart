@@ -7,9 +7,6 @@ import '../../widgets/appointments/time_slot_picker.dart';
 import 'booking_confirmation_screen.dart';
 
 class TimeSlotSelectionScreen extends StatefulWidget {
-  final String doctorId;
-  final String doctorName;
-  final String specialty;
 
   const TimeSlotSelectionScreen({
     Key? key,
@@ -17,6 +14,9 @@ class TimeSlotSelectionScreen extends StatefulWidget {
     required this.doctorName,
     required this.specialty,
   }) : super(key: key);
+  final String doctorId;
+  final String doctorName;
+  final String specialty;
 
   @override
   _TimeSlotSelectionScreenState createState() => _TimeSlotSelectionScreenState();
@@ -67,8 +67,7 @@ class _TimeSlotSelectionScreenState extends State<TimeSlotSelectionScreen> {
       initialDate: _selectedDate,
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 90)),
-      builder: (context, child) {
-        return Theme(
+      builder: (context, child) => Theme(
           data: Theme.of(context).copyWith(
             colorScheme: ColorScheme.light(
               primary: Theme.of(context).primaryColor,
@@ -78,8 +77,7 @@ class _TimeSlotSelectionScreenState extends State<TimeSlotSelectionScreen> {
             ),
           ),
           child: child!,
-        );
-      },
+        ),
     );
 
     if (picked != null && picked != _selectedDate) {
@@ -125,8 +123,7 @@ class _TimeSlotSelectionScreenState extends State<TimeSlotSelectionScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(
         title: const Text('Select Time Slot'),
         elevation: 0,
@@ -399,5 +396,4 @@ class _TimeSlotSelectionScreenState extends State<TimeSlotSelectionScreen> {
         ),
       ),
     );
-  }
 }

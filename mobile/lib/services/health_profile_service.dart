@@ -4,10 +4,6 @@ import '../models/health_profile_model.dart';
 import 'api_service.dart';
 
 class ApiResponse<T> {
-  final bool success;
-  final String? message;
-  final T? data;
-  final dynamic error;
 
   ApiResponse({
     required this.success,
@@ -15,6 +11,10 @@ class ApiResponse<T> {
     this.data,
     this.error,
   });
+  final bool success;
+  final String? message;
+  final T? data;
+  final dynamic error;
 }
 
 class HealthProfileService {

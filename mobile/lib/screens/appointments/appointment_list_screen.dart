@@ -123,8 +123,7 @@ class _AppointmentListScreenState extends State<AppointmentListScreen>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(
         title: const Text('My Appointments'),
         elevation: 0,
@@ -300,5 +299,4 @@ class _AppointmentListScreenState extends State<AppointmentListScreen>
         label: const Text('Book Appointment'),
       ),
     );
-  }
 }

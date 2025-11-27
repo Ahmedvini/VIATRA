@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
 
 class DashboardStatCard extends StatelessWidget {
-  final String title;
-  final int count;
-  final IconData icon;
-  final Color color;
-  final VoidCallback? onTap;
 
   const DashboardStatCard({
     super.key,
@@ -15,10 +10,14 @@ class DashboardStatCard extends StatelessWidget {
     required this.color,
     this.onTap,
   });
+  final String title;
+  final int count;
+  final IconData icon;
+  final Color color;
+  final VoidCallback? onTap;
 
   @override
-  Widget build(BuildContext context) {
-    return Card(
+  Widget build(BuildContext context) => Card(
       elevation: 2,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
@@ -68,5 +67,4 @@ class DashboardStatCard extends StatelessWidget {
         ),
       ),
     );
-  }
 }

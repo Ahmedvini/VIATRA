@@ -20,8 +20,7 @@ class _MainAppShellState extends State<MainAppShell> {
   int _currentIndex = 0;
 
   @override
-  Widget build(BuildContext context) {
-    return Consumer<AuthProvider>(
+  Widget build(BuildContext context) => Consumer<AuthProvider>(
       builder: (context, authProvider, _) {
         final user = authProvider.user;
         final activeRole = authProvider.activeRole ?? UserRole.patient;
@@ -56,7 +55,6 @@ class _MainAppShellState extends State<MainAppShell> {
         );
       },
     );
-  }
 
   /// Build navigation items based on role
   List<BottomNavigationBarItem> _buildNavigationItems(UserRole role) {
@@ -128,8 +126,7 @@ class _MainAppShellState extends State<MainAppShell> {
   }
 
   /// Navigate to doctor search screen
-  Widget _buildDoctorSearchScreen() {
-    return Builder(
+  Widget _buildDoctorSearchScreen() => Builder(
       builder: (context) {
         // Navigate to doctor search on first build
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -140,11 +137,9 @@ class _MainAppShellState extends State<MainAppShell> {
         return const Center(child: CircularProgressIndicator());
       },
     );
-  }
 
   /// Navigate to patient appointments screen
-  Widget _buildPatientAppointmentsScreen() {
-    return Builder(
+  Widget _buildPatientAppointmentsScreen() => Builder(
       builder: (context) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (_currentIndex == 2) {
@@ -154,11 +149,9 @@ class _MainAppShellState extends State<MainAppShell> {
         return const Center(child: CircularProgressIndicator());
       },
     );
-  }
 
   /// Navigate to health profile screen
-  Widget _buildHealthProfileScreen() {
-    return Builder(
+  Widget _buildHealthProfileScreen() => Builder(
       builder: (context) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (_currentIndex == 3) {
@@ -168,11 +161,9 @@ class _MainAppShellState extends State<MainAppShell> {
         return const Center(child: CircularProgressIndicator());
       },
     );
-  }
 
   /// Navigate to doctor appointments screen
-  Widget _buildDoctorAppointmentsScreen() {
-    return Builder(
+  Widget _buildDoctorAppointmentsScreen() => Builder(
       builder: (context) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (_currentIndex == 1) {
@@ -182,11 +173,9 @@ class _MainAppShellState extends State<MainAppShell> {
         return const Center(child: CircularProgressIndicator());
       },
     );
-  }
 
   /// Navigate to chat screen
-  Widget _buildChatScreen() {
-    return Builder(
+  Widget _buildChatScreen() => Builder(
       builder: (context) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (_currentIndex == 2) {
@@ -196,11 +185,9 @@ class _MainAppShellState extends State<MainAppShell> {
         return const Center(child: CircularProgressIndicator());
       },
     );
-  }
 
   /// Placeholder screen for features not yet implemented
-  Widget _buildPlaceholderScreen(String message) {
-    return Center(
+  Widget _buildPlaceholderScreen(String message) => Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -213,7 +200,6 @@ class _MainAppShellState extends State<MainAppShell> {
         ],
       ),
     );
-  }
 
   void _onTabTapped(int index) {
     setState(() {

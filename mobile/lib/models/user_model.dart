@@ -4,21 +4,6 @@ import 'patient_model.dart';
 enum UserRole { patient, doctor, hospital, pharmacy }
 
 class User {
-  final String id;
-  final String email;
-  final String firstName;
-  final String lastName;
-  final String phone;
-  final UserRole role;
-  final bool isActive;
-  final bool emailVerified;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  
-  // Role profile fields
-  final Doctor? doctorProfile;
-  final Patient? patientProfile;
-  final UserRole? activeRole;
 
   User({
     required this.id,
@@ -59,9 +44,23 @@ class User {
           : null,
     );
   }
+  final String id;
+  final String email;
+  final String firstName;
+  final String lastName;
+  final String phone;
+  final UserRole role;
+  final bool isActive;
+  final bool emailVerified;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  
+  // Role profile fields
+  final Doctor? doctorProfile;
+  final Patient? patientProfile;
+  final UserRole? activeRole;
 
-  Map<String, dynamic> toJson() {
-    return {
+  Map<String, dynamic> toJson() => {
       'id': id,
       'email': email,
       'firstName': firstName,
@@ -76,7 +75,6 @@ class User {
       if (patientProfile != null) 'patientProfile': patientProfile!.toJson(),
       if (activeRole != null) 'activeRole': _roleToString(activeRole!),
     };
-  }
 
   User copyWith({
     String? id,
@@ -92,8 +90,7 @@ class User {
     Doctor? doctorProfile,
     Patient? patientProfile,
     UserRole? activeRole,
-  }) {
-    return User(
+  }) => User(
       id: id ?? this.id,
       email: email ?? this.email,
       firstName: firstName ?? this.firstName,
@@ -108,7 +105,6 @@ class User {
       patientProfile: patientProfile ?? this.patientProfile,
       activeRole: activeRole ?? this.activeRole,
     );
-  }
 
   String get fullName => '$firstName $lastName';
 
@@ -126,9 +122,7 @@ class User {
   bool get hasMultipleRoles => availableRoles.length > 1;
 
   /// Check if user can switch to a specific role
-  bool canSwitchToRole(UserRole targetRole) {
-    return availableRoles.contains(targetRole);
-  }
+  bool canSwitchToRole(UserRole targetRole) => availableRoles.contains(targetRole);
 
   /// Get profile for a specific role
   dynamic getProfileForRole(UserRole targetRole) {
@@ -184,9 +178,7 @@ class User {
   }
 
   @override
-  String toString() {
-    return 'User(id: $id, email: $email, fullName: $fullName, role: $role)';
-  }
+  String toString() => 'User(id: $id, email: $email, fullName: $fullName, role: $role)';
 
   @override
   bool operator ==(Object other) {

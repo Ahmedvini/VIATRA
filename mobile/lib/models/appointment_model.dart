@@ -3,30 +3,6 @@ import 'package:intl/intl.dart';
 import 'doctor_model.dart';
 
 class Appointment {
-  final String id;
-  final String patientId;
-  final String doctorId;
-  final String appointmentType; // telehealth, in_person, phone
-  final DateTime scheduledStart;
-  final DateTime scheduledEnd;
-  final DateTime? actualStart;
-  final DateTime? actualEnd;
-  final String status; // scheduled, confirmed, in_progress, completed, cancelled, no_show
-  final String reasonForVisit;
-  final String? chiefComplaint;
-  final bool urgent;
-  final bool? followUpRequired;
-  final String? followUpInstructions;
-  final String? cancellationReason;
-  final String? cancelledBy;
-  final DateTime? cancelledAt;
-  final String? notes;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
-  
-  // Nested objects
-  final Doctor? doctor;
-  final Map<String, dynamic>? patient;
 
   Appointment({
     required this.id,
@@ -52,105 +28,6 @@ class Appointment {
     this.doctor,
     this.patient,
   });
-
-  // Computed properties
-  bool get isUpcoming => scheduledStart.isAfter(DateTime.now());
-  
-  bool get isPast => scheduledEnd.isBefore(DateTime.now());
-  
-  bool get isActive {
-    final now = DateTime.now();
-    return now.isAfter(scheduledStart) && now.isBefore(scheduledEnd);
-  }
-  
-  bool get canBeCancelled {
-    if (status == 'cancelled' || status == 'completed' || status == 'no_show') {
-      return false;
-    }
-    final hoursUntilStart = scheduledStart.difference(DateTime.now()).inHours;
-    return hoursUntilStart >= 2;
-  }
-  
-  bool get canBeRescheduled {
-    if (status == 'cancelled' || status == 'completed' || status == 'no_show') {
-      return false;
-    }
-    final hoursUntilStart = scheduledStart.difference(DateTime.now()).inHours;
-    return hoursUntilStart >= 2;
-  }
-  
-  String get doctorName {
-    return doctor?.displayName ?? doctor?.fullName ?? '';
-  }
-  
-  String get specialty {
-    return doctor?.specialty ?? '';
-  }
-  
-  String get statusLabel {
-    switch (status) {
-      case 'scheduled':
-        return 'Scheduled';
-      case 'confirmed':
-        return 'Confirmed';
-      case 'in_progress':
-        return 'In Progress';
-      case 'completed':
-        return 'Completed';
-      case 'cancelled':
-        return 'Cancelled';
-      case 'no_show':
-        return 'No Show';
-      default:
-        return status;
-    }
-  }
-  
-  int get duration {
-    return scheduledEnd.difference(scheduledStart).inMinutes;
-  }
-  
-  String get formattedDate {
-    return DateFormat('EEEE, MMMM d, yyyy').format(scheduledStart);
-  }
-  
-  String get formattedTime {
-    final start = DateFormat('h:mm a').format(scheduledStart);
-    final end = DateFormat('h:mm a').format(scheduledEnd);
-    return '$start - $end';
-  }
-  
-  Color get statusColor {
-    switch (status) {
-      case 'scheduled':
-        return Colors.blue;
-      case 'confirmed':
-        return Colors.green;
-      case 'in_progress':
-        return Colors.orange;
-      case 'completed':
-        return Colors.grey;
-      case 'cancelled':
-        return Colors.red;
-      case 'no_show':
-        return Colors.red.shade900;
-      default:
-        return Colors.grey;
-    }
-  }
-  
-  IconData get typeIcon {
-    switch (appointmentType) {
-      case 'telehealth':
-        return Icons.videocam;
-      case 'in_person':
-        return Icons.local_hospital;
-      case 'phone':
-        return Icons.phone;
-      default:
-        return Icons.event;
-    }
-  }
 
   factory Appointment.fromJson(Map<String, dynamic> json) {
     return Appointment(
@@ -200,9 +77,123 @@ class Appointment {
       patient: json['patient'] as Map<String, dynamic>?,
     );
   }
+  final String id;
+  final String patientId;
+  final String doctorId;
+  final String appointmentType; // telehealth, in_person, phone
+  final DateTime scheduledStart;
+  final DateTime scheduledEnd;
+  final DateTime? actualStart;
+  final DateTime? actualEnd;
+  final String status; // scheduled, confirmed, in_progress, completed, cancelled, no_show
+  final String reasonForVisit;
+  final String? chiefComplaint;
+  final bool urgent;
+  final bool? followUpRequired;
+  final String? followUpInstructions;
+  final String? cancellationReason;
+  final String? cancelledBy;
+  final DateTime? cancelledAt;
+  final String? notes;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+  
+  // Nested objects
+  final Doctor? doctor;
+  final Map<String, dynamic>? patient;
 
-  Map<String, dynamic> toJson() {
-    return {
+  // Computed properties
+  bool get isUpcoming => scheduledStart.isAfter(DateTime.now());
+  
+  bool get isPast => scheduledEnd.isBefore(DateTime.now());
+  
+  bool get isActive {
+    final now = DateTime.now();
+    return now.isAfter(scheduledStart) && now.isBefore(scheduledEnd);
+  }
+  
+  bool get canBeCancelled {
+    if (status == 'cancelled' || status == 'completed' || status == 'no_show') {
+      return false;
+    }
+    final hoursUntilStart = scheduledStart.difference(DateTime.now()).inHours;
+    return hoursUntilStart >= 2;
+  }
+  
+  bool get canBeRescheduled {
+    if (status == 'cancelled' || status == 'completed' || status == 'no_show') {
+      return false;
+    }
+    final hoursUntilStart = scheduledStart.difference(DateTime.now()).inHours;
+    return hoursUntilStart >= 2;
+  }
+  
+  String get doctorName => doctor?.displayName ?? doctor?.fullName ?? '';
+  
+  String get specialty => doctor?.specialty ?? '';
+  
+  String get statusLabel {
+    switch (status) {
+      case 'scheduled':
+        return 'Scheduled';
+      case 'confirmed':
+        return 'Confirmed';
+      case 'in_progress':
+        return 'In Progress';
+      case 'completed':
+        return 'Completed';
+      case 'cancelled':
+        return 'Cancelled';
+      case 'no_show':
+        return 'No Show';
+      default:
+        return status;
+    }
+  }
+  
+  int get duration => scheduledEnd.difference(scheduledStart).inMinutes;
+  
+  String get formattedDate => DateFormat('EEEE, MMMM d, yyyy').format(scheduledStart);
+  
+  String get formattedTime {
+    final start = DateFormat('h:mm a').format(scheduledStart);
+    final end = DateFormat('h:mm a').format(scheduledEnd);
+    return '$start - $end';
+  }
+  
+  Color get statusColor {
+    switch (status) {
+      case 'scheduled':
+        return Colors.blue;
+      case 'confirmed':
+        return Colors.green;
+      case 'in_progress':
+        return Colors.orange;
+      case 'completed':
+        return Colors.grey;
+      case 'cancelled':
+        return Colors.red;
+      case 'no_show':
+        return Colors.red.shade900;
+      default:
+        return Colors.grey;
+    }
+  }
+  
+  IconData get typeIcon {
+    switch (appointmentType) {
+      case 'telehealth':
+        return Icons.videocam;
+      case 'in_person':
+        return Icons.local_hospital;
+      case 'phone':
+        return Icons.phone;
+      default:
+        return Icons.event;
+    }
+  }
+
+  Map<String, dynamic> toJson() => {
       'id': id,
       'patientId': patientId,
       'doctorId': doctorId,
@@ -226,7 +217,6 @@ class Appointment {
       'doctor': doctor?.toJson(),
       'patient': patient,
     };
-  }
 
   Appointment copyWith({
     String? id,
@@ -251,8 +241,7 @@ class Appointment {
     DateTime? updatedAt,
     Doctor? doctor,
     Map<String, dynamic>? patient,
-  }) {
-    return Appointment(
+  }) => Appointment(
       id: id ?? this.id,
       patientId: patientId ?? this.patientId,
       doctorId: doctorId ?? this.doctorId,
@@ -276,12 +265,9 @@ class Appointment {
       doctor: doctor ?? this.doctor,
       patient: patient ?? this.patient,
     );
-  }
 
   @override
-  String toString() {
-    return 'Appointment(id: $id, doctorId: $doctorId, type: $appointmentType, start: $scheduledStart, status: $status)';
-  }
+  String toString() => 'Appointment(id: $id, doctorId: $doctorId, type: $appointmentType, start: $scheduledStart, status: $status)';
 
   @override
   bool operator ==(Object other) {
@@ -294,9 +280,6 @@ class Appointment {
 }
 
 class TimeSlot {
-  final DateTime start;
-  final DateTime end;
-  final bool available;
 
   TimeSlot({
     required this.start,
@@ -311,21 +294,18 @@ class TimeSlot {
       available: json['available'] ?? false,
     );
   }
+  final DateTime start;
+  final DateTime end;
+  final bool available;
 
-  Map<String, dynamic> toJson() {
-    return {
+  Map<String, dynamic> toJson() => {
       'start': start.toIso8601String(),
       'end': end.toIso8601String(),
       'available': available,
     };
-  }
 
-  String get formattedTime {
-    return DateFormat('h:mm a').format(start);
-  }
+  String get formattedTime => DateFormat('h:mm a').format(start);
 
   @override
-  String toString() {
-    return 'TimeSlot(start: $start, available: $available)';
-  }
+  String toString() => 'TimeSlot(start: $start, available: $available)';
 }

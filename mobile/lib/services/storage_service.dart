@@ -4,9 +4,9 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 /// Storage service for managing app data persistence
 class StorageService {
-  static final StorageService _instance = StorageService._internal();
   factory StorageService() => _instance;
   StorageService._internal();
+  static final StorageService _instance = StorageService._internal();
 
   SharedPreferences? _prefs;
   
@@ -121,9 +121,7 @@ class StorageService {
   }
 
   /// Remove value (alias for remove)
-  Future<bool> removeValue(String key) async {
-    return remove(key);
-  }
+  Future<bool> removeValue(String key) async => remove(key);
 
   /// Check if key exists
   Future<bool> containsKey(String key) async {
@@ -151,9 +149,7 @@ class StorageService {
   }
 
   /// Get secure value (decrypted)
-  Future<String?> getSecureValue(String key) async {
-    return await _secureStorage.read(key: key);
-  }
+  Future<String?> getSecureValue(String key) async => await _secureStorage.read(key: key);
 
   /// Remove secure value
   Future<void> removeSecureValue(String key) async {
@@ -161,14 +157,10 @@ class StorageService {
   }
 
   /// Check if secure key exists
-  Future<bool> containsSecureKey(String key) async {
-    return await _secureStorage.containsKey(key: key);
-  }
+  Future<bool> containsSecureKey(String key) async => await _secureStorage.containsKey(key: key);
 
   /// Get all secure keys
-  Future<Map<String, String>> getAllSecureValues() async {
-    return await _secureStorage.readAll();
-  }
+  Future<Map<String, String>> getAllSecureValues() async => await _secureStorage.readAll();
 
   /// Clear all secure data
   Future<void> clearSecureStorage() async {
@@ -183,14 +175,10 @@ class StorageService {
   }
 
   /// Get user preferences
-  Future<T?> getUserPreference<T>(String key) async {
-    return await getValue('user_pref_$key') as T?;
-  }
+  Future<T?> getUserPreference<T>(String key) async => await getValue('user_pref_$key') as T?;
 
   /// Remove user preference
-  Future<bool> removeUserPreference(String key) async {
-    return await remove('user_pref_$key');
-  }
+  Future<bool> removeUserPreference(String key) async => await remove('user_pref_$key');
 
   /// Store app settings
   Future<void> setAppSetting(String key, dynamic value) async {
@@ -198,9 +186,7 @@ class StorageService {
   }
 
   /// Get app settings
-  Future<T?> getAppSetting<T>(String key) async {
-    return await getValue('app_setting_$key') as T?;
-  }
+  Future<T?> getAppSetting<T>(String key) async => await getValue('app_setting_$key') as T?;
 
   /// Store cache data with TTL (Time To Live)
   Future<void> setCacheData(String key, dynamic value, {Duration? ttl}) async {
@@ -257,7 +243,7 @@ class StorageService {
     await _ensureInitialized();
     final keys = _prefs!.getKeys();
     
-    int totalSize = 0;
+    var totalSize = 0;
     final categories = <String, int>{};
     
     for (final key in keys) {
@@ -265,7 +251,7 @@ class StorageService {
       final size = value.toString().length;
       totalSize += size;
       
-      String category = 'other';
+      var category = 'other';
       if (key.startsWith('user_pref_')) {
         category = 'user_preferences';
       } else if (key.startsWith('app_setting_')) {

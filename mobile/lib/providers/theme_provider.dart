@@ -16,7 +16,7 @@ class ThemeProvider extends ChangeNotifier {
   /// Initialize theme from storage
   Future<void> initialize() async {
     try {
-      final StorageService storageService = StorageService();
+      final storageService = StorageService();
       final savedTheme = await storageService.getValue(_themeKey);
       
       if (savedTheme != null) {
@@ -48,7 +48,7 @@ class ThemeProvider extends ChangeNotifier {
     notifyListeners();
     
     try {
-      final StorageService storageService = StorageService();
+      final storageService = StorageService();
       String themeString;
       switch (mode) {
         case ThemeMode.light:
@@ -117,7 +117,5 @@ class ThemeProvider extends ChangeNotifier {
   }
   
   /// Check if the current theme is dark based on context
-  bool isDarkModeActive(BuildContext context) {
-    return getEffectiveBrightness(context) == Brightness.dark;
-  }
+  bool isDarkModeActive(BuildContext context) => getEffectiveBrightness(context) == Brightness.dark;
 }

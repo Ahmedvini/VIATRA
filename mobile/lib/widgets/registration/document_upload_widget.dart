@@ -6,18 +6,6 @@ import 'package:permission_handler/permission_handler.dart';
 import '../../utils/constants.dart';
 
 class DocumentUploadWidget extends StatefulWidget {
-  final String documentType;
-  final String title;
-  final String description;
-  final File? currentFile;
-  final bool isRequired;
-  final List<String> allowedExtensions;
-  final int maxFileSizeBytes;
-  final void Function(File?)? onFileSelected;
-  final void Function()? onFileRemoved;
-  final String? error;
-  final bool isLoading;
-  final bool enabled;
 
   const DocumentUploadWidget({
     Key? key,
@@ -34,6 +22,18 @@ class DocumentUploadWidget extends StatefulWidget {
     this.isLoading = false,
     this.enabled = true,
   }) : super(key: key);
+  final String documentType;
+  final String title;
+  final String description;
+  final File? currentFile;
+  final bool isRequired;
+  final List<String> allowedExtensions;
+  final int maxFileSizeBytes;
+  final void Function(File?)? onFileSelected;
+  final void Function()? onFileRemoved;
+  final String? error;
+  final bool isLoading;
+  final bool enabled;
 
   @override
   State<DocumentUploadWidget> createState() => _DocumentUploadWidgetState();
@@ -124,8 +124,7 @@ class _DocumentUploadWidgetState extends State<DocumentUploadWidget> {
     );
   }
 
-  Widget _buildUploadArea(ThemeData theme, ColorScheme colorScheme) {
-    return Container(
+  Widget _buildUploadArea(ThemeData theme, ColorScheme colorScheme) => Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -203,7 +202,6 @@ class _DocumentUploadWidgetState extends State<DocumentUploadWidget> {
         ],
       ),
     );
-  }
 
   Widget _buildFilePreview(ThemeData theme, ColorScheme colorScheme) {
     final fileName = widget.currentFile!.path.split('/').last;
@@ -237,12 +235,10 @@ class _DocumentUploadWidgetState extends State<DocumentUploadWidget> {
                         child: Image.file(
                           widget.currentFile!,
                           fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Icon(
+                          errorBuilder: (context, error, stackTrace) => Icon(
                               Icons.image,
                               color: colorScheme.primary,
-                            );
-                          },
+                            ),
                         ),
                       )
                     : Icon(
@@ -357,7 +353,7 @@ class _DocumentUploadWidgetState extends State<DocumentUploadWidget> {
 
       if (hasImageExtensions && widget.allowedExtensions.length <= 3) {
         // Use image picker for image-only selection
-        final XFile? image = await _imagePicker.pickImage(
+        final image = await _imagePicker.pickImage(
           source: ImageSource.gallery,
           imageQuality: 85,
         );
@@ -368,7 +364,7 @@ class _DocumentUploadWidgetState extends State<DocumentUploadWidget> {
         }
       } else {
         // Use file picker for mixed file types
-        final FilePickerResult? result = await FilePicker.platform.pickFiles(
+        final result = await FilePicker.platform.pickFiles(
           type: FileType.custom,
           allowedExtensions: widget.allowedExtensions,
           allowMultiple: false,
@@ -393,7 +389,7 @@ class _DocumentUploadWidgetState extends State<DocumentUploadWidget> {
         return;
       }
 
-      final XFile? image = await _imagePicker.pickImage(
+      final image = await _imagePicker.pickImage(
         source: ImageSource.camera,
         imageQuality: 85,
       );
@@ -548,13 +544,6 @@ class _DocumentUploadWidgetState extends State<DocumentUploadWidget> {
 
 // Batch upload widget for multiple documents
 class BatchDocumentUpload extends StatelessWidget {
-  final List<DocumentUploadConfig> documents;
-  final Map<String, File> selectedFiles;
-  final Map<String, String> errors;
-  final Set<String> loadingDocuments;
-  final void Function(String documentType, File file)? onFileSelected;
-  final void Function(String documentType)? onFileRemoved;
-  final bool enabled;
 
   const BatchDocumentUpload({
     Key? key,
@@ -566,10 +555,16 @@ class BatchDocumentUpload extends StatelessWidget {
     this.onFileRemoved,
     this.enabled = true,
   }) : super(key: key);
+  final List<DocumentUploadConfig> documents;
+  final Map<String, File> selectedFiles;
+  final Map<String, String> errors;
+  final Set<String> loadingDocuments;
+  final void Function(String documentType, File file)? onFileSelected;
+  final void Function(String documentType)? onFileRemoved;
+  final bool enabled;
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
+  Widget build(BuildContext context) => Column(
       children: documents.map((config) {
         return DocumentUploadWidget(
           documentType: config.type,
@@ -587,16 +582,9 @@ class BatchDocumentUpload extends StatelessWidget {
         );
       }).toList(),
     );
-  }
 }
 
 class DocumentUploadConfig {
-  final String type;
-  final String title;
-  final String description;
-  final bool isRequired;
-  final List<String> allowedExtensions;
-  final int maxFileSizeBytes;
 
   const DocumentUploadConfig({
     required this.type,
@@ -606,4 +594,10 @@ class DocumentUploadConfig {
     this.allowedExtensions = const ['jpg', 'jpeg', 'png', 'pdf'],
     this.maxFileSizeBytes = 10485760, // 10MB
   });
+  final String type;
+  final String title;
+  final String description;
+  final bool isRequired;
+  final List<String> allowedExtensions;
+  final int maxFileSizeBytes;
 }

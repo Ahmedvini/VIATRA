@@ -2,13 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class LocalizationHelper {
-  static AppLocalizations of(BuildContext context) {
-    return AppLocalizations.of(context)!;
-  }
+  static AppLocalizations of(BuildContext context) => AppLocalizations.of(context)!;
 
-  static bool isRTL(BuildContext context) {
-    return Directionality.of(context) == TextDirection.rtl;
-  }
+  static bool isRTL(BuildContext context) => Directionality.of(context) == TextDirection.rtl;
 
   static String getLocalizedGreeting(BuildContext context) {
     final hour = DateTime.now().hour;

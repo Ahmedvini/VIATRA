@@ -10,8 +10,7 @@ class PatientHomeScreen extends StatelessWidget {
   const PatientHomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(
         title: const Text('Home'),
         elevation: 0,
@@ -54,10 +53,8 @@ class PatientHomeScreen extends StatelessWidget {
         },
       ),
     );
-  }
 
-  Widget _buildWelcomeSection(String firstName) {
-    return Card(
+  Widget _buildWelcomeSection(String firstName) => Card(
       elevation: 2,
       child: Container(
         width: double.infinity,
@@ -101,7 +98,6 @@ class PatientHomeScreen extends StatelessWidget {
         ),
       ),
     );
-  }
 
   Widget _buildQuickActionsGrid(BuildContext context) {
     final actions = [
@@ -142,8 +138,7 @@ class PatientHomeScreen extends StatelessWidget {
       mainAxisSpacing: 16,
       crossAxisSpacing: 16,
       childAspectRatio: 1.1,
-      children: actions.map((action) {
-        return _buildActionCard(
+      children: actions.map((action) => _buildActionCard(
           context,
           icon: action['icon'] as IconData,
           title: action['title'] as String,
@@ -160,8 +155,7 @@ class PatientHomeScreen extends StatelessWidget {
             }
           },
           color: action['color'] as Color,
-        );
-      }).toList(),
+        )).toList(),
     );
   }
 
@@ -172,8 +166,7 @@ class PatientHomeScreen extends StatelessWidget {
     required String subtitle,
     required VoidCallback onTap,
     required Color color,
-  }) {
-    return Card(
+  }) => Card(
       elevation: 2,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
@@ -221,10 +214,8 @@ class PatientHomeScreen extends StatelessWidget {
         ),
       ),
     );
-  }
 
-  Widget _buildUpcomingAppointmentsSection(BuildContext context) {
-    return Column(
+  Widget _buildUpcomingAppointmentsSection(BuildContext context) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
@@ -278,5 +269,4 @@ class PatientHomeScreen extends StatelessWidget {
         ),
       ],
     );
-  }
 }

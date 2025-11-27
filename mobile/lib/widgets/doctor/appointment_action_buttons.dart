@@ -4,10 +4,6 @@ import '../../models/appointment_model.dart';
 import '../common/custom_button.dart';
 
 class AppointmentActionButtons extends StatefulWidget {
-  final Appointment appointment;
-  final Function(String appointmentId) onAccept;
-  final Function(String appointmentId, DateTime start, DateTime end) onReschedule;
-  final Function(String appointmentId, String reason) onCancel;
 
   const AppointmentActionButtons({
     super.key,
@@ -16,6 +12,10 @@ class AppointmentActionButtons extends StatefulWidget {
     required this.onReschedule,
     required this.onCancel,
   });
+  final Appointment appointment;
+  final Function(String appointmentId) onAccept;
+  final Function(String appointmentId, DateTime start, DateTime end) onReschedule;
+  final Function(String appointmentId, String reason) onCancel;
 
   @override
   State<AppointmentActionButtons> createState() => _AppointmentActionButtonsState();

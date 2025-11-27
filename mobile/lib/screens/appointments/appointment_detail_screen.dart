@@ -5,12 +5,12 @@ import '../../models/appointment_model.dart';
 import '../../providers/appointment_provider.dart';
 
 class AppointmentDetailScreen extends StatefulWidget {
-  final String appointmentId;
 
   const AppointmentDetailScreen({
     Key? key,
     required this.appointmentId,
   }) : super(key: key);
+  final String appointmentId;
 
   @override
   _AppointmentDetailScreenState createState() => _AppointmentDetailScreenState();
@@ -83,7 +83,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
     final reason = await showDialog<String>(
       context: context,
       builder: (context) {
-        String inputReason = '';
+        var inputReason = '';
         return AlertDialog(
           title: const Text('Reason for Cancellation'),
           content: TextField(
@@ -401,32 +401,47 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
             const SizedBox(height: 24),
 
             // Visit Details
-            if (appointment.reasonForVisit != null) ...[
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Visit Details',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+            ...[
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Visit Details',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
                     ),
-                    const SizedBox(height: 16),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
+                  ),
+                  const SizedBox(height: 16),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[100],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Reason for Visit',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          appointment.reasonForVisit!,
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                        if (appointment.chiefComplaint != null) ...[
+                          const SizedBox(height: 16),
                           const Text(
-                            'Reason for Visit',
+                            'Chief Complaint',
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
@@ -435,33 +450,18 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            appointment.reasonForVisit!,
+                            appointment.chiefComplaint!,
                             style: const TextStyle(fontSize: 16),
                           ),
-                          if (appointment.chiefComplaint != null) ...[
-                            const SizedBox(height: 16),
-                            const Text(
-                              'Chief Complaint',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.grey,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              appointment.chiefComplaint!,
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                          ],
                         ],
-                      ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 24),
-            ],
+            ),
+            const SizedBox(height: 24),
+          ],
 
             // Cancellation Info
             if (appointment.status == 'cancelled') ...[
@@ -565,8 +565,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
     );
   }
 
-  Widget _buildInfoTile(IconData icon, String label, String value) {
-    return Row(
+  Widget _buildInfoTile(IconData icon, String label, String value) => Row(
       children: [
         Container(
           padding: const EdgeInsets.all(8),
@@ -605,7 +604,6 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
         ),
       ],
     );
-  }
 
   Color _getStatusColor(String status) {
     switch (status) {

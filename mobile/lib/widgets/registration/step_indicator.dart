@@ -1,17 +1,6 @@
 import 'package:flutter/material.dart';
 
 class StepIndicator extends StatelessWidget {
-  final int currentStep;
-  final int totalSteps;
-  final List<String>? stepLabels;
-  final Color? activeColor;
-  final Color? inactiveColor;
-  final Color? completedColor;
-  final double? indicatorRadius;
-  final double? lineHeight;
-  final bool showLabels;
-  final TextStyle? labelStyle;
-  final EdgeInsetsGeometry? padding;
 
   const StepIndicator({
     Key? key,
@@ -27,6 +16,17 @@ class StepIndicator extends StatelessWidget {
     this.labelStyle,
     this.padding,
   }) : super(key: key);
+  final int currentStep;
+  final int totalSteps;
+  final List<String>? stepLabels;
+  final Color? activeColor;
+  final Color? inactiveColor;
+  final Color? completedColor;
+  final double? indicatorRadius;
+  final double? lineHeight;
+  final bool showLabels;
+  final TextStyle? labelStyle;
+  final EdgeInsetsGeometry? padding;
 
   @override
   Widget build(BuildContext context) {
@@ -146,15 +146,6 @@ class StepIndicator extends StatelessWidget {
 
 // Linear progress indicator variant
 class LinearStepIndicator extends StatelessWidget {
-  final int currentStep;
-  final int totalSteps;
-  final String? title;
-  final String? subtitle;
-  final Color? progressColor;
-  final Color? backgroundColor;
-  final double height;
-  final BorderRadius? borderRadius;
-  final EdgeInsetsGeometry? padding;
 
   const LinearStepIndicator({
     Key? key,
@@ -168,6 +159,15 @@ class LinearStepIndicator extends StatelessWidget {
     this.borderRadius,
     this.padding,
   }) : super(key: key);
+  final int currentStep;
+  final int totalSteps;
+  final String? title;
+  final String? subtitle;
+  final Color? progressColor;
+  final Color? backgroundColor;
+  final double height;
+  final BorderRadius? borderRadius;
+  final EdgeInsetsGeometry? padding;
 
   @override
   Widget build(BuildContext context) {
@@ -261,13 +261,6 @@ class LinearStepIndicator extends StatelessWidget {
 
 // Minimal step indicator for compact spaces
 class MinimalStepIndicator extends StatelessWidget {
-  final int currentStep;
-  final int totalSteps;
-  final Color? activeColor;
-  final Color? inactiveColor;
-  final double dotSize;
-  final double spacing;
-  final EdgeInsetsGeometry? padding;
 
   const MinimalStepIndicator({
     Key? key,
@@ -279,6 +272,13 @@ class MinimalStepIndicator extends StatelessWidget {
     this.spacing = 8,
     this.padding,
   }) : super(key: key);
+  final int currentStep;
+  final int totalSteps;
+  final Color? activeColor;
+  final Color? inactiveColor;
+  final double dotSize;
+  final double spacing;
+  final EdgeInsetsGeometry? padding;
 
   @override
   Widget build(BuildContext context) {

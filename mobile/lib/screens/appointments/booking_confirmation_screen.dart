@@ -6,15 +6,6 @@ import '../../providers/appointment_provider.dart';
 import 'appointment_detail_screen.dart';
 
 class BookingConfirmationScreen extends StatefulWidget {
-  final String doctorId;
-  final String doctorName;
-  final String specialty;
-  final String appointmentType;
-  final DateTime selectedDate;
-  final TimeSlot selectedSlot;
-  final String reasonForVisit;
-  final String chiefComplaint;
-  final bool urgent;
 
   const BookingConfirmationScreen({
     Key? key,
@@ -28,6 +19,15 @@ class BookingConfirmationScreen extends StatefulWidget {
     required this.chiefComplaint,
     required this.urgent,
   }) : super(key: key);
+  final String doctorId;
+  final String doctorName;
+  final String specialty;
+  final String appointmentType;
+  final DateTime selectedDate;
+  final TimeSlot selectedSlot;
+  final String reasonForVisit;
+  final String chiefComplaint;
+  final bool urgent;
 
   @override
   _BookingConfirmationScreenState createState() => _BookingConfirmationScreenState();
@@ -402,8 +402,7 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
     );
   }
 
-  Widget _buildDetailRow(IconData icon, String label, String value, {Color? valueColor}) {
-    return Row(
+  Widget _buildDetailRow(IconData icon, String label, String value, {Color? valueColor}) => Row(
       children: [
         Container(
           padding: const EdgeInsets.all(8),
@@ -443,5 +442,4 @@ class _BookingConfirmationScreenState extends State<BookingConfirmationScreen> {
         ),
       ],
     );
-  }
 }

@@ -13,10 +13,6 @@ enum AppointmentState {
 }
 
 class CachedAppointmentResult {
-  final List<Appointment> appointments;
-  final int totalPages;
-  final int totalResults;
-  final DateTime timestamp;
 
   CachedAppointmentResult({
     required this.appointments,
@@ -24,21 +20,6 @@ class CachedAppointmentResult {
     required this.totalResults,
     required this.timestamp,
   });
-
-  bool get isExpired {
-    final now = DateTime.now();
-    final diff = now.difference(timestamp);
-    return diff.inMinutes >= 5;
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'appointments': appointments.map((a) => a.toJson()).toList(),
-      'totalPages': totalPages,
-      'totalResults': totalResults,
-      'timestamp': timestamp.toIso8601String(),
-    };
-  }
 
   factory CachedAppointmentResult.fromJson(Map<String, dynamic> json) {
     return CachedAppointmentResult(
@@ -50,9 +31,34 @@ class CachedAppointmentResult {
       timestamp: DateTime.parse(json['timestamp'] as String),
     );
   }
+  final List<Appointment> appointments;
+  final int totalPages;
+  final int totalResults;
+  final DateTime timestamp;
+
+  bool get isExpired {
+    final now = DateTime.now();
+    final diff = now.difference(timestamp);
+    return diff.inMinutes >= 5;
+  }
+
+  Map<String, dynamic> toJson() => {
+      'appointments': appointments.map((a) => a.toJson()).toList(),
+      'totalPages': totalPages,
+      'totalResults': totalResults,
+      'timestamp': timestamp.toIso8601String(),
+    };
 }
 
 class AppointmentProvider extends ChangeNotifier {
+
+  AppointmentProvider({
+    required AppointmentService appointmentService,
+    required StorageService storageService,
+  })  : _appointmentService = appointmentService,
+        _storageService = storageService {
+    _loadFromStorage();
+  }
   final AppointmentService _appointmentService;
   final StorageService _storageService;
 
@@ -69,14 +75,6 @@ class AppointmentProvider extends ChangeNotifier {
   // Doctor-specific state
   Map<String, dynamic>? _doctorDashboardStats;
   DateTime? _statsLastFetched;
-
-  AppointmentProvider({
-    required AppointmentService appointmentService,
-    required StorageService storageService,
-  })  : _appointmentService = appointmentService,
-        _storageService = storageService {
-    _loadFromStorage();
-  }
 
   // Getters
   AppointmentState get state => _state;
@@ -97,13 +95,9 @@ class AppointmentProvider extends ChangeNotifier {
   List<TimeSlot> _availableSlots = [];
   List<TimeSlot> get availableSlots => _availableSlots;
 
-  List<Appointment> get upcomingAppointments {
-    return _appointments.where((a) => a.isUpcoming).toList();
-  }
+  List<Appointment> get upcomingAppointments => _appointments.where((a) => a.isUpcoming).toList();
 
-  List<Appointment> get pastAppointments {
-    return _appointments.where((a) => a.isPast).toList();
-  }
+  List<Appointment> get pastAppointments => _appointments.where((a) => a.isPast).toList();
 
   int get upcomingCount => upcomingAppointments.length;
   int get pastCount => pastAppointments.length;
@@ -119,9 +113,7 @@ class AppointmentProvider extends ChangeNotifier {
       DateTime.now().difference(_statsLastFetched!).inMinutes >= 5;
 
   /// Generate cache key
-  String _getCacheKey({String? status}) {
-    return json.encode({'status': status});
-  }
+  String _getCacheKey({String? status}) => json.encode({'status': status});
 
   /// Load cached results from storage
   Future<void> _loadFromStorage() async {

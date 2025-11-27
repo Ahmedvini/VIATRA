@@ -293,8 +293,7 @@ class _HealthProfileViewScreenState extends State<HealthProfileViewScreen> {
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
-    return Padding(
+  Widget _buildInfoRow(String label, String value) => Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
         children: [
@@ -312,7 +311,6 @@ class _HealthProfileViewScreenState extends State<HealthProfileViewScreen> {
         ],
       ),
     );
-  }
 
   void _showQuickActions(BuildContext context) {
     showModalBottomSheet(

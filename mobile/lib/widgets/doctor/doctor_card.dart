@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import '../../models/doctor_model.dart';
 
 class DoctorCard extends StatelessWidget {
-  final Doctor doctor;
-  final VoidCallback? onTap;
 
   const DoctorCard({
     Key? key,
     required this.doctor,
     this.onTap,
   }) : super(key: key);
+  final Doctor doctor;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -178,8 +178,7 @@ class DoctorCard extends StatelessWidget {
     required IconData icon,
     required String label,
     required Color color,
-  }) {
-    return Container(
+  }) => Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
@@ -202,7 +201,6 @@ class DoctorCard extends StatelessWidget {
         ],
       ),
     );
-  }
 
   String _getInitials(String name) {
     if (name.isEmpty) return 'D';

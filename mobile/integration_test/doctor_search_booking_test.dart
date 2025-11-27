@@ -156,7 +156,7 @@ void main() {
         // Verify search field is cleared
         final searchField = find.byKey(const Key('search_field'));
         if (searchField.evaluate().isNotEmpty) {
-          final TextField textField = tester.widget(searchField);
+          final textField = tester.widget(searchField);
           expect(textField.controller?.text, isEmpty);
         }
       }

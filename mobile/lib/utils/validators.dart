@@ -233,9 +233,7 @@ class Validators {
   }
 
   // Emergency contact validation
-  static String? validateEmergencyContactName(String? value) {
-    return validateName(value, fieldName: 'Emergency contact name');
-  }
+  static String? validateEmergencyContactName(String? value) => validateName(value, fieldName: 'Emergency contact name');
 
   static String? validateEmergencyContactPhone(String? value) {
     if (value == null || value.isEmpty) {

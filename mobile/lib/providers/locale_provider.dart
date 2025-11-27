@@ -20,11 +20,11 @@ class LocaleProvider extends ChangeNotifier {
   /// Initialize locale from storage
   Future<void> initialize() async {
     try {
-      final StorageService storageService = StorageService();
+      final storageService = StorageService();
       final savedLocale = await storageService.getValue(_localeKey);
       
       if (savedLocale != null) {
-        final Map<String, dynamic> localeMap = savedLocale as Map<String, dynamic>;
+        final localeMap = savedLocale as Map<String, dynamic>;
         final languageCode = localeMap['languageCode'] as String;
         final countryCode = localeMap['countryCode'] as String?;
         
@@ -52,7 +52,7 @@ class LocaleProvider extends ChangeNotifier {
     notifyListeners();
     
     try {
-      final StorageService storageService = StorageService();
+      final storageService = StorageService();
       await storageService.setValue(_localeKey, {
         'languageCode': newLocale.languageCode,
         'countryCode': newLocale.countryCode,
@@ -104,9 +104,7 @@ class LocaleProvider extends ChangeNotifier {
   }
   
   /// Get text direction based on current locale
-  TextDirection get textDirection {
-    return isRTL ? TextDirection.rtl : TextDirection.ltr;
-  }
+  TextDirection get textDirection => isRTL ? TextDirection.rtl : TextDirection.ltr;
   
   /// Get locale from system
   static Locale? getSystemLocale() {

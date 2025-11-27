@@ -184,8 +184,7 @@ class _DoctorSearchScreenState extends State<DoctorSearchScreen> {
     );
   }
 
-  Widget _buildInitialState(ThemeData theme) {
-    return Center(
+  Widget _buildInitialState(ThemeData theme) => Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -210,10 +209,8 @@ class _DoctorSearchScreenState extends State<DoctorSearchScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildEmptyState(ThemeData theme) {
-    return Center(
+  Widget _buildEmptyState(ThemeData theme) => Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -247,10 +244,8 @@ class _DoctorSearchScreenState extends State<DoctorSearchScreen> {
         ],
       ),
     );
-  }
 
-  Widget _buildErrorState(ThemeData theme, String? errorMessage) {
-    return Center(
+  Widget _buildErrorState(ThemeData theme, String? errorMessage) => Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -281,5 +276,4 @@ class _DoctorSearchScreenState extends State<DoctorSearchScreen> {
         ],
       ),
     );
-  }
 }

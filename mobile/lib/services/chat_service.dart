@@ -6,9 +6,9 @@ import '../models/message_model.dart';
 
 /// Service for handling chat-related API calls
 class ChatService {
-  static final ChatService _instance = ChatService._internal();
   factory ChatService() => _instance;
   ChatService._internal();
+  static final ChatService _instance = ChatService._internal();
 
   final String _baseUrl = dotenv.env['API_BASE_URL'] ?? 'http://localhost:8080';
   String? _authToken;

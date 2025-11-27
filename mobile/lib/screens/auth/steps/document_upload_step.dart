@@ -15,8 +15,8 @@ class DocumentUploadStep extends StatefulWidget {
 
 class _DocumentUploadStepState extends State<DocumentUploadStep> {
   Map<String, File> _selectedFiles = {};
-  Map<String, String> _errors = {};
-  Set<String> _uploadingDocuments = {};
+  final Map<String, String> _errors = {};
+  final Set<String> _uploadingDocuments = {};
 
   @override
   void initState() {
@@ -129,11 +129,9 @@ class _DocumentUploadStepState extends State<DocumentUploadStep> {
     });
   }
 
-  String _getDocumentTitle(String documentType) {
-    return _getRequiredDocuments()
+  String _getDocumentTitle(String documentType) => _getRequiredDocuments()
         .firstWhere((doc) => doc.type == documentType)
         .title;
-  }
 
   bool _canContinue() {
     final requiredDocuments = _getRequiredDocuments()

@@ -93,7 +93,7 @@ class AppConfig {
       
       _initialized = true;
       Logger.info('AppConfig initialized successfully');
-      Logger.info('App: ${appName} v${version} (${buildNumber})');
+      Logger.info('App: $appName v$version ($buildNumber)');
       Logger.info('Environment: $environment');
       Logger.info('API Base URL: $apiBaseUrl');
     } catch (e) {
@@ -127,8 +127,7 @@ class AppConfig {
   }
   
   /// Get configuration as a map for debugging
-  static Map<String, dynamic> toMap() {
-    return {
+  static Map<String, dynamic> toMap() => {
       'appName': appName,
       'version': version,
       'buildNumber': buildNumber,
@@ -142,7 +141,6 @@ class AppConfig {
       'supportedLocales': supportedLocales,
       'themeMode': themeMode,
     };
-  }
   
   /// Validate configuration
   static List<String> validate() {

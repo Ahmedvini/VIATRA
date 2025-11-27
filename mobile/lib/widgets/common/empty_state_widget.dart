@@ -2,12 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class EmptyStateWidget extends StatelessWidget {
-  final String? title;
-  final String? message;
-  final IconData? icon;
-  final String? actionLabel;
-  final VoidCallback? onAction;
-  final Widget? customIcon;
 
   const EmptyStateWidget({
     super.key,
@@ -18,6 +12,12 @@ class EmptyStateWidget extends StatelessWidget {
     this.onAction,
     this.customIcon,
   });
+  final String? title;
+  final String? message;
+  final IconData? icon;
+  final String? actionLabel;
+  final VoidCallback? onAction;
+  final Widget? customIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +41,7 @@ class EmptyStateWidget extends StatelessWidget {
               ),
             const SizedBox(height: 24),
             Text(
-              title ?? l10n.emptyNoData,
+              title ?? l10n.emptyStateNoData,
               style: theme.textTheme.titleLarge?.copyWith(
                 color: theme.colorScheme.onSurface,
                 fontWeight: FontWeight.w600,
@@ -79,14 +79,14 @@ class EmptyStateWidget extends StatelessWidget {
 }
 
 class EmptyAppointmentsWidget extends StatelessWidget {
-  final bool isUpcoming;
-  final VoidCallback? onBookAppointment;
 
   const EmptyAppointmentsWidget({
     super.key,
     this.isUpcoming = true,
     this.onBookAppointment,
   });
+  final bool isUpcoming;
+  final VoidCallback? onBookAppointment;
 
   @override
   Widget build(BuildContext context) {
@@ -103,12 +103,12 @@ class EmptyAppointmentsWidget extends StatelessWidget {
 }
 
 class EmptySearchWidget extends StatelessWidget {
-  final VoidCallback? onClearSearch;
 
   const EmptySearchWidget({
     super.key,
     this.onClearSearch,
   });
+  final VoidCallback? onClearSearch;
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +117,7 @@ class EmptySearchWidget extends StatelessWidget {
     return EmptyStateWidget(
       icon: Icons.search_off,
       title: l10n.noDoctorsFound,
-      message: l10n.emptyNoResults,
+      message: l10n.emptyStateNoResults,
       actionLabel: onClearSearch != null ? l10n.buttonClearSearch : null,
       onAction: onClearSearch,
     );
@@ -125,14 +125,14 @@ class EmptySearchWidget extends StatelessWidget {
 }
 
 class EmptyHealthDataWidget extends StatelessWidget {
-  final String type; // 'conditions', 'allergies', 'medications'
-  final VoidCallback? onAdd;
 
   const EmptyHealthDataWidget({
     super.key,
     required this.type,
     this.onAdd,
   });
+  final String type; // 'conditions', 'allergies', 'medications'
+  final VoidCallback? onAdd;
 
   @override
   Widget build(BuildContext context) {
@@ -155,7 +155,7 @@ class EmptyHealthDataWidget extends StatelessWidget {
         icon = Icons.medication_outlined;
         break;
       default:
-        title = l10n.emptyNoData;
+        title = l10n.emptyStateNoData;
         icon = Icons.inbox_outlined;
     }
 

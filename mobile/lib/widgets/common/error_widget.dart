@@ -10,11 +10,6 @@ enum ErrorType {
 }
 
 class ErrorDisplayWidget extends StatelessWidget {
-  final String? message;
-  final ErrorType type;
-  final VoidCallback? onRetry;
-  final IconData? icon;
-  final bool compact;
 
   const ErrorDisplayWidget({
     super.key,
@@ -24,6 +19,11 @@ class ErrorDisplayWidget extends StatelessWidget {
     this.icon,
     this.compact = false,
   });
+  final String? message;
+  final ErrorType type;
+  final VoidCallback? onRetry;
+  final IconData? icon;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {

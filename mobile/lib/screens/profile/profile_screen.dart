@@ -12,8 +12,7 @@ class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
         elevation: 0,
@@ -89,10 +88,8 @@ class ProfileScreen extends StatelessWidget {
         },
       ),
     );
-  }
 
-  Widget _buildSettingsList(BuildContext context, AuthProvider authProvider) {
-    return Card(
+  Widget _buildSettingsList(BuildContext context, AuthProvider authProvider) => Card(
       elevation: 2,
       child: Column(
         children: [
@@ -162,7 +159,6 @@ class ProfileScreen extends StatelessWidget {
         ],
       ),
     );
-  }
 
   Widget _buildSettingsTile(
     BuildContext context, {
@@ -171,8 +167,7 @@ class ProfileScreen extends StatelessWidget {
     required VoidCallback onTap,
     Color? iconColor,
     Color? titleColor,
-  }) {
-    return ListTile(
+  }) => ListTile(
       leading: Icon(icon, color: iconColor),
       title: Text(
         title,
@@ -181,7 +176,6 @@ class ProfileScreen extends StatelessWidget {
       trailing: const Icon(Icons.chevron_right),
       onTap: onTap,
     );
-  }
 
   void _handleLogout(BuildContext context, AuthProvider authProvider) {
     showDialog(

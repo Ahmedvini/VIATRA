@@ -15,23 +15,6 @@ enum ButtonSize {
 }
 
 class CustomButton extends StatelessWidget {
-  final String text;
-  final VoidCallback? onPressed;
-  final ButtonVariant variant;
-  final ButtonSize size;
-  final bool isLoading;
-  final bool isDisabled;
-  final Widget? icon;
-  final bool isIconLeading;
-  final double? width;
-  final EdgeInsetsGeometry? padding;
-  final BorderRadius? borderRadius;
-  final Color? backgroundColor;
-  final Color? foregroundColor;
-  final Color? borderColor;
-  final TextStyle? textStyle;
-  final double? elevation;
-  final FocusNode? focusNode;
 
   const CustomButton({
     Key? key,
@@ -53,6 +36,23 @@ class CustomButton extends StatelessWidget {
     this.elevation,
     this.focusNode,
   }) : super(key: key);
+  final String text;
+  final VoidCallback? onPressed;
+  final ButtonVariant variant;
+  final ButtonSize size;
+  final bool isLoading;
+  final bool isDisabled;
+  final Widget? icon;
+  final bool isIconLeading;
+  final double? width;
+  final EdgeInsetsGeometry? padding;
+  final BorderRadius? borderRadius;
+  final Color? backgroundColor;
+  final Color? foregroundColor;
+  final Color? borderColor;
+  final TextStyle? textStyle;
+  final double? elevation;
+  final FocusNode? focusNode;
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +117,7 @@ class CustomButton extends StatelessWidget {
     ColorScheme colorScheme,
     bool isEnabled,
   ) {
-    Widget buttonChild = _buildButtonContent();
+    final var buttonChild = _buildButtonContent(context, theme, colorScheme);
 
     switch (variant) {
       case ButtonVariant.primary:
@@ -218,7 +218,7 @@ class CustomButton extends StatelessWidget {
     }
   }
 
-  Widget _buildButtonContent() {
+  Widget _buildButtonContent(BuildContext context, ThemeData theme, ColorScheme colorScheme) {
     if (isLoading) {
       return SizedBox(
         width: _getIconSize(),
@@ -227,8 +227,8 @@ class CustomButton extends StatelessWidget {
           strokeWidth: 2,
           valueColor: AlwaysStoppedAnimation<Color>(
             variant == ButtonVariant.outlined || variant == ButtonVariant.text
-                ? Theme.of(context as BuildContext).colorScheme.primary
-                : Theme.of(context as BuildContext).colorScheme.onPrimary,
+                ? colorScheme.primary
+                : colorScheme.onPrimary,
           ),
         ),
       );
@@ -279,13 +279,6 @@ class CustomButton extends StatelessWidget {
 
 // Specialized button variants
 class PrimaryButton extends StatelessWidget {
-  final String text;
-  final VoidCallback? onPressed;
-  final bool isLoading;
-  final bool isDisabled;
-  final Widget? icon;
-  final ButtonSize size;
-  final double? width;
 
   const PrimaryButton({
     Key? key,
@@ -297,10 +290,16 @@ class PrimaryButton extends StatelessWidget {
     this.size = ButtonSize.medium,
     this.width,
   }) : super(key: key);
+  final String text;
+  final VoidCallback? onPressed;
+  final bool isLoading;
+  final bool isDisabled;
+  final Widget? icon;
+  final ButtonSize size;
+  final double? width;
 
   @override
-  Widget build(BuildContext context) {
-    return CustomButton(
+  Widget build(BuildContext context) => CustomButton(
       text: text,
       onPressed: onPressed,
       variant: ButtonVariant.primary,
@@ -310,17 +309,9 @@ class PrimaryButton extends StatelessWidget {
       icon: icon,
       width: width,
     );
-  }
 }
 
 class SecondaryButton extends StatelessWidget {
-  final String text;
-  final VoidCallback? onPressed;
-  final bool isLoading;
-  final bool isDisabled;
-  final Widget? icon;
-  final ButtonSize size;
-  final double? width;
 
   const SecondaryButton({
     Key? key,
@@ -332,10 +323,16 @@ class SecondaryButton extends StatelessWidget {
     this.size = ButtonSize.medium,
     this.width,
   }) : super(key: key);
+  final String text;
+  final VoidCallback? onPressed;
+  final bool isLoading;
+  final bool isDisabled;
+  final Widget? icon;
+  final ButtonSize size;
+  final double? width;
 
   @override
-  Widget build(BuildContext context) {
-    return CustomButton(
+  Widget build(BuildContext context) => CustomButton(
       text: text,
       onPressed: onPressed,
       variant: ButtonVariant.secondary,
@@ -345,17 +342,9 @@ class SecondaryButton extends StatelessWidget {
       icon: icon,
       width: width,
     );
-  }
 }
 
 class OutlinedCustomButton extends StatelessWidget {
-  final String text;
-  final VoidCallback? onPressed;
-  final bool isLoading;
-  final bool isDisabled;
-  final Widget? icon;
-  final ButtonSize size;
-  final double? width;
 
   const OutlinedCustomButton({
     Key? key,
@@ -367,10 +356,16 @@ class OutlinedCustomButton extends StatelessWidget {
     this.size = ButtonSize.medium,
     this.width,
   }) : super(key: key);
+  final String text;
+  final VoidCallback? onPressed;
+  final bool isLoading;
+  final bool isDisabled;
+  final Widget? icon;
+  final ButtonSize size;
+  final double? width;
 
   @override
-  Widget build(BuildContext context) {
-    return CustomButton(
+  Widget build(BuildContext context) => CustomButton(
       text: text,
       onPressed: onPressed,
       variant: ButtonVariant.outlined,
@@ -380,17 +375,9 @@ class OutlinedCustomButton extends StatelessWidget {
       icon: icon,
       width: width,
     );
-  }
 }
 
 class TextCustomButton extends StatelessWidget {
-  final String text;
-  final VoidCallback? onPressed;
-  final bool isLoading;
-  final bool isDisabled;
-  final Widget? icon;
-  final ButtonSize size;
-  final double? width;
 
   const TextCustomButton({
     Key? key,
@@ -402,10 +389,16 @@ class TextCustomButton extends StatelessWidget {
     this.size = ButtonSize.medium,
     this.width,
   }) : super(key: key);
+  final String text;
+  final VoidCallback? onPressed;
+  final bool isLoading;
+  final bool isDisabled;
+  final Widget? icon;
+  final ButtonSize size;
+  final double? width;
 
   @override
-  Widget build(BuildContext context) {
-    return CustomButton(
+  Widget build(BuildContext context) => CustomButton(
       text: text,
       onPressed: onPressed,
       variant: ButtonVariant.text,
@@ -415,17 +408,9 @@ class TextCustomButton extends StatelessWidget {
       icon: icon,
       width: width,
     );
-  }
 }
 
 class DangerButton extends StatelessWidget {
-  final String text;
-  final VoidCallback? onPressed;
-  final bool isLoading;
-  final bool isDisabled;
-  final Widget? icon;
-  final ButtonSize size;
-  final double? width;
 
   const DangerButton({
     Key? key,
@@ -437,10 +422,16 @@ class DangerButton extends StatelessWidget {
     this.size = ButtonSize.medium,
     this.width,
   }) : super(key: key);
+  final String text;
+  final VoidCallback? onPressed;
+  final bool isLoading;
+  final bool isDisabled;
+  final Widget? icon;
+  final ButtonSize size;
+  final double? width;
 
   @override
-  Widget build(BuildContext context) {
-    return CustomButton(
+  Widget build(BuildContext context) => CustomButton(
       text: text,
       onPressed: onPressed,
       variant: ButtonVariant.danger,
@@ -450,5 +441,4 @@ class DangerButton extends StatelessWidget {
       icon: icon,
       width: width,
     );
-  }
 }
