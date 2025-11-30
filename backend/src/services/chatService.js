@@ -5,7 +5,7 @@ import logger from '../config/logger.js';
 import  sequelize  from '../config/database.js';
 
 // Initialize models
-const { Conversation, Message, User } = models;
+import { Conversation, Message, User } from '../models/index.js';
 
 /**
  * Generate Redis cache key for chat data
