@@ -2,7 +2,7 @@ import { Op } from 'sequelize';
 import initModels from '../models/index.js';
 import redisClient from '../config/redis.js';
 import logger from '../config/logger.js';
-import { sequelize } from '../config/database.js';
+import  sequelize  from '../config/database.js';
 
 // Initialize models
 const models = initModels();
