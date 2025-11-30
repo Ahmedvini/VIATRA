@@ -1,8 +1,11 @@
 import { getSession } from '../services/sessionService.js';
 import { verifyToken, decodeToken } from '../utils/jwt.js';
 import { Patient, Doctor } from '../models/index.js';
+import jwt from 'jsonwebtoken';
+import config from '../config/index.js';
 import logger from '../config/logger.js';
 
+/**
 /**
  * Extract bearer token from Authorization header
  * @param {string} authHeader - Authorization header value
@@ -371,3 +374,26 @@ export const requireOwnership = (ownerField = 'userId', source = 'params') => {
     }
   };
 };
+
+
+
+// ✅ إضافات عشان توافق بقية الكود اللي بيعمل import { requireAuth, requireRole } from '../middleware/auth.js';
+
+// نفس authenticate لكن باسم requireAuth
+export const requireAuth = authenticate;
+
+// نفس authorize لكن باسم requireRole
+export const requireRole = (...requiredRoles) => authorize(...requiredRoles);
+
+// اختياري: default export لو محتاجينه في أي مكان
+const authMiddleware = {
+  authenticate,
+  authorize,
+  optionalAuthenticate,
+  requireEmailVerified,
+  requireOwnership,
+  requireAuth,
+  requireRole,
+};
+
+export default authMiddleware;
