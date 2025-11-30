@@ -144,34 +144,35 @@ export const checkDatabaseHealth = async () => {
     };
   }
 };
-
 // Sequelize instance
 let sequelize = null;
+// Helper to create a new Sequelize instance
+const createSequelizeInstance = () => {
+  const environment = process.env.NODE_ENV || 'development';
+  const sequelizeConfig = dbConfig[environment];
 
-// Initialize Sequelize
+  return new Sequelize(
+    sequelizeConfig.database,
+    sequelizeConfig.username,
+    sequelizeConfig.password,
+    sequelizeConfig
+  );
+};
+
+// Initialize Sequelize (اختياري في الـ startup علشان نعمل test للاتصال)
 export const initializeSequelize = async () => {
   try {
-    // لو متـinitialized قبل كده، رجّع نفس الـ instance
-    if (sequelize) {
-      return sequelize;
+    // لو لسه مفيش instance، أنشئ واحد
+    if (!sequelize) {
+      sequelize = createSequelizeInstance();
     }
 
-    const environment = process.env.NODE_ENV || 'development';
-    const sequelizeConfig = dbConfig[environment];
-
-    const instance = new Sequelize(
-      sequelizeConfig.database,
-      sequelizeConfig.username,
-      sequelizeConfig.password,
-      sequelizeConfig
-    );
-
-    // Test the connection
-    await instance.authenticate();
+    // اختبر الاتصال
+    await sequelize.authenticate();
     logger.info('Sequelize connection established successfully');
 
-    // بعد ما نتأكد إن الاتصال شغال، نخزّنه في المتغيّر global
-    sequelize = instance;
+    // مهم جدًا: **ما نـعملش import للـ models هنا**
+    // علشان نتجنب الـ circular dependency مع models/index.js
 
     return sequelize;
   } catch (error) {
@@ -180,11 +181,13 @@ export const initializeSequelize = async () => {
   }
 };
 
-// Get Sequelize instance (لازم تكون ناديت initializeSequelize قبلها في الـ startup)
+// Get Sequelize instance (lazy initialization)
 export const getSequelize = () => {
+  // لو أول مرة يتنادي، نعمل initialization sync
   if (!sequelize) {
-    throw new Error('Sequelize not initialized. Call initializeSequelize() first.');
+    sequelize = createSequelizeInstance();
   }
+
   return sequelize;
 };
 
