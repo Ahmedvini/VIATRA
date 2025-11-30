@@ -1,10 +1,26 @@
+// src/services/authService.js
 import crypto from 'crypto';
-import { sendVerificationEmail, sendPasswordResetEmail, sendWelcomeEmail } from '../utils/email.js';
-import { generateTokens, verifyToken, validateTokenType, decodeToken } from '../utils/jwt.js';
-import { createSession, getSession, deleteSession, updateSession } from './sessionService.js';
+import { Op } from 'sequelize'; // ✅ for "ne" operator in resetPassword
+import {
+  sendVerificationEmail,
+  sendPasswordResetEmail,
+  sendWelcomeEmail
+} from '../utils/email.js';
+import {
+  generateTokens,
+  verifyToken,
+  validateTokenType,
+  decodeToken
+} from '../utils/jwt.js';
+import {
+  createSession,
+  getSession,
+  deleteSession,
+  updateSession
+} from './sessionService.js';
 import logger from '../config/logger.js';
 import config from '../config/index.js';
-import models, { User, Verification } from '../models/index.js';
+import models from '../models/index.js'; // ✅ default export with all models
 
 /**
  * Generate 6-digit verification code
@@ -28,71 +44,92 @@ const generateResetToken = () => {
  * @returns {Promise<Object>} - Created user with tokens
  */
 export const registerUser = async (userData) => {
-  const { email, password, firstName, lastName, phone, role, preferredLanguage = 'en', ...roleSpecificData } = userData;
-  
+  const {
+    email,
+    password,
+    firstName,
+    lastName,
+    phone,
+    role,
+    preferredLanguage = 'en',
+    ...roleSpecificData
+  } = userData;
+
   try {
     // Check if user already exists
     const existingUser = await models.User.findOne({ where: { email } });
     if (existingUser) {
       throw new Error('User with this email already exists');
     }
-    
+
     // Start transaction
     const result = await models.sequelize.transaction(async (transaction) => {
       // Create user record
-      const user = await models.User.create({
-        email,
-        password_hash: password, // Will be hashed by the User model hook
-        first_name: firstName,
-        last_name: lastName,
-        phone,
-        role,
-        is_active: true,
-        email_verified: false
-      }, { transaction });
-      
+      const user = await models.User.create(
+        {
+          email,
+          password_hash: password, // Will be hashed by the User model hook
+          first_name: firstName,
+          last_name: lastName,
+          phone,
+          role,
+          is_active: true,
+          email_verified: false
+        },
+        { transaction }
+      );
+
       // Create role-specific profile
       let profile = null;
       if (role === 'patient') {
-        profile = await models.Patient.create({
-          user_id: user.id,
-          date_of_birth: roleSpecificData.dateOfBirth || new Date('1990-01-01'),
-          gender: roleSpecificData.gender || 'prefer_not_to_say',
-          preferred_language: preferredLanguage
-        }, { transaction });
+        profile = await models.Patient.create(
+          {
+            user_id: user.id,
+            date_of_birth: roleSpecificData.dateOfBirth || new Date('1990-01-01'),
+            gender: roleSpecificData.gender || 'prefer_not_to_say',
+            preferred_language: preferredLanguage
+          },
+          { transaction }
+        );
       } else if (role === 'doctor') {
-        profile = await models.Doctor.create({
-          user_id: user.id,
-          license_number: roleSpecificData.licenseNumber,
-          specialty: roleSpecificData.specialty,
-          title: roleSpecificData.title,
-          npi_number: roleSpecificData.npiNumber,
-          education: roleSpecificData.education,
-          consultation_fee: roleSpecificData.consultationFee,
-          telehealth_enabled: true,
-          is_accepting_patients: false // Require verification first
-        }, { transaction });
+        profile = await models.Doctor.create(
+          {
+            user_id: user.id,
+            license_number: roleSpecificData.licenseNumber,
+            specialty: roleSpecificData.specialty,
+            title: roleSpecificData.title,
+            npi_number: roleSpecificData.npiNumber,
+            education: roleSpecificData.education,
+            consultation_fee: roleSpecificData.consultationFee,
+            telehealth_enabled: true,
+            is_accepting_patients: false // Require verification first
+          },
+          { transaction }
+        );
       }
-      
+
       // Generate email verification code
       const verificationCode = generateVerificationCode();
       const expiresAt = new Date(Date.now() + config.email.verificationCodeExpiry);
-      
+
       // Create email verification record
-      await models.Verification.create({
-        user_id: user.id,
-        doctor_id: profile && role === 'doctor' ? profile.id : null,
-        type: 'email',
-        status: 'pending',
-        verification_code: verificationCode,
-        expires_at: expiresAt,
-        attempts: 0,
-        max_attempts: 3
-      }, { transaction });
-      
+      await models.Verification.create(
+        {
+          user_id: user.id,
+          doctor_id: profile && role === 'doctor' ? profile.id : null,
+          type: 'email',
+          status: 'pending',
+          verification_code: verificationCode,
+          expires_at: expiresAt,
+          attempts: 0,
+          max_attempts: 3
+        },
+        { transaction }
+      );
+
       return { user, profile, verificationCode };
     });
-    
+
     // Send verification email
     const emailSent = await sendVerificationEmail(
       result.user.email,
@@ -100,18 +137,18 @@ export const registerUser = async (userData) => {
       result.verificationCode,
       preferredLanguage
     );
-    
+
     if (!emailSent) {
       logger.warn('Failed to send verification email', { userId: result.user.id });
     }
-    
+
     // Generate JWT tokens
     const tokens = generateTokens({
       userId: result.user.id,
       email: result.user.email,
       role: result.user.role
     });
-    
+
     // Prepare session payload
     const sessionPayload = {
       userId: result.user.id,
@@ -122,38 +159,42 @@ export const registerUser = async (userData) => {
       isActive: result.user.is_active,
       emailVerified: result.user.email_verified
     };
-    
+
     // Decode tokens to get expiration dates
     const accessTokenDecoded = decodeToken(tokens.accessToken);
     const refreshTokenDecoded = decodeToken(tokens.refreshToken);
-    
-    const accessTokenExpiration = accessTokenDecoded ? new Date(accessTokenDecoded.exp * 1000) : null;
-    const refreshTokenExpiration = refreshTokenDecoded ? new Date(refreshTokenDecoded.exp * 1000) : null;
-    
+
+    const accessTokenExpiration = accessTokenDecoded
+      ? new Date(accessTokenDecoded.exp * 1000)
+      : null;
+    const refreshTokenExpiration = refreshTokenDecoded
+      ? new Date(refreshTokenDecoded.exp * 1000)
+      : null;
+
     // Create session for access token
     await createSession(
-      tokens.accessToken, 
-      sessionPayload, 
-      false, 
-      'access', 
+      tokens.accessToken,
+      sessionPayload,
+      false,
+      'access',
       accessTokenExpiration
     );
-    
+
     // Create session for refresh token
     await createSession(
-      tokens.refreshToken, 
-      sessionPayload, 
-      true, 
-      'refresh', 
+      tokens.refreshToken,
+      sessionPayload,
+      true,
+      'refresh',
       refreshTokenExpiration
     );
-    
+
     logger.info('User registered successfully', {
       userId: result.user.id,
       email: result.user.email,
       role: result.user.role
     });
-    
+
     return {
       user: {
         id: result.user.id,
@@ -199,29 +240,29 @@ export const loginUser = async (email, password, rememberMe = false) => {
         }
       ]
     });
-    
+
     if (!user) {
       throw new Error('Invalid email or password');
     }
-    
+
     // Check if account is active
     if (!user.is_active) {
       throw new Error('Account has been deactivated. Please contact support.');
     }
-    
+
     // Verify password
     const isPasswordValid = await user.checkPassword(password);
     if (!isPasswordValid) {
       throw new Error('Invalid email or password');
     }
-    
+
     // Generate JWT tokens
     const tokens = generateTokens({
       userId: user.id,
       email: user.email,
       role: user.role
     });
-    
+
     // Prepare session payload
     const sessionPayload = {
       userId: user.id,
@@ -232,43 +273,47 @@ export const loginUser = async (email, password, rememberMe = false) => {
       isActive: user.is_active,
       emailVerified: user.email_verified
     };
-    
+
     // Decode tokens to get expiration dates
     const accessTokenDecoded = decodeToken(tokens.accessToken);
     const refreshTokenDecoded = decodeToken(tokens.refreshToken);
-    
-    const accessTokenExpiration = accessTokenDecoded ? new Date(accessTokenDecoded.exp * 1000) : null;
-    const refreshTokenExpiration = refreshTokenDecoded ? new Date(refreshTokenDecoded.exp * 1000) : null;
-    
+
+    const accessTokenExpiration = accessTokenDecoded
+      ? new Date(accessTokenDecoded.exp * 1000)
+      : null;
+    const refreshTokenExpiration = refreshTokenDecoded
+      ? new Date(refreshTokenDecoded.exp * 1000)
+      : null;
+
     // Create session for access token
     await createSession(
-      tokens.accessToken, 
-      sessionPayload, 
-      rememberMe, 
-      'access', 
+      tokens.accessToken,
+      sessionPayload,
+      rememberMe,
+      'access',
       accessTokenExpiration
     );
-    
+
     // Create session for refresh token
     await createSession(
-      tokens.refreshToken, 
-      sessionPayload, 
-      true, 
-      'refresh', 
+      tokens.refreshToken,
+      sessionPayload,
+      true,
+      'refresh',
       refreshTokenExpiration
     );
-    
+
     // Update last login time
     await user.update({
       last_login: new Date()
     });
-    
+
     logger.info('User logged in successfully', {
       userId: user.id,
       email: user.email,
       rememberMe: rememberMe
     });
-    
+
     return {
       user: {
         id: user.id,
@@ -304,55 +349,63 @@ export const verifyEmail = async (code, email = null) => {
         type: 'email',
         status: 'pending'
       },
-      include: [{
-        model: models.User,
-        as: 'user',
-        where: email ? { email } : {},
-        required: true
-      }]
+      include: [
+        {
+          model: models.User,
+          as: 'user',
+          where: email ? { email } : {},
+          required: true
+        }
+      ]
     });
-    
+
     if (!verification) {
       throw new Error('Invalid or expired verification code');
     }
-    
+
     // Check if code is expired
     if (verification.expires_at && new Date() > verification.expires_at) {
       throw new Error('Verification code has expired');
     }
-    
+
     // Check attempts limit
     if (verification.attempts >= verification.max_attempts) {
       throw new Error('Maximum verification attempts exceeded');
     }
-    
+
     // Start transaction
     await models.sequelize.transaction(async (transaction) => {
       // Mark verification as verified
-      await verification.update({
-        status: 'verified',
-        verified_at: new Date(),
-        attempts: verification.attempts + 1
-      }, { transaction });
-      
+      await verification.update(
+        {
+          status: 'verified',
+          verified_at: new Date(),
+          attempts: verification.attempts + 1
+        },
+        { transaction }
+      );
+
       // Update user email_verified status
-      await verification.user.update({
-        email_verified: true
-      }, { transaction });
+      await verification.user.update(
+        {
+          email_verified: true
+        },
+        { transaction }
+      );
     });
-    
+
     // Send welcome email
     await sendWelcomeEmail(
       verification.user.email,
       verification.user.first_name,
       verification.user.role
     );
-    
+
     logger.info('Email verified successfully', {
       userId: verification.user.id,
       email: verification.user.email
     });
-    
+
     return true;
   } catch (error) {
     logger.error('Email verification failed:', error);
@@ -374,11 +427,11 @@ export const requestPasswordReset = async (email) => {
       logger.info('Password reset requested for non-existent email', { email });
       return true;
     }
-    
+
     // Generate secure reset token
     const resetToken = generateResetToken();
     const expiresAt = new Date(Date.now() + config.email.resetTokenExpiry);
-    
+
     // Create or update reset verification record
     const [verification] = await models.Verification.findOrCreate({
       where: {
@@ -393,7 +446,7 @@ export const requestPasswordReset = async (email) => {
         max_attempts: 3
       }
     });
-    
+
     // If record already exists, update it
     if (!verification.isNewRecord) {
       await verification.update({
@@ -403,23 +456,23 @@ export const requestPasswordReset = async (email) => {
         status: 'pending'
       });
     }
-    
+
     // Send password reset email
     const emailSent = await sendPasswordResetEmail(
       user.email,
       user.first_name,
       resetToken
     );
-    
+
     if (!emailSent) {
       logger.warn('Failed to send password reset email', { userId: user.id });
     }
-    
+
     logger.info('Password reset requested', {
       userId: user.id,
       email: user.email
     });
-    
+
     return true;
   } catch (error) {
     logger.error('Password reset request failed:', error);
@@ -442,60 +495,71 @@ export const resetPassword = async (token, newPassword) => {
         type: 'password_reset',
         status: 'pending'
       },
-      include: [{
-        model: models.User,
-        as: 'user',
-        required: true
-      }]
+      include: [
+        {
+          model: models.User,
+          as: 'user',
+          required: true
+        }
+      ]
     });
-    
+
     if (!verification) {
       throw new Error('Invalid or expired reset token');
     }
-    
+
     // Check if token is expired
     if (verification.expires_at && new Date() > verification.expires_at) {
       throw new Error('Reset token has expired');
     }
-    
+
     // Check attempts limit
     if (verification.attempts >= verification.max_attempts) {
       throw new Error('Maximum reset attempts exceeded');
     }
-    
+
     // Start transaction
     await models.sequelize.transaction(async (transaction) => {
       // Update user password
-      await verification.user.update({
-        password_hash: newPassword // Will be hashed by the User model hook
-      }, { transaction });
-      
-      // Mark verification as verified (consumed)
-      await verification.update({
-        status: 'verified',
-        verified_at: new Date(),
-        attempts: verification.attempts + 1
-      }, { transaction });
-      
-      // Invalidate all other reset tokens for this user
-      await models.Verification.update({
-        status: 'expired'
-      }, {
-        where: {
-          user_id: verification.user.id,
-          type: 'password_reset',
-          status: 'pending',
-          id: { [models.sequelize.Op.ne]: verification.id }
+      await verification.user.update(
+        {
+          password_hash: newPassword // Will be hashed by the User model hook
         },
-        transaction
-      });
+        { transaction }
+      );
+
+      // Mark verification as verified (consumed)
+      await verification.update(
+        {
+          status: 'verified',
+          verified_at: new Date(),
+          attempts: verification.attempts + 1
+        },
+        { transaction }
+      );
+
+      // Invalidate all other reset tokens for this user
+      await models.Verification.update(
+        {
+          status: 'expired'
+        },
+        {
+          where: {
+            user_id: verification.user.id,
+            type: 'password_reset',
+            status: 'pending',
+            id: { [Op.ne]: verification.id } // ✅ use Sequelize.Op correctly
+          },
+          transaction
+        }
+      );
     });
-    
+
     logger.info('Password reset successfully', {
       userId: verification.user.id,
       email: verification.user.email
     });
-    
+
     return true;
   } catch (error) {
     logger.error('Password reset failed:', error);
@@ -512,31 +576,31 @@ export const refreshAccessToken = async (refreshToken) => {
   try {
     // Verify refresh token
     const decoded = verifyToken(refreshToken);
-    
+
     // Validate token type
     if (!validateTokenType(refreshToken, 'refresh')) {
       throw new Error('Invalid token type');
     }
-    
+
     // Check if session exists
     const sessionExists = await getSession(refreshToken);
     if (!sessionExists) {
       throw new Error('Session not found or expired');
     }
-    
+
     // Find user to get latest data
     const user = await models.User.findByPk(decoded.userId);
     if (!user || !user.is_active) {
       throw new Error('User not found or inactive');
     }
-    
+
     // Generate new access token
     const tokens = generateTokens({
       userId: user.id,
       email: user.email,
       role: user.role
     });
-    
+
     // Update session with new access token
     await createSession(tokens.accessToken, {
       userId: user.id,
@@ -547,11 +611,11 @@ export const refreshAccessToken = async (refreshToken) => {
       isActive: user.is_active,
       emailVerified: user.email_verified
     });
-    
+
     logger.info('Access token refreshed successfully', {
       userId: user.id
     });
-    
+
     return tokens.accessToken;
   } catch (error) {
     logger.error('Token refresh failed:', error);
