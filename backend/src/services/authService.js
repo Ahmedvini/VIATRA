@@ -2,12 +2,9 @@ import crypto from 'crypto';
 import { sendVerificationEmail, sendPasswordResetEmail, sendWelcomeEmail } from '../utils/email.js';
 import { generateTokens, verifyToken, validateTokenType, decodeToken } from '../utils/jwt.js';
 import { createSession, getSession, deleteSession, updateSession } from './sessionService.js';
-import initModels from '../models/index.js';
 import logger from '../config/logger.js';
 import config from '../config/index.js';
-
-// Initialize models
-const models = initModels();
+import models, { User, Verification } from '../models/index.js';
 
 /**
  * Generate 6-digit verification code
