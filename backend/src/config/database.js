@@ -195,5 +195,6 @@ export const closeSequelize = async () => {
 };
 
 export { pool };
+export { sequelize };
 export default sequelize;
 
