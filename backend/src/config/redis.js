@@ -1,221 +1,130 @@
-import { createClient } from 'redis';
-import config from './index.js';
-import logger from './logger.js';
+// src/config/logger.js
+import winston from 'winston';
 
-let client = null;
+// ما نستخدمش config/index.js هنا عشان ما نعملش دايرة imports
+const nodeEnv = process.env.NODE_ENV || 'development';
+const isProduction = nodeEnv === 'production';
+const isDevelopment = nodeEnv === 'development';
 
-// Create Redis client
-const createRedisClient = () => {
-  // Define reconnect strategy function
-  const reconnectStrategy = (retries) => {
-    if (retries >= 10) {
-      logger.error('Redis: Too many retry attempts, giving up');
-      return new Error('Too many retry attempts');
-    }
-    
-    const delay = Math.min(retries * 100, 3000);
-    logger.warn(`Redis: Retrying connection in ${delay}ms (attempt ${retries + 1})`);
-    return delay;
-  };
+// Define log format
+const logFormat = winston.format.combine(
+  winston.format.timestamp({
+    format: 'YYYY-MM-DD HH:mm:ss'
+  }),
+  winston.format.errors({ stack: true }),
+  winston.format.json()
+);
 
-  const clientConfig = {
-    socket: {
-      host: config.redis.host,
-      port: config.redis.port,
-      connectTimeout: 10000,
-      lazyConnect: true,
-      reconnectStrategy: reconnectStrategy
-    },
-    password: config.redis.auth || undefined,
-    database: config.redis.database
-  };
-  
-  return createClient(clientConfig);
-};
+// Define console format for development
+const consoleFormat = winston.format.combine(
+  winston.format.colorize(),
+  winston.format.timestamp({
+    format: 'HH:mm:ss'
+  }),
+  winston.format.printf(({ timestamp, level, message, ...meta }) => {
+    const metaStr = Object.keys(meta).length ? JSON.stringify(meta, null, 2) : '';
+    return `${timestamp} [${level}]: ${message} ${metaStr}`;
+  })
+);
 
-// Connect to Redis
-export const connectRedis = async () => {
-  try {
-    client = createRedisClient();
-    
-    // Event listeners
-    client.on('connect', () => {
-      logger.info('Redis: Connecting...');
-    });
-    
-    client.on('ready', () => {
-      logger.info('Redis: Connected and ready');
-    });
-    
-    client.on('error', (error) => {
-      logger.error('Redis error:', error);
-    });
-    
-    client.on('reconnecting', () => {
-      logger.info('Redis: Reconnecting...');
-    });
-    
-    client.on('end', () => {
-      logger.info('Redis: Connection ended');
-    });
-    
-    // Connect to Redis
-    await client.connect();
-    
-    return client;
-  } catch (error) {
-    logger.error('Redis connection failed:', error);
-    throw error;
+// Create logger
+const logger = winston.createLogger({
+  level: isDevelopment ? 'debug' : 'info',
+  format: logFormat,
+  defaultMeta: {
+    service: 'viatra-backend',
+    environment: nodeEnv
+  },
+  transports: []
+});
+
+// Console transport for all environments
+logger.add(
+  new winston.transports.Console({
+    format: isDevelopment ? consoleFormat : logFormat,
+    level: isDevelopment ? 'debug' : 'info'
+  })
+);
+
+// File transports for production
+if (isProduction) {
+  logger.add(
+    new winston.transports.File({
+      filename: 'logs/app.log',
+      format: logFormat,
+      level: 'info',
+      maxsize: 5242880, // 5MB
+      maxFiles: 5
+    })
+  );
+
+  logger.add(
+    new winston.transports.File({
+      filename: 'logs/error.log',
+      format: logFormat,
+      level: 'error',
+      maxsize: 5242880, // 5MB
+      maxFiles: 5
+    })
+  );
+}
+
+// Request logging middleware
+export const requestLogger = (req, res, next) => {
+  const start = Date.now();
+
+  // Skip health check logs in production
+  if (isProduction && req.path === '/health') {
+    return next();
   }
-};
 
-// Disconnect from Redis
-export const disconnectRedis = async () => {
-  if (client && client.isOpen) {
-    try {
-      await client.quit();
-      logger.info('Redis disconnected');
-    } catch (error) {
-      logger.error('Error disconnecting from Redis:', error);
-      throw error;
-    }
-  }
-};
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    const logData = {
+      method: req.method,
+      url: req.url,
+      statusCode: res.statusCode,
+      duration: `${duration}ms`,
+      userAgent: req.get('User-Agent'),
+      ip: req.ip,
+      userId: req.user?.id || 'anonymous'
+    };
 
-// Redis helper functions with error handling
-export const get = async (key) => {
-  try {
-    if (!client || !client.isReady) {
-      throw new Error('Redis client not ready');
-    }
-    
-    const value = await client.get(key);
-    logger.debug(`Redis GET: ${key}`);
-    return value;
-  } catch (error) {
-    logger.error(`Redis GET error for key ${key}:`, error);
-    throw error;
-  }
-};
-
-export const set = async (key, value, options = {}) => {
-  try {
-    if (!client || !client.isReady) {
-      throw new Error('Redis client not ready');
-    }
-    
-    let result;
-    if (options.ttl) {
-      result = await client.setEx(key, options.ttl, value);
+    if (res.statusCode >= 400) {
+      logger.warn('HTTP Request', logData);
     } else {
-      result = await client.set(key, value);
+      logger.info('HTTP Request', logData);
     }
-    
-    logger.debug(`Redis SET: ${key} (TTL: ${options.ttl || 'none'})`);
-    return result;
-  } catch (error) {
-    logger.error(`Redis SET error for key ${key}:`, error);
-    throw error;
-  }
+  });
+
+  next();
 };
 
-export const del = async (key) => {
-  try {
-    if (!client || !client.isReady) {
-      throw new Error('Redis client not ready');
-    }
-    
-    const result = await client.del(key);
-    logger.debug(`Redis DEL: ${key}`);
-    return result;
-  } catch (error) {
-    logger.error(`Redis DEL error for key ${key}:`, error);
-    throw error;
-  }
+// Error logging helper
+export const logError = (error, context = {}) => {
+  logger.error('Application Error', {
+    message: error.message,
+    stack: error.stack,
+    ...context
+  });
 };
 
-export const exists = async (key) => {
-  try {
-    if (!client || !client.isReady) {
-      throw new Error('Redis client not ready');
-    }
-    
-    const result = await client.exists(key);
-    logger.debug(`Redis EXISTS: ${key} = ${result}`);
-    return result === 1;
-  } catch (error) {
-    logger.error(`Redis EXISTS error for key ${key}:`, error);
-    throw error;
-  }
+// Performance logging helper
+export const logPerformance = (operation, duration, metadata = {}) => {
+  logger.info('Performance Metric', {
+    operation,
+    duration: `${duration}ms`,
+    ...metadata
+  });
 };
 
-export const hget = async (key, field) => {
-  try {
-    if (!client || !client.isReady) {
-      throw new Error('Redis client not ready');
-    }
-    
-    const value = await client.hGet(key, field);
-    logger.debug(`Redis HGET: ${key}.${field}`);
-    return value;
-  } catch (error) {
-    logger.error(`Redis HGET error for ${key}.${field}:`, error);
-    throw error;
-  }
+// Security event logging
+export const logSecurityEvent = (event, details = {}) => {
+  logger.warn('Security Event', {
+    event,
+    timestamp: new Date().toISOString(),
+    ...details
+  });
 };
 
-export const hset = async (key, field, value) => {
-  try {
-    if (!client || !client.isReady) {
-      throw new Error('Redis client not ready');
-    }
-    
-    const result = await client.hSet(key, field, value);
-    logger.debug(`Redis HSET: ${key}.${field}`);
-    return result;
-  } catch (error) {
-    logger.error(`Redis HSET error for ${key}.${field}:`, error);
-    throw error;
-  }
-};
-
-export const expire = async (key, seconds) => {
-  try {
-    if (!client || !client.isReady) {
-      throw new Error('Redis client not ready');
-    }
-    
-    const result = await client.expire(key, seconds);
-    logger.debug(`Redis EXPIRE: ${key} (${seconds}s)`);
-    return result;
-  } catch (error) {
-    logger.error(`Redis EXPIRE error for key ${key}:`, error);
-    throw error;
-  }
-};
-
-// Health check function
-export const checkRedisHealth = async () => {
-  try {
-    if (!client || !client.isReady) {
-      return {
-        status: 'unhealthy',
-        error: 'Client not ready'
-      };
-    }
-    
-    const result = await client.ping();
-    return {
-      status: 'healthy',
-      response: result
-    };
-  } catch (error) {
-    return {
-      status: 'unhealthy',
-      error: error.message
-    };
-  }
-};
-
-export { client };
-export default client;
+export default logger;
