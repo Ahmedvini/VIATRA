@@ -3,9 +3,9 @@ import { createClient } from 'redis';
 import config from './index.js';
 import logger from './logger.js';
 
-let client;
+let client = null;
 
-// Function to initialize Redis client
+// Internal: create and connect client
 const initRedis = async () => {
   if (client?.isOpen) return client;
 
@@ -19,7 +19,7 @@ const initRedis = async () => {
   });
 
   client.on('error', (err) => {
-    logger.error('Redis connection error:', { error: err.message });
+    logger.error('Redis connection error', { error: err.message });
   });
 
   client.on('connect', () => {
@@ -34,14 +34,28 @@ const initRedis = async () => {
   return client;
 };
 
-// Reusable Ensure Connection
+// --------- EXPORTS USED BY src/index.js ---------
+
+export const connectRedis = async () => {
+  // used in src/index.js
+  return initRedis();
+};
+
+export const disconnectRedis = async () => {
+  // used in src/index.js
+  if (client?.isOpen) {
+    await client.quit();
+    logger.info('Redis disconnected');
+  }
+};
+
+// --------- HELPERS USED BY sessionService.js ---------
+
 const ensureConnected = async () => {
   if (!client?.isOpen) {
     await initRedis();
   }
 };
-
-/* ---------- EXPORTED METHODS ---------- */
 
 export const get = async (key) => {
   await ensureConnected();
@@ -52,6 +66,7 @@ export const set = async (key, value, options = {}) => {
   await ensureConnected();
 
   if (options.ttl) {
+    // TTL in seconds
     return client.set(key, value, { EX: options.ttl });
   }
 
@@ -68,5 +83,16 @@ export const exists = async (key) => {
   return client.exists(key);
 };
 
-/* -------- Export full Redis client if needed -------- */
-export default client;
+// Optional: لو محتاج الكلاينت نفسه في أي مكان تاني
+export const getRedisClient = () => client;
+
+// ممكن نخلي default export object مفيد
+export default {
+  connectRedis,
+  disconnectRedis,
+  get,
+  set,
+  del,
+  exists,
+  getRedisClient
+};
