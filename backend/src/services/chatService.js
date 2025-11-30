@@ -5,7 +5,6 @@ import logger from '../config/logger.js';
 import  sequelize  from '../config/database.js';
 
 // Initialize models
-const models = initModels();
 const { Conversation, Message, User } = models;
 
 /**
