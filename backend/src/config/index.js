@@ -258,4 +258,5 @@ if (!isProduction) {
   validateConfig();
 }
 
-export default config;
+export default models;
+export { sequelize };
