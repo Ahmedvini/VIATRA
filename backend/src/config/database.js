@@ -151,25 +151,28 @@ let sequelize = null;
 // Initialize Sequelize
 export const initializeSequelize = async () => {
   try {
+    // لو متـinitialized قبل كده، رجّع نفس الـ instance
+    if (sequelize) {
+      return sequelize;
+    }
+
     const environment = process.env.NODE_ENV || 'development';
     const sequelizeConfig = dbConfig[environment];
-    
-    sequelize = new Sequelize(
+
+    const instance = new Sequelize(
       sequelizeConfig.database,
       sequelizeConfig.username,
       sequelizeConfig.password,
       sequelizeConfig
     );
-    
+
     // Test the connection
-    await sequelize.authenticate();
+    await instance.authenticate();
     logger.info('Sequelize connection established successfully');
-    
-    // Initialize models - this triggers the models/index.js module to load
-    // which will invoke all model factories and setup associations
-    await import('../models/index.js');
-    logger.info('Database models initialized successfully');
-    
+
+    // بعد ما نتأكد إن الاتصال شغال، نخزّنه في المتغيّر global
+    sequelize = instance;
+
     return sequelize;
   } catch (error) {
     logger.error('Unable to connect to the database via Sequelize:', error);
@@ -177,13 +180,14 @@ export const initializeSequelize = async () => {
   }
 };
 
-// Get Sequelize instance
+// Get Sequelize instance (لازم تكون ناديت initializeSequelize قبلها في الـ startup)
 export const getSequelize = () => {
   if (!sequelize) {
-        initializeSequelize();
+    throw new Error('Sequelize not initialized. Call initializeSequelize() first.');
   }
   return sequelize;
 };
+
 
 // Close Sequelize connection
 export const closeSequelize = async () => {
