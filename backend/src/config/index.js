@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import sequelize, { pool } from './database.js';
 
 // Load environment variables from .env file
 dotenv.config();
