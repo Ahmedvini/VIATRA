@@ -180,7 +180,7 @@ export const initializeSequelize = async () => {
 // Get Sequelize instance
 export const getSequelize = () => {
   if (!sequelize) {
-    throw new Error('Sequelize not initialized. Call initializeSequelize() first.');
+        initializeSequelize();
   }
   return sequelize;
 };
