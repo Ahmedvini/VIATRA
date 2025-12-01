@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import '../config/app_config.dart';
+import '../utils/logger.dart';
 
 /// HTTP response wrapper
 class ApiResponse<T> {
-
   ApiResponse({
     required this.success,
     this.data,
@@ -14,19 +14,22 @@ class ApiResponse<T> {
     this.error,
   });
 
-  factory ApiResponse.success(T data, {String? message, int? statusCode}) => ApiResponse(
-      success: true,
-      data: data,
-      message: message,
-      statusCode: statusCode ?? 200,
-    );
+  factory ApiResponse.success(T data, {String? message, int? statusCode}) =>
+      ApiResponse(
+        success: true,
+        data: data,
+        message: message,
+        statusCode: statusCode ?? 200,
+      );
 
-  factory ApiResponse.error(String message, {int? statusCode, Map<String, dynamic>? error}) => ApiResponse(
-      success: false,
-      message: message,
-      statusCode: statusCode ?? 500,
-      error: error,
-    );
+  factory ApiResponse.error(String message,
+          {int? statusCode, Map<String, dynamic>? error}) =>
+      ApiResponse(
+        success: false,
+        message: message,
+        statusCode: statusCode ?? 500,
+        error: error,
+      );
   final bool success;
   final T? data;
   final String? message;
@@ -36,10 +39,10 @@ class ApiResponse<T> {
 
 /// API service for handling HTTP requests
 class ApiService {
-
   ApiService() {
     _client = http.Client();
     _baseUrl = AppConfig.apiBaseUrl;
+    Logger.info('ApiService initialized with base URL: $_baseUrl');
   }
   late final http.Client _client;
   late final String _baseUrl;
@@ -62,10 +65,10 @@ class ApiService {
 
   /// Get default headers
   Map<String, String> get _defaultHeaders => {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-    if (_accessToken != null) 'Authorization': 'Bearer $_accessToken',
-  };
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        if (_accessToken != null) 'Authorization': 'Bearer $_accessToken',
+      };
 
   /// Make GET request
   Future<ApiResponse<T>> get<T>(
@@ -175,21 +178,22 @@ class ApiService {
     try {
       final uri = _buildUri(endpoint);
       final request = http.MultipartRequest('POST', uri);
-      
+
       // Add headers
       request.headers.addAll({..._defaultHeaders, ...?headers});
-      
+
       // Add file
-      request.files.add(await http.MultipartFile.fromPath(fieldName, file.path));
-      
+      request.files
+          .add(await http.MultipartFile.fromPath(fieldName, file.path));
+
       // Add fields
       if (fields != null) {
         request.fields.addAll(fields);
       }
-      
+
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
-      
+
       return _handleResponse<T>(response);
     } catch (e) {
       return ApiResponse.error('File upload error: $e');
@@ -199,13 +203,14 @@ class ApiService {
   /// Build URI with query parameters
   Uri _buildUri(String endpoint, [Map<String, dynamic>? queryParams]) {
     final uri = Uri.parse('$_baseUrl$endpoint');
-    
+
     if (queryParams != null && queryParams.isNotEmpty) {
-      return uri.replace(queryParameters: queryParams.map(
+      return uri.replace(
+          queryParameters: queryParams.map(
         (key, value) => MapEntry(key, value.toString()),
       ));
     }
-    
+
     return uri;
   }
 
@@ -248,7 +253,8 @@ class ApiService {
   }
 
   /// Health check
-  Future<ApiResponse<Map<String, dynamic>>> healthCheck() async => get<Map<String, dynamic>>('/health');
+  Future<ApiResponse<Map<String, dynamic>>> healthCheck() async =>
+      get<Map<String, dynamic>>('/health');
 
   /// Dispose resources
   void dispose() {

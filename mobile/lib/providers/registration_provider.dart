@@ -17,7 +17,6 @@ enum RegistrationStep {
 }
 
 class RegistrationProvider with ChangeNotifier {
-
   RegistrationProvider(this._authService, this._verificationService);
   final AuthService _authService;
   final VerificationService _verificationService;
@@ -70,9 +69,10 @@ class RegistrationProvider with ChangeNotifier {
     }
   }
 
-  bool get canGoBack => _currentStep != RegistrationStep.roleSelection && 
-           _currentStep != RegistrationStep.verification &&
-           _currentStep != RegistrationStep.complete;
+  bool get canGoBack =>
+      _currentStep != RegistrationStep.roleSelection &&
+      _currentStep != RegistrationStep.verification &&
+      _currentStep != RegistrationStep.complete;
 
   int get totalSteps {
     if (_selectedRole == UserRole.doctor) {
@@ -196,62 +196,68 @@ class RegistrationProvider with ChangeNotifier {
   bool _validateBasicInfo() {
     // Check basic fields - support both fullName and firstName+lastName
     final hasName = (_formData['fullName']?.toString().isNotEmpty == true) ||
-                    (_formData['firstName']?.toString().isNotEmpty == true &&
-                     _formData['lastName']?.toString().isNotEmpty == true);
-    
+        (_formData['firstName']?.toString().isNotEmpty == true &&
+            _formData['lastName']?.toString().isNotEmpty == true);
+
     final hasBasicFields = hasName &&
-           _formData['email']?.toString().isNotEmpty == true &&
-           _formData['password']?.toString().isNotEmpty == true &&
-           _formData['phone']?.toString().isNotEmpty == true &&
-           _formData['dateOfBirth'] != null &&
-           _formData['gender']?.toString().isNotEmpty == true;
-    
+        _formData['email']?.toString().isNotEmpty == true &&
+        _formData['password']?.toString().isNotEmpty == true &&
+        _formData['phone']?.toString().isNotEmpty == true &&
+        _formData['dateOfBirth'] != null &&
+        _formData['gender']?.toString().isNotEmpty == true;
+
     // Check if password matches confirm password
     final password = _formData['password']?.toString() ?? '';
     final confirmPassword = _formData['confirmPassword']?.toString() ?? '';
     final passwordsMatch = password.isNotEmpty && password == confirmPassword;
-    
+
     return hasBasicFields && passwordsMatch;
   }
 
   bool _validateProfessionalInfo() {
     if (_selectedRole != UserRole.doctor) return true;
-    
+
     // Support both 'specialty' and 'specialization' field names
-    final hasSpecialty = (_formData['specialty']?.toString().isNotEmpty == true) ||
-                        (_formData['specialization']?.toString().isNotEmpty == true);
-    
+    final hasSpecialty =
+        (_formData['specialty']?.toString().isNotEmpty == true) ||
+            (_formData['specialization']?.toString().isNotEmpty == true);
+
     // Support both 'bio' and 'hospitalAffiliation' field names
-    final hasBioOrHospital = (_formData['bio']?.toString().isNotEmpty == true) ||
-                            (_formData['hospitalAffiliation']?.toString().isNotEmpty == true);
-    
+    final hasBioOrHospital =
+        (_formData['bio']?.toString().isNotEmpty == true) ||
+            (_formData['hospitalAffiliation']?.toString().isNotEmpty == true);
+
     return hasSpecialty &&
-           _formData['licenseNumber']?.toString().isNotEmpty == true &&
-           _formData['yearsOfExperience'] != null &&
-           _formData['consultationFee'] != null &&
-           hasBioOrHospital;
+        _formData['licenseNumber']?.toString().isNotEmpty == true &&
+        _formData['yearsOfExperience'] != null &&
+        _formData['consultationFee'] != null &&
+        hasBioOrHospital;
   }
 
   bool _validateAddressInfo() {
     // Support both 'address' and 'addressLine1' field names
     final hasAddress = (_formData['address']?.toString().isNotEmpty == true) ||
-                      (_formData['addressLine1']?.toString().isNotEmpty == true);
-    
+        (_formData['addressLine1']?.toString().isNotEmpty == true);
+
     return hasAddress &&
-           _formData['city']?.toString().isNotEmpty == true &&
-           _formData['state']?.toString().isNotEmpty == true &&
-           _formData['postalCode']?.toString().isNotEmpty == true;
+        _formData['city']?.toString().isNotEmpty == true &&
+        _formData['state']?.toString().isNotEmpty == true &&
+        _formData['postalCode']?.toString().isNotEmpty == true;
   }
 
   bool _validateDocuments() {
     if (_selectedRole == UserRole.doctor) {
       // Support both camelCase and snake_case key names
-      return (_documents.containsKey('medicalLicense') || _documents.containsKey('medical_license')) &&
-             (_documents.containsKey('identityDocument') || _documents.containsKey('identity_document')) &&
-             (_documents.containsKey('educationCertificate') || _documents.containsKey('education_certificate'));
+      return (_documents.containsKey('medicalLicense') ||
+              _documents.containsKey('medical_license')) &&
+          (_documents.containsKey('identityDocument') ||
+              _documents.containsKey('identity_document')) &&
+          (_documents.containsKey('educationCertificate') ||
+              _documents.containsKey('education_certificate'));
     } else {
       // For patients, only identity document is required
-      return _documents.containsKey('identityDocument') || _documents.containsKey('identity_document');
+      return _documents.containsKey('identityDocument') ||
+          _documents.containsKey('identity_document');
     }
   }
 
@@ -262,61 +268,44 @@ class RegistrationProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      // Create user data based on role
-      final userData = <String, dynamic>{
-        'email': _formData['email'],
-        'password': _formData['password'],
-        'phone': _formData['phone'],
-        'dateOfBirth': _formData['dateOfBirth']?.toIso8601String(),
-        'role': _selectedRole!.name,
-        'address': {
-          'line1': _formData['addressLine1'],
-          'line2': _formData['addressLine2'],
-          'city': _formData['city'],
-          'state': _formData['state'],
-          'country': _formData['country'],
-          'postalCode': _formData['postalCode'],
-        },
-      };
-      
       // Handle name fields - support both fullName and firstName/lastName
+      String firstName = 'User';
+      String lastName = 'Name';
+      
       if (_formData['firstName'] != null && _formData['lastName'] != null) {
-        userData['firstName'] = _formData['firstName'];
-        userData['lastName'] = _formData['lastName'];
+        firstName = _formData['firstName'].toString();
+        lastName = _formData['lastName'].toString();
       } else if (_formData['fullName'] != null) {
         // Split fullName into firstName and lastName
         final nameParts = (_formData['fullName'] as String).trim().split(' ');
-        userData['firstName'] = nameParts.first;
-        userData['lastName'] = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : nameParts.first;
-      } else {
-        // Fallback
-        userData['firstName'] = 'User';
-        userData['lastName'] = 'Name';
+        firstName = nameParts.first;
+        lastName = nameParts.length > 1
+            ? nameParts.sublist(1).join(' ')
+            : nameParts.first;
       }
+
+      // Create base user data
+      final userData = <String, dynamic>{
+        'email': _formData['email'],
+        'password': _formData['password'],
+        'firstName': firstName,
+        'lastName': lastName,
+        'phone': _formData['phone'],
+        'role': _selectedRole!.name,
+      };
 
       // Add role-specific data
       if (_selectedRole == UserRole.doctor) {
-        userData['doctorData'] = {
-          'specialization': _formData['specialization'],
-          'licenseNumber': _formData['licenseNumber'],
-          'yearsOfExperience': _formData['yearsOfExperience'],
-          'hospitalAffiliation': _formData['hospitalAffiliation'],
-          'consultationFee': _formData['consultationFee'],
-          'bio': _formData['bio'],
-          'languagesSpoken': _formData['languagesSpoken'] ?? [],
-        };
+        // Doctor-specific fields
+        userData['specialty'] = _formData['specialty'] ?? _formData['specialization'];
+        userData['licenseNumber'] = _formData['licenseNumber'];
+        userData['consultationFee'] = _formData['consultationFee'];
+        userData['title'] = 'Dr.'; // Default title
+        userData['education'] = _formData['bio'] ?? _formData['hospitalAffiliation'];
       } else {
-        userData['patientData'] = {
-          'emergencyContact': _formData['emergencyContact'] != null ? {
-            'name': _formData['emergencyContact']['name'],
-            'relationship': _formData['emergencyContact']['relationship'],
-            'phone': _formData['emergencyContact']['phone'],
-          } : null,
-          'bloodType': _formData['bloodType'],
-          'allergies': _formData['allergies'] ?? [],
-          'medicalHistory': _formData['medicalHistory'] ?? [],
-          'currentMedications': _formData['currentMedications'] ?? [],
-        };
+        // Patient-specific fields
+        userData['dateOfBirth'] = _formData['dateOfBirth']?.toIso8601String();
+        userData['gender'] = _formData['gender'];
       }
 
       // Register user via AuthProvider if available, otherwise use AuthService directly
@@ -329,13 +318,12 @@ class RegistrationProvider with ChangeNotifier {
         // Fallback: register directly via AuthService
         await _authService.register(userData);
       }
-      
+
       // Upload documents if registration successful
       await _uploadDocuments();
 
       // Move to verification step
       _currentStep = RegistrationStep.verification;
-      
     } catch (e) {
       _error = e.toString();
     } finally {
@@ -354,10 +342,10 @@ class RegistrationProvider with ChangeNotifier {
       try {
         // Submit document with proper parameters
         await _verificationService.submitDocument(
-          entry.value,  // File
-          entry.key,    // Document type
-          'Document verification for ${entry.key}',  // Description
-          _accessToken!,  // Access token
+          entry.value, // File
+          entry.key, // Document type
+          'Document verification for ${entry.key}', // Description
+          _accessToken!, // Access token
         );
       } catch (e) {
         // Log error but continue with other documents
@@ -378,17 +366,17 @@ class RegistrationProvider with ChangeNotifier {
       _isLoading = true;
       notifyListeners();
 
-      final response = await _verificationService.getVerificationStatus(_accessToken!);
-      
+      final response =
+          await _verificationService.getVerificationStatus(_accessToken!);
+
       if (response.success && response.data != null) {
         _verifications = response.data!;
       }
-      
+
       // Check if all required verifications are completed
       if (_areAllVerificationsCompleted()) {
         _currentStep = RegistrationStep.complete;
       }
-      
     } catch (e) {
       _error = e.toString();
     } finally {
@@ -401,17 +389,16 @@ class RegistrationProvider with ChangeNotifier {
     final requiredTypes = _selectedRole == UserRole.doctor
         ? ['medical_license', 'identity_document', 'education_certificate']
         : ['identity_document'];
-    
+
     for (final type in requiredTypes) {
-      final verification = _verifications
-          .where((v) => v.documentType == type)
-          .firstOrNull;
-      
+      final verification =
+          _verifications.where((v) => v.documentType == type).firstOrNull;
+
       if (verification?.status != VerificationStatus.approved) {
         return false;
       }
     }
-    
+
     return true;
   }
 
@@ -426,7 +413,8 @@ class RegistrationProvider with ChangeNotifier {
       _isLoading = true;
       notifyListeners();
 
-      await _verificationService.resendVerificationEmail(_accessToken!, language: 'en');
+      await _verificationService.resendVerificationEmail(_accessToken!,
+          language: 'en');
     } catch (e) {
       _error = e.toString();
     } finally {

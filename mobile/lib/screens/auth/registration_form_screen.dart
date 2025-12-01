@@ -24,67 +24,77 @@ class _RegistrationFormScreenState extends State<RegistrationFormScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-      appBar: AppBar(
-        key: const Key('registration_app_bar'),
-        title: const Text('Registration'),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: Consumer<RegistrationProvider>(
-          builder: (context, registrationProvider, _) {
-            if (registrationProvider.canGoBack) {
+        appBar: AppBar(
+          key: const Key('registration_app_bar'),
+          title: const Text('Registration'),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: Consumer<RegistrationProvider>(
+            builder: (context, registrationProvider, _) {
+              if (registrationProvider.canGoBack) {
+                return IconButton(
+                  key: const Key('registration_back_button'),
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () {
+                    // If currently on Basic Info (first step after role selection),
+                    // navigate back to role selection screen
+                    if (registrationProvider.currentStep ==
+                        RegistrationStep.basicInfo) {
+                      context.go('/auth/role-selection');
+                    } else {
+                      // Normal step navigation within the form
+                      registrationProvider.previousStep();
+                    }
+                  },
+                );
+              }
               return IconButton(
-                key: const Key('registration_back_button'),
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () => registrationProvider.previousStep(),
+                icon: const Icon(Icons.close),
+                onPressed: () => _showExitConfirmation(context),
+              );
+            },
+          ),
+        ),
+        body: Consumer<RegistrationProvider>(
+          builder: (context, registrationProvider, _) {
+            if (registrationProvider.isLoading) {
+              return const LoadingWidget(
+                message: 'Loading...',
               );
             }
-            return IconButton(
-              icon: const Icon(Icons.close),
-              onPressed: () => _showExitConfirmation(context),
-            );
-          },
-        ),
-      ),
-      body: Consumer<RegistrationProvider>(
-        builder: (context, registrationProvider, _) {
-          if (registrationProvider.isLoading) {
-            return const LoadingWidget(
-              message: 'Loading...',
-            );
-          }
 
-          return SafeArea(
-            child: Column(
-              children: [
-                // Progress indicator
-                _buildProgressIndicator(context, registrationProvider),
+            return SafeArea(
+              child: Column(
+                children: [
+                  // Progress indicator
+                  _buildProgressIndicator(context, registrationProvider),
 
-                // Error display
-                if (registrationProvider.error != null)
-                  Padding(
-                    padding: const EdgeInsetsDirectional.all(16.0),
-                    child: custom_error.ErrorDisplayWidget(
-                      message: registrationProvider.error!,
-                      onRetry: () => registrationProvider.clearError(),
+                  // Error display
+                  if (registrationProvider.error != null)
+                    Padding(
+                      padding: const EdgeInsetsDirectional.all(16.0),
+                      child: custom_error.ErrorDisplayWidget(
+                        message: registrationProvider.error!,
+                        onRetry: () => registrationProvider.clearError(),
+                      ),
+                    ),
+
+                  // Step content
+                  Expanded(
+                    child: Form(
+                      key: _formKey,
+                      child: _buildStepContent(context, registrationProvider),
                     ),
                   ),
 
-                // Step content
-                Expanded(
-                  child: Form(
-                    key: _formKey,
-                    child: _buildStepContent(context, registrationProvider),
-                  ),
-                ),
-
-                // Navigation buttons
-                _buildNavigationButtons(context, registrationProvider),
-              ],
-            ),
-          );
-        },
-      ),
-    );
+                  // Navigation buttons
+                  _buildNavigationButtons(context, registrationProvider),
+                ],
+              ),
+            );
+          },
+        ),
+      );
 
   Widget _buildProgressIndicator(
     BuildContext context,
@@ -323,7 +333,8 @@ class _RegistrationFormScreenState extends State<RegistrationFormScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Cancel Registration'),
-        content: const Text('Are you sure you want to cancel registration? All progress will be lost.'),
+        content: const Text(
+            'Are you sure you want to cancel registration? All progress will be lost.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),

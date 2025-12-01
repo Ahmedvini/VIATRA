@@ -26,12 +26,15 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
   void initState() {
     super.initState();
     _loadSavedData();
+    // Add listeners to password fields to trigger validation
+    _passwordController.addListener(_saveData);
+    _confirmPasswordController.addListener(_saveData);
   }
 
   void _loadSavedData() {
     final provider = context.read<RegistrationProvider>();
     final formData = provider.formData;
-    
+
     _firstNameController.text = (formData['firstName'] as String?) ?? '';
     _lastNameController.text = (formData['lastName'] as String?) ?? '';
     _emailController.text = (formData['email'] as String?) ?? '';
@@ -43,6 +46,10 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
 
   @override
   void dispose() {
+    // Remove listeners
+    _passwordController.removeListener(_saveData);
+    _confirmPasswordController.removeListener(_saveData);
+    // Dispose controllers
     _firstNameController.dispose();
     _lastNameController.dispose();
     _emailController.dispose();
@@ -53,18 +60,18 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
   }
 
   void _saveData() {
-    if (_formKey.currentState!.validate()) {
-      final provider = context.read<RegistrationProvider>();
-      provider.updateMultipleFormData({
-        'firstName': _firstNameController.text.trim(),
-        'lastName': _lastNameController.text.trim(),
-        'email': _emailController.text.trim(),
-        'password': _passwordController.text,
-        'confirmPassword': _confirmPasswordController.text,
-        'phone': _phoneController.text.trim(),
-        'dateOfBirth': _dateOfBirth,
-      });
-    }
+    // Always save data to provider, even if form validation fails
+    // The provider will do its own validation for the Next button
+    final provider = context.read<RegistrationProvider>();
+    provider.updateMultipleFormData({
+      'firstName': _firstNameController.text.trim(),
+      'lastName': _lastNameController.text.trim(),
+      'email': _emailController.text.trim(),
+      'password': _passwordController.text,
+      'confirmPassword': _confirmPasswordController.text,
+      'phone': _phoneController.text.trim(),
+      'dateOfBirth': _dateOfBirth,
+    });
   }
 
   Future<void> _selectDateOfBirth() async {
@@ -75,7 +82,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
       lastDate: DateTime.now(),
       helpText: 'Select your date of birth',
     );
-    
+
     if (picked != null) {
       setState(() {
         _dateOfBirth = picked;
@@ -102,58 +109,60 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            
+
             const SizedBox(height: 8),
-            
+
             Text(
               'Please provide your basic information to create your account.',
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurface.withOpacity(0.7),
               ),
             ),
-            
+
             const SizedBox(height: 32),
-            
+
             // First Name
             CustomTextField(
               label: 'First Name',
               hint: 'Enter your first name',
               controller: _firstNameController,
-              validator: (value) => Validators.validateName(value, fieldName: 'First name'),
+              validator: (value) =>
+                  Validators.validateName(value, fieldName: 'First name'),
               prefixIcon: const Icon(Icons.person_outline),
               textCapitalization: TextCapitalization.words,
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Last Name
             CustomTextField(
               label: 'Last Name',
               hint: 'Enter your last name',
               controller: _lastNameController,
-              validator: (value) => Validators.validateName(value, fieldName: 'Last name'),
+              validator: (value) =>
+                  Validators.validateName(value, fieldName: 'Last name'),
               prefixIcon: const Icon(Icons.person_outline),
               textCapitalization: TextCapitalization.words,
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Email
             EmailTextField(
               controller: _emailController,
               validator: Validators.validateEmail,
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Phone
             PhoneTextField(
               controller: _phoneController,
               validator: Validators.validatePhone,
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Date of Birth
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -192,7 +201,8 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                             style: theme.textTheme.bodyLarge?.copyWith(
                               color: _dateOfBirth != null
                                   ? theme.colorScheme.onSurface
-                                  : theme.colorScheme.onSurface.withOpacity(0.6),
+                                  : theme.colorScheme.onSurface
+                                      .withOpacity(0.6),
                             ),
                           ),
                         ),
@@ -216,9 +226,9 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                   ),
               ],
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             // Password Section
             Text(
               'Create Password',
@@ -226,18 +236,18 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Password
             PasswordTextField(
               controller: _passwordController,
               validator: Validators.validatePassword,
               textInputAction: TextInputAction.next,
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Confirm Password
             PasswordTextField(
               label: 'Confirm Password',
@@ -249,9 +259,9 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
               ),
               textInputAction: TextInputAction.done,
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             // Password requirements
             Container(
               padding: const EdgeInsets.all(16),
@@ -280,7 +290,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 80),
           ],
         ),

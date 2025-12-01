@@ -21,30 +21,59 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  
+
   DateTime? _dateOfBirth;
 
   @override
   void initState() {
     super.initState();
     _loadExistingData();
+    // Add listeners to update provider in real-time
+    _firstNameController.addListener(_updateProvider);
+    _lastNameController.addListener(_updateProvider);
+    _emailController.addListener(_updateProvider);
+    _phoneController.addListener(_updateProvider);
+    _passwordController.addListener(_updateProvider);
+    _confirmPasswordController.addListener(_updateProvider);
   }
 
   void _loadExistingData() {
     final provider = context.read<RegistrationProvider>();
     final data = provider.formData;
-    
+
     _firstNameController.text = (data['firstName'] as String?) ?? '';
     _lastNameController.text = (data['lastName'] as String?) ?? '';
     _emailController.text = (data['email'] as String?) ?? '';
     _phoneController.text = (data['phone'] as String?) ?? '';
     _passwordController.text = (data['password'] as String?) ?? '';
-    _confirmPasswordController.text = (data['password'] as String?) ?? '';
+    _confirmPasswordController.text =
+        (data['confirmPassword'] as String?) ?? '';
     _dateOfBirth = data['dateOfBirth'] as DateTime?;
+  }
+
+  void _updateProvider() {
+    final provider = context.read<RegistrationProvider>();
+    provider.updateMultipleFormData({
+      'firstName': _firstNameController.text.trim(),
+      'lastName': _lastNameController.text.trim(),
+      'email': _emailController.text.trim(),
+      'phone': _phoneController.text.trim(),
+      'password': _passwordController.text,
+      'confirmPassword': _confirmPasswordController.text,
+      'dateOfBirth': _dateOfBirth,
+    });
   }
 
   @override
   void dispose() {
+    // Remove listeners
+    _firstNameController.removeListener(_updateProvider);
+    _lastNameController.removeListener(_updateProvider);
+    _emailController.removeListener(_updateProvider);
+    _phoneController.removeListener(_updateProvider);
+    _passwordController.removeListener(_updateProvider);
+    _confirmPasswordController.removeListener(_updateProvider);
+    // Dispose controllers
     _firstNameController.dispose();
     _lastNameController.dispose();
     _emailController.dispose();
@@ -72,6 +101,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
       setState(() {
         _dateOfBirth = date;
       });
+      _updateProvider(); // Update provider when date changes
     }
   }
 
@@ -88,7 +118,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
     }
 
     final provider = context.read<RegistrationProvider>();
-    
+
     // Update form data
     provider.updateMultipleFormData({
       'firstName': _firstNameController.text.trim(),
@@ -96,6 +126,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
       'email': _emailController.text.trim(),
       'phone': _phoneController.text.trim(),
       'password': _passwordController.text,
+      'confirmPassword': _confirmPasswordController.text,
       'dateOfBirth': _dateOfBirth,
     });
 
