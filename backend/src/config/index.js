@@ -182,7 +182,11 @@ const config = {
 
 // Load secrets from Secret Manager in production
 export const loadProductionSecrets = async () => {
-  if (!isProduction) return;
+  // Skip Secret Manager if USE_GCP_SECRETS is not explicitly set to true
+  // This allows Railway and other platforms to use environment variables directly
+  if (!isProduction || process.env.USE_GCP_SECRETS !== 'true') {
+    return;
+  }
   
   // Validate GCP_PROJECT_ID when actually needed for Secret Manager
   if (!config.gcp.projectId) {
