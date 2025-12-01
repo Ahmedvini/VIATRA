@@ -1,11 +1,11 @@
 import crypto from 'crypto';
 import { sendVerificationEmail } from '../utils/email.js';
-import initModels from '../models/index.js';
+import { User, Doctor, Verification } from '../models/index.js';
 import logger from '../config/logger.js';
 import config from '../config/index.js';
 
-// Initialize models
-const models = initModels();
+// Create models object for easier access
+const models = { User, Doctor, Verification };
 
 /**
  * Generate 6-digit verification code
