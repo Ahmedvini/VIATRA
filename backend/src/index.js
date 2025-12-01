@@ -80,9 +80,16 @@ app.get('/debug/env-check', (req, res) => {
   res.status(200).json(envCheck);
 });
 
-// Import and mount API routes
-import apiRoutes from './routes/index.js';
-app.use('/api/v1', apiRoutes);
+// Routes will be mounted after initialization
+let apiRoutes = null;
+
+// Function to initialize and mount routes
+const initializeRoutes = async () => {
+  // Dynamically import routes after Sequelize is initialized
+  const { default: routes } = await import('./routes/index.js');
+  apiRoutes = routes;
+  app.use('/api/v1', apiRoutes);
+};
 
 // 404 handler
 app.use(notFoundHandler);
@@ -143,6 +150,9 @@ const startServer = async () => {
     
     // Initialize Sequelize ORM
     await initializeSequelize();
+    
+    // Initialize and mount routes after Sequelize is ready
+    await initializeRoutes();
     
     // Initialize Socket.io server
     io = initializeSocketServer(httpServer);

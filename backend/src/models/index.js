@@ -14,7 +14,7 @@ import MessageModel from './Message.js';
 // Get sequelize instance
 const sequelize = getSequelize();
 
-// Initialize all models immediately
+// Initialize all models
 const User = UserModel(sequelize, DataTypes);
 const Doctor = DoctorModel(sequelize, DataTypes);
 const Patient = PatientModel(sequelize, DataTypes);
@@ -25,7 +25,6 @@ const Conversation = ConversationModel(sequelize, DataTypes);
 const Message = MessageModel(sequelize, DataTypes);
 
 // Define associations after all models are initialized
-
 // User associations
 User.hasOne(Doctor, { foreignKey: 'user_id', as: 'doctorProfile' });
 User.hasOne(Patient, { foreignKey: 'user_id', as: 'patientProfile' });
@@ -59,7 +58,7 @@ Conversation.hasMany(Message, { foreignKey: 'conversation_id', as: 'messages' })
 Message.belongsTo(Conversation, { foreignKey: 'conversation_id', as: 'conversation' });
 Message.belongsTo(User, { foreignKey: 'sender_id', as: 'sender' });
 
-// Export models directly
+// Export models
 export { User, Doctor, Patient, Appointment, HealthProfile, Verification, Conversation, Message, sequelize };
 
 export default {
