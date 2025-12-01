@@ -165,10 +165,8 @@ export const initializeSequelize = async () => {
     await sequelizeInstance.authenticate();
     logger.info('Sequelize connection established successfully');
     
-    // Initialize models - this triggers the models/index.js module to load
-    // which will invoke all model factories and setup associations
-    await import('../models/index.js');
-    logger.info('Database models initialized successfully');
+    // Models will be initialized lazily when first accessed
+    logger.info('Sequelize initialized - models will load on first access');
     
     return sequelizeInstance;
   } catch (error) {
