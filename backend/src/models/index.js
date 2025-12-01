@@ -84,54 +84,19 @@ const initializeModels = () => {
   return modelsCache;
 };
 
-// Export models with getters to ensure lazy initialization
-export const User = new Proxy({}, {
-  get: (target, prop) => initializeModels().User[prop],
-  set: (target, prop, value) => { initializeModels().User[prop] = value; return true; }
-});
+// Initialize models immediately on first import
+const models = initializeModels();
 
-export const Doctor = new Proxy({}, {
-  get: (target, prop) => initializeModels().Doctor[prop],
-  set: (target, prop, value) => { initializeModels().Doctor[prop] = value; return true; }
-});
-
-export const Patient = new Proxy({}, {
-  get: (target, prop) => initializeModels().Patient[prop],
-  set: (target, prop, value) => { initializeModels().Patient[prop] = value; return true; }
-});
-
-export const Appointment = new Proxy({}, {
-  get: (target, prop) => initializeModels().Appointment[prop],
-  set: (target, prop, value) => { initializeModels().Appointment[prop] = value; return true; }
-});
-
-export const HealthProfile = new Proxy({}, {
-  get: (target, prop) => initializeModels().HealthProfile[prop],
-  set: (target, prop, value) => { initializeModels().HealthProfile[prop] = value; return true; }
-});
-
-export const Verification = new Proxy({}, {
-  get: (target, prop) => initializeModels().Verification[prop],
-  set: (target, prop, value) => { initializeModels().Verification[prop] = value; return true; }
-});
-
-export const Conversation = new Proxy({}, {
-  get: (target, prop) => initializeModels().Conversation[prop],
-  set: (target, prop, value) => { initializeModels().Conversation[prop] = value; return true; }
-});
-
-export const Message = new Proxy({}, {
-  get: (target, prop) => initializeModels().Message[prop],
-  set: (target, prop, value) => { initializeModels().Message[prop] = value; return true; }
-});
-
-// Export sequelize instance getter
-export const sequelize = new Proxy({}, {
-  get: (target, prop) => {
-    const seq = getSequelize();
-    return typeof seq[prop] === 'function' ? seq[prop].bind(seq) : seq[prop];
-  }
-});
+// Export models directly (no Proxy needed)
+export const User = models.User;
+export const Doctor = models.Doctor;
+export const Patient = models.Patient;
+export const Appointment = models.Appointment;
+export const HealthProfile = models.HealthProfile;
+export const Verification = models.Verification;
+export const Conversation = models.Conversation;
+export const Message = models.Message;
+export const sequelize = models.sequelize;
 
 // Export all models as a single object for convenience
-export default initializeModels;
+export default () => models;
