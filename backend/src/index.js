@@ -87,13 +87,11 @@ const initializeRoutes = async () => {
   const { default: routes } = await import('./routes/index.js');
   apiRoutes = routes;
   app.use('/api/v1', apiRoutes);
+  
+  // Register 404 and error handlers AFTER routes are mounted
+  app.use(notFoundHandler);
+  app.use(errorHandler);
 };
-
-// 404 handler
-app.use(notFoundHandler);
-
-// Error handling middleware
-app.use(errorHandler);
 
 // Graceful shutdown handler
 let io = null;
