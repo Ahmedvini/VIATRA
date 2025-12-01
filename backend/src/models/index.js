@@ -58,14 +58,6 @@ Conversation.hasMany(Message, { foreignKey: 'conversation_id', as: 'messages' })
 Message.belongsTo(Conversation, { foreignKey: 'conversation_id', as: 'conversation' });
 Message.belongsTo(User, { foreignKey: 'sender_id', as: 'sender' });
 
-// Verify models are properly initialized
-console.log('Models initialized:', {
-  User: typeof User.getTableName === 'function',
-  Doctor: typeof Doctor.getTableName === 'function',
-  Patient: typeof Patient.getTableName === 'function',
-  Verification: typeof Verification.getTableName === 'function'
-});
-
 // Export models
 export { User, Doctor, Patient, Appointment, HealthProfile, Verification, Conversation, Message, sequelize };
 

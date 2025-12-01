@@ -7,15 +7,6 @@ import config from '../config/index.js';
 // Create models object for easier access
 const models = { User, Doctor, Verification };
 
-// Debug: Check if models have getTableName
-console.log('VerificationService models check:', {
-  User: typeof User?.getTableName === 'function',
-  Doctor: typeof Doctor?.getTableName === 'function',
-  Verification: typeof Verification?.getTableName === 'function',
-  UserConstructor: User?.constructor?.name,
-  UserPrototype: Object.getPrototypeOf(User)?.constructor?.name
-});
-
 /**
  * Generate 6-digit verification code
  * @returns {string} - 6-digit numeric code
