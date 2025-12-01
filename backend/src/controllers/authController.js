@@ -10,6 +10,16 @@ export const register = async (req, res) => {
   try {
     const userData = req.body;
     
+    // DEBUG: Log incoming registration data
+    logger.info('Registration attempt:', {
+      role: userData.role,
+      email: userData.email,
+      fields: Object.keys(userData),
+      hasPassword: !!userData.password,
+      hasFirstName: !!userData.firstName,
+      hasLastName: !!userData.lastName
+    });
+    
     // For doctor registration, ensure required fields are present
     if (userData.role === 'doctor') {
       const requiredFields = ['licenseNumber', 'specialty', 'title'];
@@ -40,10 +50,13 @@ export const register = async (req, res) => {
       emailSent: result.emailSent
     });
   } catch (error) {
-    logger.error('Registration failed:', error, {
+    logger.error('Registration failed:', {
+      error: error.message,
+      stack: error.stack,
       email: req.body?.email,
       role: req.body?.role,
-      ip: req.ip
+      ip: req.ip,
+      fields: Object.keys(req.body || {})
     });
     
     if (error.message.includes('already exists')) {
@@ -56,7 +69,8 @@ export const register = async (req, res) => {
     if (error.message.includes('validation') || error.message.includes('required')) {
       return res.status(400).json({
         error: 'Validation error',
-        message: error.message
+        message: error.message,
+        details: error.details || null
       });
     }
     
