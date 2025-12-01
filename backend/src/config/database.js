@@ -154,12 +154,24 @@ export const initializeSequelize = async () => {
     const environment = process.env.NODE_ENV || 'development';
     const sequelizeConfig = dbConfig[environment];
     
-    sequelizeInstance = new Sequelize(
-      sequelizeConfig.database,
-      sequelizeConfig.username,
-      sequelizeConfig.password,
-      sequelizeConfig
-    );
+    // Use DATABASE_URL if available (Railway, Heroku, etc.)
+    if (config.database.url) {
+      sequelizeInstance = new Sequelize(config.database.url, {
+        dialect: 'postgres',
+        logging: sequelizeConfig.logging || false,
+        dialectOptions: sequelizeConfig.dialectOptions,
+        pool: sequelizeConfig.pool,
+        define: sequelizeConfig.define
+      });
+    } else {
+      // Use discrete credentials
+      sequelizeInstance = new Sequelize(
+        sequelizeConfig.database,
+        sequelizeConfig.username,
+        sequelizeConfig.password,
+        sequelizeConfig
+      );
+    }
     
     // Test the connection
     await sequelizeInstance.authenticate();
