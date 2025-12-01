@@ -7,9 +7,9 @@ import '../../providers/appointment_provider.dart';
 class AppointmentDetailScreen extends StatefulWidget {
 
   const AppointmentDetailScreen({
-    Key? key,
+    super.key,
     required this.appointmentId,
-  }) : super(key: key);
+  });
   final String appointmentId;
 
   @override
@@ -114,7 +114,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
       final provider = Provider.of<AppointmentProvider>(context, listen: false);
       await provider.cancelAppointment(
         widget.appointmentId,
-        reason.isNotEmpty ? reason : null,
+        reason.isNotEmpty ? reason : 'No reason provided',
       );
 
       if (mounted) {
@@ -210,8 +210,8 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
     final formattedDate = DateFormat('EEEE, MMM d, yyyy').format(appointment.scheduledStart);
     final formattedStartTime = DateFormat('h:mm a').format(appointment.scheduledStart);
     final formattedEndTime = DateFormat('h:mm a').format(appointment.scheduledEnd);
-    final canCancel = appointment.canBeCancelled();
-    final canReschedule = appointment.canBeRescheduled();
+    final canCancel = appointment.canBeCancelled;
+    final canReschedule = appointment.canBeRescheduled;
 
     return Scaffold(
       appBar: AppBar(
@@ -340,7 +340,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              appointment.specialty ?? 'Specialist',
+                              appointment.specialty,
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.grey[600],
@@ -435,7 +435,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          appointment.reasonForVisit!,
+                          appointment.reasonForVisit,
                           style: const TextStyle(fontSize: 16),
                         ),
                         if (appointment.chiefComplaint != null) ...[

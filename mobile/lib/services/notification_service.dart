@@ -151,7 +151,6 @@ class NotificationService {
   /// Show local notification
   Future<void> _showLocalNotification(RemoteMessage message) async {
     final notification = message.notification;
-    final android = message.notification?.android;
 
     if (notification != null) {
       const androidDetails = AndroidNotificationDetails(
@@ -179,7 +178,7 @@ class NotificationService {
         notification.title,
         notification.body,
         details,
-        payload: message.data['conversation_id'],
+        payload: message.data['conversation_id'] as String?,
       );
     }
   }

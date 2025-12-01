@@ -6,7 +6,7 @@ import '../../../utils/validators.dart';
 import '../../../widgets/common/custom_text_field.dart';
 
 class BasicInfoStep extends StatefulWidget {
-  const BasicInfoStep({Key? key}) : super(key: key);
+  const BasicInfoStep({super.key});
 
   @override
   State<BasicInfoStep> createState() => _BasicInfoStepState();
@@ -32,13 +32,13 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
     final provider = context.read<RegistrationProvider>();
     final formData = provider.formData;
     
-    _firstNameController.text = formData['firstName'] ?? '';
-    _lastNameController.text = formData['lastName'] ?? '';
-    _emailController.text = formData['email'] ?? '';
-    _passwordController.text = formData['password'] ?? '';
-    _confirmPasswordController.text = formData['password'] ?? '';
-    _phoneController.text = formData['phone'] ?? '';
-    _dateOfBirth = formData['dateOfBirth'];
+    _firstNameController.text = (formData['firstName'] as String?) ?? '';
+    _lastNameController.text = (formData['lastName'] as String?) ?? '';
+    _emailController.text = (formData['email'] as String?) ?? '';
+    _passwordController.text = (formData['password'] as String?) ?? '';
+    _confirmPasswordController.text = (formData['password'] as String?) ?? '';
+    _phoneController.text = (formData['phone'] as String?) ?? '';
+    _dateOfBirth = formData['dateOfBirth'] as DateTime?;
   }
 
   @override
@@ -67,7 +67,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
   }
 
   Future<void> _selectDateOfBirth() async {
-    final DateTime? picked = await showDatePicker(
+    final picked = await showDatePicker(
       context: context,
       initialDate: _dateOfBirth ?? DateTime(2000),
       firstDate: DateTime(1900),
@@ -107,7 +107,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
             Text(
               'Please provide your basic information to create your account.',
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onBackground.withOpacity(0.7),
+                color: theme.colorScheme.onSurface.withOpacity(0.7),
               ),
             ),
             

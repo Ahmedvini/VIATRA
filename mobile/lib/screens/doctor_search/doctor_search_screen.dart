@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/doctor_search_provider.dart';
-import '../../models/doctor_model.dart';
+
 import '../../widgets/doctor/doctor_card.dart';
 import '../../utils/constants.dart';
 import 'doctor_search_filter_sheet.dart';
 
 class DoctorSearchScreen extends StatefulWidget {
-  const DoctorSearchScreen({Key? key}) : super(key: key);
+  const DoctorSearchScreen({super.key});
 
   @override
   State<DoctorSearchScreen> createState() => _DoctorSearchScreenState();

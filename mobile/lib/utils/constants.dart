@@ -445,12 +445,12 @@ class DoctorSearchConstants {
   ];
   
   // Fee range presets (in USD)
-  static const List<Map<String, double?>> feeRanges = [
+  static const List<Map<String, dynamic>> feeRanges = [
     {'label': 'Any', 'min': null, 'max': null},
-    {'label': 'Under \$50', 'min': null, 'max': 50},
-    {'label': '\$50 - \$100', 'min': 50, 'max': 100},
-    {'label': '\$100 - \$200', 'min': 100, 'max': 200},
-    {'label': 'Over \$200', 'min': 200, 'max': null},
+    {'label': 'Under \$50', 'min': null, 'max': 50.0},
+    {'label': '\$50 - \$100', 'min': 50.0, 'max': 100.0},
+    {'label': '\$100 - \$200', 'min': 100.0, 'max': 200.0},
+    {'label': 'Over \$200', 'min': 200.0, 'max': null},
   ];
 }
 

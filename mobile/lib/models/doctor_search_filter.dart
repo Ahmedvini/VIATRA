@@ -17,30 +17,26 @@ class DoctorSearchFilter {
   });
 
   /// Create filter from JSON
-  factory DoctorSearchFilter.fromJson(Map<String, dynamic> json) {
-    return DoctorSearchFilter(
-      searchQuery: json['searchQuery'],
-      specialty: json['specialty'],
-      subSpecialty: json['subSpecialty'],
-      city: json['city'],
-      state: json['state'],
-      zipCode: json['zipCode'],
-      minFee: json['minFee']?.toDouble(),
-      maxFee: json['maxFee']?.toDouble(),
+  factory DoctorSearchFilter.fromJson(Map<String, dynamic> json) => DoctorSearchFilter(
+      searchQuery: json['searchQuery'] as String?,
+      specialty: json['specialty'] as String?,
+      subSpecialty: json['subSpecialty'] as String?,
+      city: json['city'] as String?,
+      state: json['state'] as String?,
+      zipCode: json['zipCode'] as String?,
+      minFee: (json['minFee'] as num?)?.toDouble(),
+      maxFee: (json['maxFee'] as num?)?.toDouble(),
       languages: json['languages'] != null
-          ? List<String>.from(json['languages'])
+          ? List<String>.from(json['languages'] as List)
           : null,
-      isAcceptingPatients: json['isAcceptingPatients'],
-      telehealthEnabled: json['telehealthEnabled'],
-      sortBy: json['sortBy'] ?? 'created_at',
-      sortOrder: json['sortOrder'] ?? 'DESC',
+      isAcceptingPatients: json['isAcceptingPatients'] as bool?,
+      telehealthEnabled: json['telehealthEnabled'] as bool?,
+      sortBy: (json['sortBy'] as String?) ?? 'created_at',
+      sortOrder: (json['sortOrder'] as String?) ?? 'DESC',
     );
-  }
 
   /// Create an empty filter
-  factory DoctorSearchFilter.clear() {
-    return DoctorSearchFilter();
-  }
+  factory DoctorSearchFilter.clear() => DoctorSearchFilter();
   final String? searchQuery;
   final String? specialty;
   final String? subSpecialty;

@@ -7,7 +7,7 @@ import '../../widgets/common/custom_button.dart';
 import '../../utils/validators.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -62,7 +62,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      backgroundColor: colorScheme.background,
+      backgroundColor: colorScheme.surface,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -109,7 +109,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 Text(
                   'Sign in to continue to your account',
                   style: theme.textTheme.bodyLarge?.copyWith(
-                    color: colorScheme.onBackground.withOpacity(0.7),
+                    color: colorScheme.onSurface.withOpacity(0.7),
                   ),
                 ),
                 
@@ -192,7 +192,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Text(
                         'OR',
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onBackground.withOpacity(0.6),
+                          color: colorScheme.onSurface.withOpacity(0.6),
                         ),
                       ),
                     ),
@@ -219,7 +219,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Text(
                       'Don\'t have an account? ',
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onBackground.withOpacity(0.7),
+                        color: colorScheme.onSurface.withOpacity(0.7),
                       ),
                     ),
                     GestureDetector(

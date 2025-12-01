@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+
 import '../../providers/appointment_provider.dart';
 import '../../widgets/doctor/doctor_appointment_card.dart';
-import '../../models/appointment_model.dart';
+
 
 class DoctorAppointmentListScreen extends StatefulWidget {
   const DoctorAppointmentListScreen({super.key});

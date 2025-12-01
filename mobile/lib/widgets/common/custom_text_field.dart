@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 class CustomTextField extends StatefulWidget {
 
   const CustomTextField({
-    Key? key,
+    super.key,
     this.label,
     this.hint,
     this.initialValue,
@@ -37,7 +37,7 @@ class CustomTextField extends StatefulWidget {
     this.errorBorder,
     this.autofocus = false,
     this.textCapitalization = TextCapitalization.none,
-  }) : super(key: key);
+  });
   final String? label;
   final String? hint;
   final String? initialValue;
@@ -232,7 +232,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
 class EmailTextField extends StatelessWidget {
 
   const EmailTextField({
-    Key? key,
+    super.key,
     this.label = 'Email',
     this.initialValue,
     this.controller,
@@ -241,7 +241,7 @@ class EmailTextField extends StatelessWidget {
     this.onSaved,
     this.enabled = true,
     this.focusNode,
-  }) : super(key: key);
+  });
   final String? label;
   final String? initialValue;
   final TextEditingController? controller;
@@ -272,7 +272,7 @@ class EmailTextField extends StatelessWidget {
 class PasswordTextField extends StatelessWidget {
 
   const PasswordTextField({
-    Key? key,
+    super.key,
     this.label = 'Password',
     this.hint = 'Enter your password',
     this.controller,
@@ -282,7 +282,7 @@ class PasswordTextField extends StatelessWidget {
     this.enabled = true,
     this.focusNode,
     this.textInputAction = TextInputAction.done,
-  }) : super(key: key);
+  });
   final String? label;
   final String? hint;
   final TextEditingController? controller;
@@ -313,7 +313,7 @@ class PasswordTextField extends StatelessWidget {
 class PhoneTextField extends StatelessWidget {
 
   const PhoneTextField({
-    Key? key,
+    super.key,
     this.label = 'Phone Number',
     this.controller,
     this.validator,
@@ -321,7 +321,7 @@ class PhoneTextField extends StatelessWidget {
     this.onSaved,
     this.enabled = true,
     this.focusNode,
-  }) : super(key: key);
+  });
   final String? label;
   final TextEditingController? controller;
   final String? Function(String?)? validator;
@@ -352,14 +352,14 @@ class PhoneTextField extends StatelessWidget {
 class SearchTextField extends StatelessWidget {
 
   const SearchTextField({
-    Key? key,
+    super.key,
     this.hint = 'Search...',
     this.controller,
     this.onChanged,
     this.onClear,
     this.enabled = true,
     this.focusNode,
-  }) : super(key: key);
+  });
   final String? hint;
   final TextEditingController? controller;
   final void Function(String)? onChanged;

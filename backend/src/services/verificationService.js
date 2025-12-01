@@ -1,8 +1,12 @@
 import crypto from 'crypto';
 import { sendVerificationEmail } from '../utils/email.js';
+import initModels from '../models/index.js';
 import logger from '../config/logger.js';
 import config from '../config/index.js';
-import models from '../models/index.js';
+
+// Initialize models
+const models = initModels();
+
 /**
  * Generate 6-digit verification code
  * @returns {string} - 6-digit numeric code

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class LoadingWidget extends StatelessWidget {
 
@@ -15,7 +14,6 @@ class LoadingWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
     return Center(
@@ -45,7 +43,7 @@ class LoadingWidget extends StatelessWidget {
           ] else ...[
             const SizedBox(height: 16),
             Text(
-              l10n.loadingPleaseWait,
+              'Please wait...',
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurface.withOpacity(0.6),
               ),
@@ -61,9 +59,7 @@ class LoadingWidget extends StatelessWidget {
 class LoadingOverlay extends StatelessWidget {
 
   const LoadingOverlay({
-    super.key,
-    required this.isLoading,
-    required this.child,
+    required this.isLoading, required this.child, super.key,
     this.message,
   });
   final bool isLoading;

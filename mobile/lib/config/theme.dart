@@ -13,8 +13,6 @@ class AppTheme {
     onSecondary: Colors.black,
     error: Color(0xFFB00020),
     onError: Colors.white,
-    background: Color(0xFFF5F5F5),
-    onBackground: Colors.black,
     surface: Colors.white,
     onSurface: Colors.black,
   );
@@ -27,8 +25,6 @@ class AppTheme {
     onSecondary: Colors.black,
     error: Color(0xFFCF6679),
     onError: Colors.black,
-    background: Color(0xFF121212),
-    onBackground: Colors.white,
     surface: Color(0xFF1E1E1E),
     onSurface: Colors.white,
   );
@@ -137,10 +133,10 @@ class AppTheme {
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
     ),
-    cardTheme: CardTheme(
+    cardTheme: const CardThemeData(
       elevation: 2,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.all(Radius.circular(12)),
       ),
     ),
     // RTL support
@@ -187,10 +183,10 @@ class AppTheme {
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
     ),
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(12)),
       ),
       color: _darkColorScheme.surface,
     ),

@@ -2,13 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/health_profile_provider.dart';
-import '../../models/health_profile_model.dart';
 import '../../widgets/health_profile/vitals_card.dart';
 import '../../widgets/health_profile/chronic_condition_tile.dart';
 import '../../widgets/health_profile/allergy_tile.dart';
 
 class HealthProfileViewScreen extends StatefulWidget {
-  const HealthProfileViewScreen({Key? key}) : super(key: key);
+  const HealthProfileViewScreen({super.key});
 
   @override
   State<HealthProfileViewScreen> createState() => _HealthProfileViewScreenState();
@@ -147,13 +146,13 @@ class _HealthProfileViewScreenState extends State<HealthProfileViewScreen> {
                     onAdd: () => context.push('/health-profile/chronic-condition/add'),
                   ),
                   const SizedBox(height: 8),
-                  if (profile.chronicConditions == null || profile.chronicConditions!.isEmpty)
+                  if (profile.chronicConditions.isEmpty)
                     _buildEmptyState(context, 'No chronic conditions recorded')
                   else
-                    ...profile.chronicConditions!.map((condition) =>
+                    ...profile.chronicConditions.map((condition) =>
                         ChronicConditionTile(
                           condition: condition,
-                          onDelete: () => _deleteChronicCondition(context, condition['name']),
+                          onDelete: () => _deleteChronicCondition(context, condition.id),
                         )),
                   const SizedBox(height: 16),
 
@@ -165,23 +164,23 @@ class _HealthProfileViewScreenState extends State<HealthProfileViewScreen> {
                     onAdd: () => context.push('/health-profile/allergy/add'),
                   ),
                   const SizedBox(height: 8),
-                  if (profile.allergies == null || profile.allergies!.isEmpty)
+                  if (profile.allergies.isEmpty)
                     _buildEmptyState(context, 'No allergies recorded')
                   else
-                    ...profile.allergies!.map((allergy) => AllergyTile(
+                    ...profile.allergies.map((allergy) => AllergyTile(
                           allergy: allergy,
-                          onDelete: () => _deleteAllergy(context, allergy['allergen']),
+                          onDelete: () => _deleteAllergy(context, allergy.allergen),
                         )),
                   const SizedBox(height: 16),
 
                   // Current Medications Section
-                  if (profile.medications != null && profile.medications!.isNotEmpty) ...[
+                  if (profile.currentMedications.isNotEmpty) ...[
                     _buildSectionHeader(context, 'Current Medications', Icons.medication),
                     const SizedBox(height: 8),
-                    ...profile.medications!.map((med) => Card(
+                    ...profile.currentMedications.map((med) => Card(
                           child: ListTile(
                             leading: const Icon(Icons.medication),
-                            title: Text(med),
+                            title: Text(med.name),
                           ),
                         )),
                     const SizedBox(height: 16),
@@ -197,12 +196,12 @@ class _HealthProfileViewScreenState extends State<HealthProfileViewScreen> {
                     Card(
                       child: ListTile(
                         leading: const Icon(Icons.person),
-                        title: Text(profile.emergencyContact!['name'] ?? 'N/A'),
+                        title: Text(profile.emergencyContact!.name ?? 'N/A'),
                         subtitle: Text(
-                          '${profile.emergencyContact!['relationship'] ?? ''}\n${profile.emergencyContact!['phone'] ?? ''}'
+                          '${profile.emergencyContact!.relationship ?? ''}\n${profile.emergencyContact!.phone ?? ''}'
                               .trim(),
                         ),
-                        trailing: profile.emergencyContact!['phone'] != null
+                        trailing: profile.emergencyContact!.phone != null
                             ? IconButton(
                                 icon: const Icon(Icons.phone),
                                 onPressed: () {
@@ -292,25 +291,6 @@ class _HealthProfileViewScreenState extends State<HealthProfileViewScreen> {
       ),
     );
   }
-
-  Widget _buildInfoRow(String label, String value) => Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              label,
-              style: const TextStyle(fontWeight: FontWeight.w500),
-            ),
-          ),
-          Expanded(
-            flex: 3,
-            child: Text(value),
-          ),
-        ],
-      ),
-    );
 
   void _showQuickActions(BuildContext context) {
     showModalBottomSheet(

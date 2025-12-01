@@ -5,13 +5,13 @@ import '../../utils/constants.dart';
 class VerificationStatusCard extends StatelessWidget {
 
   const VerificationStatusCard({
-    Key? key,
+    super.key,
     required this.verifications,
     required this.userRole,
     this.isLoading = false,
     this.onRefresh,
     this.onResubmit,
-  }) : super(key: key);
+  });
   final List<Verification> verifications;
   final String userRole;
   final bool isLoading;
@@ -140,7 +140,7 @@ class VerificationStatusCard extends StatelessWidget {
                 docType,
                 verification,
               );
-            }).toList(),
+            }),
 
             const SizedBox(height: 16),
 
@@ -443,7 +443,7 @@ class VerificationStatusCard extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 4),
               child: Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.error_outline,
                     color: Colors.red,
                     size: 16,
@@ -457,7 +457,7 @@ class VerificationStatusCard extends StatelessWidget {
                   ),
                 ],
               ),
-            )).toList(),
+            )),
           ],
         ),
         actions: [

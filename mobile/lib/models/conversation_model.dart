@@ -1,11 +1,7 @@
-import 'package:json_annotation/json_annotation.dart';
 import 'user_model.dart';
 import 'message_model.dart';
 
-part 'conversation_model.g.dart';
-
 /// Represents a conversation in the chat system
-@JsonSerializable(explicitToJson: true)
 class Conversation {
 
   Conversation({
@@ -13,49 +9,88 @@ class Conversation {
     required this.type,
     required this.participantIds,
     required this.createdBy,
-    this.lastMessageAt,
+    required this.createdAt, required this.updatedAt, this.lastMessageAt,
     this.metadata,
-    required this.createdAt,
-    required this.updatedAt,
     this.unreadCount,
     this.participants,
     this.lastMessage,
   });
 
   /// Creates a Conversation from JSON
-  factory Conversation.fromJson(Map<String, dynamic> json) =>
-      _$ConversationFromJson(json);
+  factory Conversation.fromJson(Map<String, dynamic> json) => Conversation(
+      id: json['id']?.toString() ?? '',
+      type: (json['type'] as String?) ?? 'direct',
+      participantIds: json['participant_ids'] != null
+          ? List<String>.from(json['participant_ids'] as List)
+          : json['participantIds'] != null
+              ? List<String>.from(json['participantIds'] as List)
+              : [],
+      createdBy: (json['created_by'] as String?) ?? (json['createdBy'] as String?) ?? '',
+      lastMessageAt: json['last_message_at'] != null
+          ? DateTime.parse(json['last_message_at'] as String)
+          : json['lastMessageAt'] != null
+              ? DateTime.parse(json['lastMessageAt'] as String)
+              : null,
+      metadata: json['metadata'] as Map<String, dynamic>?,
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'] as String)
+          : json['createdAt'] != null
+              ? DateTime.parse(json['createdAt'] as String)
+              : DateTime.now(),
+      updatedAt: json['updated_at'] != null
+          ? DateTime.parse(json['updated_at'] as String)
+          : json['updatedAt'] != null
+              ? DateTime.parse(json['updatedAt'] as String)
+              : DateTime.now(),
+      unreadCount: (json['unread_count'] as int?) ?? (json['unreadCount'] as int?),
+      participants: json['participants'] != null
+          ? (json['participants'] as List)
+              .map((e) => User.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : null,
+      lastMessage: json['last_message'] != null
+          ? Message.fromJson(json['last_message'] as Map<String, dynamic>)
+          : json['lastMessage'] != null
+              ? Message.fromJson(json['lastMessage'] as Map<String, dynamic>)
+              : null,
+    );
   final String id;
   final String type; // 'direct', 'group', 'channel'
   
-  @JsonKey(name: 'participant_ids')
   final List<String> participantIds;
   
-  @JsonKey(name: 'created_by')
   final String createdBy;
   
-  @JsonKey(name: 'last_message_at')
   final DateTime? lastMessageAt;
   
   final Map<String, dynamic>? metadata;
   
-  @JsonKey(name: 'created_at')
   final DateTime createdAt;
   
-  @JsonKey(name: 'updated_at')
   final DateTime updatedAt;
   
   // Virtual fields from API
-  @JsonKey(name: 'unread_count')
   final int? unreadCount;
   
   final List<User>? participants;
   
-  @JsonKey(name: 'last_message')
   final Message? lastMessage;
 
   /// Converts Conversation to JSON
-  Map<String, dynamic> toJson() => _$ConversationToJson(this);
+  Map<String, dynamic> toJson() => {
+      'id': id,
+      'type': type,
+      'participant_ids': participantIds,
+      'created_by': createdBy,
+      'last_message_at': lastMessageAt?.toIso8601String(),
+      'metadata': metadata,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+      'unread_count': unreadCount,
+      if (participants != null)
+        'participants': participants!.map((e) => e.toJson()).toList(),
+      if (lastMessage != null) 'last_message': lastMessage!.toJson(),
+    };
 
   /// Creates a copy of the conversation with updated fields
   Conversation copyWith({
@@ -115,15 +150,10 @@ class Conversation {
       return metadata!['avatar_url'] as String;
     }
 
-    // For direct conversations, return the other participant's avatar
-    if (type == 'direct' && participants != null && participants!.isNotEmpty) {
-      final otherParticipant = participants!.firstWhere(
-        (p) => p.id != currentUserId,
-        orElse: () => participants!.first,
-      );
-      return otherParticipant.profilePicture;
-    }
-
+    // For direct conversations, could return the other participant's avatar
+    // User model doesn't have profilePicture field yet
+    // Return null for now or implement profile picture field later
+    
     return null;
   }
 

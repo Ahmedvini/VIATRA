@@ -9,11 +9,11 @@ import 'booking_confirmation_screen.dart';
 class TimeSlotSelectionScreen extends StatefulWidget {
 
   const TimeSlotSelectionScreen({
-    Key? key,
+    super.key,
     required this.doctorId,
     required this.doctorName,
     required this.specialty,
-  }) : super(key: key);
+  });
   final String doctorId;
   final String doctorName;
   final String specialty;
@@ -62,7 +62,7 @@ class _TimeSlotSelectionScreenState extends State<TimeSlotSelectionScreen> {
   }
 
   Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
+    final picked = await showDatePicker(
       context: context,
       initialDate: _selectedDate,
       firstDate: DateTime.now(),
@@ -285,14 +285,12 @@ class _TimeSlotSelectionScreenState extends State<TimeSlotSelectionScreen> {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  _isLoading
-                      ? const Center(
+                  if (_isLoading) const Center(
                           child: Padding(
                             padding: EdgeInsets.all(32.0),
                             child: CircularProgressIndicator(),
                           ),
-                        )
-                      : Consumer<AppointmentProvider>(
+                        ) else Consumer<AppointmentProvider>(
                           builder: (context, provider, child) {
                             final slots = provider.availableSlots;
                             if (slots.isEmpty) {

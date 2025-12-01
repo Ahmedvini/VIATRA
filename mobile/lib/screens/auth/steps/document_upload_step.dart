@@ -7,7 +7,7 @@ import '../../../widgets/registration/document_upload_widget.dart';
 import '../../../models/user_model.dart';
 
 class DocumentUploadStep extends StatefulWidget {
-  const DocumentUploadStep({Key? key}) : super(key: key);
+  const DocumentUploadStep({super.key});
 
   @override
   State<DocumentUploadStep> createState() => _DocumentUploadStepState();
@@ -27,15 +27,15 @@ class _DocumentUploadStepState extends State<DocumentUploadStep> {
   void _loadExistingFiles() {
     final provider = context.read<RegistrationProvider>();
     setState(() {
-      _selectedFiles = Map.from(provider.uploadedDocuments);
+      _selectedFiles = Map.from(provider.documents);
     });
   }
 
   List<DocumentUploadConfig> _getRequiredDocuments() {
     final provider = context.read<RegistrationProvider>();
-    final userType = provider.formData['userType'] as UserType?;
+    final userRole = provider.selectedRole;
 
-    if (userType == UserType.doctor) {
+    if (userRole == UserRole.doctor) {
       return [
         const DocumentUploadConfig(
           type: 'identity_document',
@@ -90,7 +90,7 @@ class _DocumentUploadStepState extends State<DocumentUploadStep> {
     final provider = context.read<RegistrationProvider>();
     
     try {
-      await provider.uploadDocument(documentType, file);
+      provider.addDocument(documentType, file);
       
       setState(() {
         _uploadingDocuments.remove(documentType);
@@ -123,6 +123,8 @@ class _DocumentUploadStepState extends State<DocumentUploadStep> {
   }
 
   void _handleFileRemoved(String documentType) {
+    final provider = context.read<RegistrationProvider>();
+    provider.removeDocument(documentType);
     setState(() {
       _selectedFiles.remove(documentType);
       _errors.remove(documentType);
@@ -157,13 +159,12 @@ class _DocumentUploadStepState extends State<DocumentUploadStep> {
     final provider = context.read<RegistrationProvider>();
     
     try {
-      // Submit registration
-      await provider.submitRegistration();
+      // The actual registration submission happens in nextStep
+      // which internally calls _submitRegistration
+      await provider.nextStep();
       
       if (!mounted) return;
       
-      // Navigate to verification pending screen
-      provider.nextStep();
     } catch (e) {
       if (!mounted) return;
       
@@ -281,12 +282,11 @@ class _DocumentUploadStepState extends State<DocumentUploadStep> {
           ),
           child: SafeArea(
             child: Row(
-              children: [
-                Expanded(
+              children: [                  Expanded(
                   child: CustomButton(
                     text: 'Back',
                     onPressed: provider.isLoading ? null : _back,
-                    type: ButtonType.outlined,
+                    variant: ButtonVariant.outlined,
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -297,7 +297,7 @@ class _DocumentUploadStepState extends State<DocumentUploadStep> {
                     onPressed: provider.isLoading || !_canContinue()
                         ? null
                         : _continue,
-                    type: ButtonType.primary,
+                    variant: ButtonVariant.primary,
                     isLoading: provider.isLoading,
                   ),
                 ),

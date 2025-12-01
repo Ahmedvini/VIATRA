@@ -7,9 +7,9 @@ import '../appointments/time_slot_selection_screen.dart';
 class DoctorDetailScreen extends StatefulWidget {
 
   const DoctorDetailScreen({
-    Key? key,
+    super.key,
     required this.doctorId,
-  }) : super(key: key);
+  });
   final String doctorId;
 
   @override
@@ -151,7 +151,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                       ),
                       if (doctor.isVerified) ...[
                         const SizedBox(width: 8),
-                        Icon(
+                        const Icon(
                           Icons.verified,
                           color: Colors.blue,
                           size: 24,
@@ -182,7 +182,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       if (doctor.rating != null) ...[
-                        Icon(Icons.star, color: Colors.amber, size: 20),
+                        const Icon(Icons.star, color: Colors.amber, size: 20),
                         const SizedBox(width: 4),
                         Text(
                           doctor.rating!.toStringAsFixed(1),
@@ -198,7 +198,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                         const SizedBox(width: 16),
                       ],
                       if (doctor.yearsOfExperience != null) ...[
-                        Icon(Icons.work_outline, size: 20),
+                        const Icon(Icons.work_outline, size: 20),
                         const SizedBox(width: 4),
                         Text(
                           '${doctor.yearsOfExperience} years',

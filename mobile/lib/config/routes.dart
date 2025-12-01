@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+
+import '../models/health_profile_model.dart';
 import '../providers/auth_provider.dart';
-import '../screens/auth/login_screen.dart';
-import '../screens/auth/role_selection_screen.dart';
-import '../screens/auth/registration_form_screen.dart';
-import '../screens/auth/verification_pending_screen.dart';
-import '../screens/health_profile/health_profile_view_screen.dart';
-import '../screens/health_profile/health_profile_edit_screen.dart';
-import '../screens/health_profile/chronic_condition_form_screen.dart';
-import '../screens/health_profile/allergy_form_screen.dart';
-import '../screens/doctor_search/doctor_search_screen.dart';
-import '../screens/doctor_search/doctor_detail_screen.dart';
-import '../screens/appointments/appointment_list_screen.dart';
 import '../screens/appointments/appointment_detail_screen.dart';
-import '../screens/doctor/doctor_dashboard_screen.dart';
-import '../screens/doctor/doctor_appointment_list_screen.dart';
+import '../screens/appointments/appointment_list_screen.dart';
+import '../screens/auth/login_screen.dart';
+import '../screens/auth/registration_form_screen.dart';
+import '../screens/auth/role_selection_screen.dart';
+import '../screens/auth/verification_pending_screen.dart';
 import '../screens/doctor/doctor_appointment_detail_screen.dart';
+import '../screens/doctor/doctor_appointment_list_screen.dart';
+import '../screens/doctor/doctor_dashboard_screen.dart';
+import '../screens/doctor_search/doctor_detail_screen.dart';
+import '../screens/doctor_search/doctor_search_screen.dart';
+import '../screens/health_profile/allergy_form_screen.dart';
+import '../screens/health_profile/chronic_condition_form_screen.dart';
+import '../screens/health_profile/health_profile_edit_screen.dart';
+import '../screens/health_profile/health_profile_view_screen.dart';
 import '../screens/main_app_shell.dart';
 import '../screens/profile/profile_screen.dart';
 
@@ -86,10 +88,8 @@ class AppRouter {
         path: '/health-profile/edit',
         name: 'health-profile-edit',
         builder: (context, state) {
-          final profile = state.extra;
-          return HealthProfileEditScreen(
-            profile: profile != null ? profile as dynamic : null,
-          );
+          final profile = state.extra as HealthProfile?;
+          return HealthProfileEditScreen(profile: profile);
         },
       ),
       GoRoute(

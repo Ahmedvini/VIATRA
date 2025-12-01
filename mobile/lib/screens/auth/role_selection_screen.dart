@@ -6,7 +6,7 @@ import '../../providers/registration_provider.dart';
 import '../../widgets/common/custom_button.dart';
 
 class RoleSelectionScreen extends StatelessWidget {
-  const RoleSelectionScreen({Key? key}) : super(key: key);
+  const RoleSelectionScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +14,7 @@ class RoleSelectionScreen extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      backgroundColor: colorScheme.background,
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
         title: const Text('Create Account'),
         backgroundColor: Colors.transparent,
@@ -33,7 +33,7 @@ class RoleSelectionScreen extends StatelessWidget {
                 'Choose Your Role',
                 style: theme.textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: colorScheme.onBackground,
+                  color: colorScheme.onSurface,
                 ),
               ),
               
@@ -42,7 +42,7 @@ class RoleSelectionScreen extends StatelessWidget {
               Text(
                 'Select how you\'ll be using Viatra Health to get started with the right registration process.',
                 style: theme.textTheme.bodyLarge?.copyWith(
-                  color: colorScheme.onBackground.withOpacity(0.7),
+                  color: colorScheme.onSurface.withOpacity(0.7),
                   height: 1.5,
                 ),
               ),
@@ -95,7 +95,7 @@ class RoleSelectionScreen extends StatelessWidget {
                   Text(
                     'Already have an account? ',
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onBackground.withOpacity(0.7),
+                      color: colorScheme.onSurface.withOpacity(0.7),
                     ),
                   ),
                   GestureDetector(
@@ -123,14 +123,14 @@ class RoleSelectionScreen extends StatelessWidget {
 class _RoleCard extends StatelessWidget {
 
   const _RoleCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.subtitle,
     required this.icon,
     required this.features,
     required this.role,
     required this.color,
-  }) : super(key: key);
+  });
   final String title;
   final String subtitle;
   final IconData icon;
@@ -246,7 +246,7 @@ class _RoleCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                )).toList(),
+                )),
                 
                 const SizedBox(height: 20),
                 
@@ -277,15 +277,14 @@ class _RoleCard extends StatelessWidget {
 class MinimalRoleSelection extends StatelessWidget {
 
   const MinimalRoleSelection({
-    Key? key,
+    super.key,
     this.onRoleSelected,
-  }) : super(key: key);
+  });
   final void Function(UserRole role)? onRoleSelected;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
 
     return Column(
       mainAxisSize: MainAxisSize.min,

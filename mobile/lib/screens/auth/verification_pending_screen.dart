@@ -6,7 +6,7 @@ import '../../widgets/registration/verification_status_card.dart';
 import '../../widgets/common/custom_button.dart';
 
 class VerificationPendingScreen extends StatefulWidget {
-  const VerificationPendingScreen({Key? key}) : super(key: key);
+  const VerificationPendingScreen({super.key});
 
   @override
   State<VerificationPendingScreen> createState() => _VerificationPendingScreenState();
@@ -80,7 +80,7 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
                         Text(
                           'Your registration has been submitted successfully. We\'re reviewing your documents.',
                           style: theme.textTheme.bodyLarge?.copyWith(
-                            color: colorScheme.onBackground.withOpacity(0.7),
+                            color: colorScheme.onSurface.withOpacity(0.7),
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -111,7 +111,7 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: colorScheme.surfaceVariant.withOpacity(0.3),
+                      color: colorScheme.surfaceContainerHighest.withOpacity(0.3),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: colorScheme.outline.withOpacity(0.2),
@@ -182,7 +182,7 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
                       ),
                       child: Row(
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.email_outlined,
                             color: Colors.orange,
                           ),

@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import '../../models/user_model.dart';
-import '../../config/theme.dart';
+
 
 /// Reusable role switcher widget
 class RoleSwitcherWidget extends StatelessWidget {
 
   const RoleSwitcherWidget({
-    super.key,
-    required this.availableRoles,
-    required this.activeRole,
-    required this.onRoleChanged,
+    required this.availableRoles, required this.activeRole, required this.onRoleChanged, super.key,
   });
   final List<UserRole> availableRoles;
   final UserRole activeRole;
@@ -57,7 +54,7 @@ class RoleSwitcherWidget extends StatelessWidget {
             Icon(
               icon,
               size: 18,
-              color: isActive ? Colors.white : AppTheme.primaryColor,
+              color: isActive ? Colors.white : Theme.of(context).colorScheme.primary,
             ),
             const SizedBox(width: 8),
             Text(label),
@@ -68,7 +65,7 @@ class RoleSwitcherWidget extends StatelessWidget {
             onRoleChanged(role);
           }
         },
-        selectedColor: AppTheme.primaryColor,
+        selectedColor: Theme.of(context).colorScheme.primary,
         checkmarkColor: Colors.white,
         labelStyle: TextStyle(
           color: isActive ? Colors.white : Colors.black87,

@@ -4,11 +4,9 @@ import '../../../providers/registration_provider.dart';
 import '../../../widgets/common/custom_text_field.dart';
 import '../../../widgets/common/custom_button.dart';
 import '../../../widgets/common/custom_dropdown.dart';
-import '../../../utils/constants.dart';
-import '../../../models/doctor_model.dart';
 
 class ProfessionalInfoStep extends StatefulWidget {
-  const ProfessionalInfoStep({Key? key}) : super(key: key);
+  const ProfessionalInfoStep({super.key});
 
   @override
   State<ProfessionalInfoStep> createState() => _ProfessionalInfoStepState();
@@ -24,6 +22,24 @@ class _ProfessionalInfoStepState extends State<ProfessionalInfoStep> {
   
   String? _selectedSpecialty;
   List<String> _selectedLanguages = [];
+  
+  final List<String> _medicalSpecialties = [
+    'General Practice',
+    'Cardiology',
+    'Dermatology',
+    'Endocrinology',
+    'Gastroenterology',
+    'Neurology',
+    'Obstetrics & Gynecology',
+    'Oncology',
+    'Ophthalmology',
+    'Orthopedics',
+    'Pediatrics',
+    'Psychiatry',
+    'Radiology',
+    'Surgery',
+    'Urology',
+  ];
   
   final List<String> _availableLanguages = [
     'English',
@@ -46,17 +62,15 @@ class _ProfessionalInfoStepState extends State<ProfessionalInfoStep> {
 
   void _loadExistingData() {
     final provider = context.read<RegistrationProvider>();
-    final doctorData = provider.doctorData;
+    final data = provider.formData;
     
-    if (doctorData != null) {
-      _licenseNumberController.text = doctorData.licenseNumber ?? '';
-      _selectedSpecialty = doctorData.specialty;
-      _yearsOfExperienceController.text = doctorData.yearsOfExperience?.toString() ?? '';
-      _selectedLanguages = doctorData.languages ?? [];
-      _bioController.text = doctorData.bio ?? '';
-      _clinicNameController.text = doctorData.clinicName ?? '';
-      _clinicAddressController.text = doctorData.clinicAddress ?? '';
-    }
+    _licenseNumberController.text = (data['licenseNumber'] as String?) ?? '';
+    _selectedSpecialty = data['specialty'] as String?;
+    _yearsOfExperienceController.text = data['yearsOfExperience']?.toString() ?? '';
+    _selectedLanguages = (data['languages'] as List<dynamic>?)?.cast<String>() ?? [];
+    _bioController.text = (data['bio'] as String?) ?? '';
+    _clinicNameController.text = (data['clinicName'] as String?) ?? '';
+    _clinicAddressController.text = (data['clinicAddress'] as String?) ?? '';
   }
 
   @override
@@ -91,7 +105,7 @@ class _ProfessionalInfoStepState extends State<ProfessionalInfoStep> {
     final provider = context.read<RegistrationProvider>();
     
     // Update doctor data
-    provider.updateDoctorData({
+    provider.updateMultipleFormData({
       'licenseNumber': _licenseNumberController.text.trim(),
       'specialty': _selectedSpecialty,
       'yearsOfExperience': int.tryParse(_yearsOfExperienceController.text.trim()) ?? 0,
@@ -136,10 +150,9 @@ class _ProfessionalInfoStepState extends State<ProfessionalInfoStep> {
           // License Number
           CustomTextField(
             controller: _licenseNumberController,
-            labelText: 'Medical License Number',
-            hintText: 'Enter your license number',
-            prefixIcon: Icons.badge,
-            isRequired: true,
+            label: 'Medical License Number',
+            hint: 'Enter your license number',
+            prefixIcon: const Icon(Icons.badge),
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
                 return 'License number is required';
@@ -152,14 +165,13 @@ class _ProfessionalInfoStepState extends State<ProfessionalInfoStep> {
           // Specialty
           CustomDropdown<String>(
             value: _selectedSpecialty,
-            labelText: 'Specialty',
-            hintText: 'Select your specialty',
-            prefixIcon: Icons.local_hospital,
-            isRequired: true,
-            items: AppConstants.medicalSpecialties
-                .map((specialty) => DropdownMenuItem(
+            label: 'Specialty',
+            hint: 'Select your specialty',
+            prefixIcon: const Icon(Icons.local_hospital),
+            items: _medicalSpecialties
+                .map((specialty) => DropdownItem<String>(
                       value: specialty,
-                      child: Text(specialty),
+                      text: specialty,
                     ))
                 .toList(),
             onChanged: (value) {
@@ -167,17 +179,22 @@ class _ProfessionalInfoStepState extends State<ProfessionalInfoStep> {
                 _selectedSpecialty = value;
               });
             },
+            validator: (value) {
+              if (value == null) {
+                return 'Specialty is required';
+              }
+              return null;
+            },
           ),
           const SizedBox(height: 16),
 
           // Years of Experience
           CustomTextField(
             controller: _yearsOfExperienceController,
-            labelText: 'Years of Experience',
-            hintText: 'Enter years of experience',
-            prefixIcon: Icons.work,
+            label: 'Years of Experience',
+            hint: 'Enter years of experience',
+            prefixIcon: const Icon(Icons.work),
             keyboardType: TextInputType.number,
-            isRequired: true,
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
                 return 'Years of experience is required';
@@ -201,9 +218,9 @@ class _ProfessionalInfoStepState extends State<ProfessionalInfoStep> {
           // Bio
           CustomTextField(
             controller: _bioController,
-            labelText: 'Professional Bio',
-            hintText: 'Tell us about yourself and your experience',
-            prefixIcon: Icons.description,
+            label: 'Professional Bio',
+            hint: 'Tell us about yourself and your experience',
+            prefixIcon: const Icon(Icons.description),
             maxLines: 5,
             maxLength: 500,
             validator: (value) {
@@ -218,18 +235,18 @@ class _ProfessionalInfoStepState extends State<ProfessionalInfoStep> {
           // Clinic Name (Optional)
           CustomTextField(
             controller: _clinicNameController,
-            labelText: 'Clinic/Hospital Name',
-            hintText: 'Enter clinic or hospital name (optional)',
-            prefixIcon: Icons.business,
+            label: 'Clinic/Hospital Name',
+            hint: 'Enter clinic or hospital name (optional)',
+            prefixIcon: const Icon(Icons.business),
           ),
           const SizedBox(height: 16),
 
           // Clinic Address (Optional)
           CustomTextField(
             controller: _clinicAddressController,
-            labelText: 'Clinic/Hospital Address',
-            hintText: 'Enter clinic or hospital address (optional)',
-            prefixIcon: Icons.location_on,
+            label: 'Clinic/Hospital Address',
+            hint: 'Enter clinic or hospital address (optional)',
+            prefixIcon: const Icon(Icons.location_on),
             maxLines: 2,
           ),
           const SizedBox(height: 32),
@@ -241,7 +258,7 @@ class _ProfessionalInfoStepState extends State<ProfessionalInfoStep> {
                 child: CustomButton(
                   text: 'Back',
                   onPressed: _back,
-                  type: ButtonType.outlined,
+                  variant: ButtonVariant.outlined,
                 ),
               ),
               const SizedBox(width: 16),
@@ -249,7 +266,7 @@ class _ProfessionalInfoStepState extends State<ProfessionalInfoStep> {
                 child: CustomButton(
                   text: 'Continue',
                   onPressed: _continue,
-                  type: ButtonType.primary,
+                  variant: ButtonVariant.primary,
                 ),
               ),
             ],

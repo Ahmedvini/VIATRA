@@ -7,7 +7,7 @@ import '../../../widgets/common/custom_button.dart';
 import '../../../widgets/common/custom_text_field.dart';
 
 class BasicInfoStep extends StatefulWidget {
-  const BasicInfoStep({Key? key}) : super(key: key);
+  const BasicInfoStep({super.key});
 
   @override
   State<BasicInfoStep> createState() => _BasicInfoStepState();
@@ -34,13 +34,13 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
     final provider = context.read<RegistrationProvider>();
     final data = provider.formData;
     
-    _firstNameController.text = data['firstName'] ?? '';
-    _lastNameController.text = data['lastName'] ?? '';
-    _emailController.text = data['email'] ?? '';
-    _phoneController.text = data['phone'] ?? '';
-    _passwordController.text = data['password'] ?? '';
-    _confirmPasswordController.text = data['password'] ?? '';
-    _dateOfBirth = data['dateOfBirth'];
+    _firstNameController.text = (data['firstName'] as String?) ?? '';
+    _lastNameController.text = (data['lastName'] as String?) ?? '';
+    _emailController.text = (data['email'] as String?) ?? '';
+    _phoneController.text = (data['phone'] as String?) ?? '';
+    _passwordController.text = (data['password'] as String?) ?? '';
+    _confirmPasswordController.text = (data['password'] as String?) ?? '';
+    _dateOfBirth = data['dateOfBirth'] as DateTime?;
   }
 
   @override
@@ -90,7 +90,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
     final provider = context.read<RegistrationProvider>();
     
     // Update form data
-    provider.updateFormData({
+    provider.updateMultipleFormData({
       'firstName': _firstNameController.text.trim(),
       'lastName': _lastNameController.text.trim(),
       'email': _emailController.text.trim(),
@@ -133,10 +133,9 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
               Expanded(
                 child: CustomTextField(
                   controller: _firstNameController,
-                  labelText: 'First Name',
-                  hintText: 'Enter your first name',
-                  prefixIcon: Icons.person,
-                  isRequired: true,
+                  label: 'First Name',
+                  hint: 'Enter your first name',
+                  prefixIcon: const Icon(Icons.person),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return 'First name is required';
@@ -149,10 +148,9 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
               Expanded(
                 child: CustomTextField(
                   controller: _lastNameController,
-                  labelText: 'Last Name',
-                  hintText: 'Enter your last name',
-                  prefixIcon: Icons.person,
-                  isRequired: true,
+                  label: 'Last Name',
+                  hint: 'Enter your last name',
+                  prefixIcon: const Icon(Icons.person),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return 'Last name is required';
@@ -168,11 +166,10 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
           // Email
           CustomTextField(
             controller: _emailController,
-            labelText: 'Email',
-            hintText: 'Enter your email',
-            prefixIcon: Icons.email,
+            label: 'Email',
+            hint: 'Enter your email',
+            prefixIcon: const Icon(Icons.email),
             keyboardType: TextInputType.emailAddress,
-            isRequired: true,
             validator: Validators.validateEmail,
           ),
           const SizedBox(height: 16),
@@ -180,11 +177,10 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
           // Phone
           CustomTextField(
             controller: _phoneController,
-            labelText: 'Phone Number',
-            hintText: 'Enter your phone number',
-            prefixIcon: Icons.phone,
+            label: 'Phone Number',
+            hint: 'Enter your phone number',
+            prefixIcon: const Icon(Icons.phone),
             keyboardType: TextInputType.phone,
-            isRequired: true,
             validator: Validators.validatePhone,
           ),
           const SizedBox(height: 16),
@@ -199,10 +195,9 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
                       ? '${_dateOfBirth!.day.toString().padLeft(2, '0')}/${_dateOfBirth!.month.toString().padLeft(2, '0')}/${_dateOfBirth!.year}'
                       : '',
                 ),
-                labelText: 'Date of Birth',
-                hintText: 'Select your date of birth',
-                prefixIcon: Icons.calendar_today,
-                isRequired: true,
+                label: 'Date of Birth',
+                hint: 'Select your date of birth',
+                prefixIcon: const Icon(Icons.calendar_today),
                 validator: (value) {
                   if (_dateOfBirth == null) {
                     return 'Date of birth is required';
@@ -217,11 +212,10 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
           // Password
           CustomTextField(
             controller: _passwordController,
-            labelText: 'Password',
-            hintText: 'Enter your password',
-            prefixIcon: Icons.lock,
-            isPassword: true,
-            isRequired: true,
+            label: 'Password',
+            hint: 'Enter your password',
+            prefixIcon: const Icon(Icons.lock),
+            obscureText: true,
             validator: Validators.validatePassword,
           ),
           const SizedBox(height: 16),
@@ -229,11 +223,10 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
           // Confirm Password
           CustomTextField(
             controller: _confirmPasswordController,
-            labelText: 'Confirm Password',
-            hintText: 'Confirm your password',
-            prefixIcon: Icons.lock,
-            isPassword: true,
-            isRequired: true,
+            label: 'Confirm Password',
+            hint: 'Confirm your password',
+            prefixIcon: const Icon(Icons.lock),
+            obscureText: true,
             validator: (value) {
               if (value != _passwordController.text) {
                 return 'Passwords do not match';
@@ -247,7 +240,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
           CustomButton(
             text: 'Continue',
             onPressed: _continue,
-            type: ButtonType.primary,
+            variant: ButtonVariant.primary,
           ),
         ],
       ),

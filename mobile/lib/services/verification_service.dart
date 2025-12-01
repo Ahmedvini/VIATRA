@@ -1,6 +1,7 @@
 import 'dart:io';
-import '../services/api_service.dart';
+
 import '../models/verification_model.dart';
+import '../services/api_service.dart';
 
 class VerificationService {
 
@@ -28,19 +29,20 @@ class VerificationService {
         '/verification/submit',
         file,
         fieldName: 'document',
-        additionalData: formData,
+        fields: formData,
       );
       
-      if (response.isSuccess && response.data != null) {
-        final verificationData = response.data!['data'] ?? response.data!;
+      if (response.success && response.data != null) {
+        final responseData = response.data as Map<String, dynamic>;
+        final verificationData = responseData['data'] ?? responseData;
         
         // Map the response to Verification model
         final verification = Verification(
-          id: verificationData['verificationId']?.toString() ?? '',
+          id: (verificationData['verificationId'] as String?) ?? verificationData['id']?.toString() ?? '',
           userId: token, // We don't get userId back, using token as placeholder
-          documentType: _parseDocumentType(verificationData['documentType'] ?? documentType),
-          documentUrl: verificationData['documentUrl'],
-          status: _parseStatus(verificationData['status']),
+          documentType: (verificationData['documentType'] as String?) ?? documentType,
+          documentUrl: verificationData['documentUrl'] as String?,
+          status: _parseStatus(verificationData['status'] as String?),
           submittedAt: _parseDateTime(verificationData['submittedAt']),
         );
         
@@ -61,12 +63,13 @@ class VerificationService {
       
       final response = await _apiService.get('/verification/status');
       
-      if (response.isSuccess && response.data != null) {
-        final data = response.data!['data'] ?? response.data!;
-        final verificationsData = data['verifications'] as List? ?? [];
+      if (response.success && response.data != null) {
+        final responseData = response.data as Map<String, dynamic>;
+        final data = responseData['data'] ?? responseData;
+        final verificationsData = (data['verifications'] as List?) ?? [];
         
         final verifications = verificationsData
-            .map((item) => Verification.fromJson(item))
+            .map((item) => Verification.fromJson(item as Map<String, dynamic>))
             .toList();
         
         return ApiResponse.success(verifications);
@@ -89,9 +92,9 @@ class VerificationService {
         requestData['language'] = language;
       }
       
-      final response = await _apiService.post('/verification/resend-email', requestData);
+      final response = await _apiService.post('/verification/resend-email', body: requestData);
       
-      if (response.isSuccess) {
+      if (response.success) {
         return ApiResponse.success(null);
       }
       
@@ -109,9 +112,10 @@ class VerificationService {
       
       final response = await _apiService.get('/verification/document/$documentId');
       
-      if (response.isSuccess && response.data != null) {
-        final verificationData = response.data!['data'] ?? response.data!;
-        final verification = Verification.fromJson(verificationData);
+      if (response.success && response.data != null) {
+        final responseData = response.data as Map<String, dynamic>;
+        final verificationData = responseData['data'] ?? responseData;
+        final verification = Verification.fromJson(verificationData as Map<String, dynamic>);
         
         return ApiResponse.success(verification);
       }
@@ -122,24 +126,7 @@ class VerificationService {
     }
   }
 
-  // Helper methods for parsing backend data
-  static DocumentType _parseDocumentType(String? typeStr) {
-    switch (typeStr?.toLowerCase()) {
-      case 'medical_license':
-      case 'license':
-        return DocumentType.license;
-      case 'board_certification':
-      case 'education_certificate':
-      case 'certificate':
-        return DocumentType.certificate;
-      case 'identification':
-      case 'id_card':
-        return DocumentType.id_card;
-      default:
-        return DocumentType.license;
-    }
-  }
-
+  // Helper method for parsing status
   static VerificationStatus _parseStatus(String? statusStr) {
     switch (statusStr?.toLowerCase()) {
       case 'pending':

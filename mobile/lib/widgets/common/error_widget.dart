@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 enum ErrorType {
   network,
@@ -27,10 +26,9 @@ class ErrorDisplayWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
-    final errorMessage = message ?? _getDefaultMessage(l10n, type);
+    final errorMessage = message ?? _getDefaultMessage(type);
     final errorIcon = icon ?? _getDefaultIcon(type);
 
     if (compact) {
@@ -62,7 +60,7 @@ class ErrorDisplayWidget extends StatelessWidget {
               ElevatedButton.icon(
                 onPressed: onRetry,
                 icon: const Icon(Icons.refresh),
-                label: Text(l10n.buttonRetry),
+                label: const Text('Retry'),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 24,
@@ -82,10 +80,7 @@ class ErrorDisplayWidget extends StatelessWidget {
     String errorMessage,
     IconData errorIcon,
     ThemeData theme,
-  ) {
-    final l10n = AppLocalizations.of(context)!;
-
-    return Container(
+  ) => Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: theme.colorScheme.errorContainer,
@@ -111,27 +106,25 @@ class ErrorDisplayWidget extends StatelessWidget {
             const SizedBox(width: 12),
             TextButton(
               onPressed: onRetry,
-              child: Text(l10n.buttonRetry),
+              child: const Text('Retry'),
             ),
           ],
         ],
       ),
     );
-  }
 
-  String _getDefaultMessage(AppLocalizations l10n, ErrorType type) {
+  String _getDefaultMessage(ErrorType type) {
     switch (type) {
       case ErrorType.network:
-        return l10n.errorNetwork;
+        return 'Network connection error. Please check your internet connection.';
       case ErrorType.auth:
-        return l10n.errorAuth;
+        return 'Authentication error. Please log in again.';
       case ErrorType.validation:
-        return l10n.errorValidation;
+        return 'Validation error. Please check your input.';
       case ErrorType.server:
-        return l10n.errorServer;
+        return 'Server error. Please try again later.';
       case ErrorType.unknown:
-      default:
-        return l10n.errorUnknown;
+        return 'An unexpected error occurred. Please try again.';
     }
   }
 
@@ -146,7 +139,6 @@ class ErrorDisplayWidget extends StatelessWidget {
       case ErrorType.server:
         return Icons.dns_outlined;
       case ErrorType.unknown:
-      default:
         return Icons.warning_amber_outlined;
     }
   }
@@ -160,7 +152,6 @@ class ErrorSnackBar {
     VoidCallback? onRetry,
   }) {
     final theme = Theme.of(context);
-    final l10n = AppLocalizations.of(context)!;
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -180,7 +171,7 @@ class ErrorSnackBar {
         behavior: SnackBarBehavior.floating,
         action: onRetry != null
             ? SnackBarAction(
-                label: l10n.buttonRetry,
+                label: 'Retry',
                 textColor: Colors.white,
                 onPressed: onRetry,
               )
@@ -200,7 +191,6 @@ class ErrorSnackBar {
       case ErrorType.server:
         return Icons.dns_outlined;
       case ErrorType.unknown:
-      default:
         return Icons.warning_amber_outlined;
     }
   }

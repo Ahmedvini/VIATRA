@@ -6,30 +6,23 @@ class Verification {
     required this.id,
     required this.userId,
     required this.documentType,
-    this.documentUrl,
-    required this.status,
-    required this.submittedAt,
+    required this.status, required this.submittedAt, this.documentUrl,
     this.reviewedAt,
     this.reviewedBy,
     this.comments,
   });
 
-  factory Verification.fromJson(Map<String, dynamic> json) {
-    return Verification(
+  factory Verification.fromJson(Map<String, dynamic> json) => Verification(
       id: json['id']?.toString() ?? '',
-      userId: json['userId'] ?? json['user_id']?.toString() ?? '',
-      documentType: json['documentType'] ?? json['document_type'] ?? '',
-      documentUrl: json['documentUrl'] ?? json['document_url'],
-      status: _parseStatus(json['status']),
+      userId: (json['userId'] as String?) ?? json['user_id']?.toString() ?? '',
+      documentType: (json['documentType'] as String?) ?? (json['document_type'] as String?) ?? '',
+      documentUrl: (json['documentUrl'] as String?) ?? (json['document_url'] as String?),
+      status: _parseStatus(json['status'] as String?),
       submittedAt: _parseDateTime(json['submittedAt'] ?? json['submitted_at']),
       reviewedAt: _parseDateTime(json['reviewedAt'] ?? json['reviewed_at']),
-      reviewedBy: json['reviewedBy'] ?? json['reviewed_by'],
-      comments: json['comments'] ?? json['admin_notes'],
+      reviewedBy: (json['reviewedBy'] as String?) ?? (json['reviewed_by'] as String?),
+      comments: (json['comments'] as String?) ?? (json['admin_notes'] as String?),
     );
-  } VerificationStatus.rejected:
-       VerificationStatus.rejected:
-        return 'rejected'; VerificationStatus.notSubmitted:
-        return 'not_submitted';
   final String id;
   final String userId;
   final String documentType;  // Changed from enum to String
@@ -121,12 +114,8 @@ class Verification {
         return 'not_submitted';
     }
   }
-      casecase
-      case
-    }
-  }
 
-  DateTime _parseDateTime(dynamic dateTime) {
+  static DateTime _parseDateTime(dynamic dateTime) {
     if (dateTime == null) return DateTime.now();
     if (dateTime is DateTime) return dateTime;
     if (dateTime is String) {

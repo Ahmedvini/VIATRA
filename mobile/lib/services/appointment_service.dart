@@ -20,14 +20,12 @@ class PaginationMetadata {
     required this.totalPages,
   });
 
-  factory PaginationMetadata.fromJson(Map<String, dynamic> json) {
-    return PaginationMetadata(
+  factory PaginationMetadata.fromJson(Map<String, dynamic> json) => PaginationMetadata(
       total: json['total'] as int,
       page: json['page'] as int,
       limit: json['limit'] as int,
       totalPages: json['totalPages'] as int,
     );
-  }
   final int total;
   final int page;
   final int limit;

@@ -11,12 +11,9 @@ class Appointment {
     required this.appointmentType,
     required this.scheduledStart,
     required this.scheduledEnd,
-    this.actualStart,
+    required this.status, required this.reasonForVisit, required this.urgent, this.actualStart,
     this.actualEnd,
-    required this.status,
-    required this.reasonForVisit,
     this.chiefComplaint,
-    required this.urgent,
     this.followUpRequired,
     this.followUpInstructions,
     this.cancellationReason,
@@ -29,54 +26,52 @@ class Appointment {
     this.patient,
   });
 
-  factory Appointment.fromJson(Map<String, dynamic> json) {
-    return Appointment(
+  factory Appointment.fromJson(Map<String, dynamic> json) => Appointment(
       id: json['id']?.toString() ?? '',
-      patientId: json['patientId'] ?? json['patient_id']?.toString() ?? '',
-      doctorId: json['doctorId'] ?? json['doctor_id']?.toString() ?? '',
-      appointmentType: json['appointmentType'] ?? json['appointment_type'] ?? '',
-      scheduledStart: DateTime.parse(json['scheduledStart'] ?? json['scheduled_start']),
-      scheduledEnd: DateTime.parse(json['scheduledEnd'] ?? json['scheduled_end']),
+      patientId: (json['patientId'] ?? json['patient_id'])?.toString() ?? '',
+      doctorId: (json['doctorId'] ?? json['doctor_id'])?.toString() ?? '',
+      appointmentType: (json['appointmentType'] ?? json['appointment_type'] ?? '') as String,
+      scheduledStart: DateTime.parse((json['scheduledStart'] ?? json['scheduled_start']) as String),
+      scheduledEnd: DateTime.parse((json['scheduledEnd'] ?? json['scheduled_end']) as String),
       actualStart: json['actualStart'] != null 
-          ? DateTime.parse(json['actualStart'])
+          ? DateTime.parse(json['actualStart'] as String)
           : json['actual_start'] != null
-              ? DateTime.parse(json['actual_start'])
+              ? DateTime.parse(json['actual_start'] as String)
               : null,
       actualEnd: json['actualEnd'] != null
-          ? DateTime.parse(json['actualEnd'])
+          ? DateTime.parse(json['actualEnd'] as String)
           : json['actual_end'] != null
-              ? DateTime.parse(json['actual_end'])
+              ? DateTime.parse(json['actual_end'] as String)
               : null,
-      status: json['status'] ?? '',
-      reasonForVisit: json['reasonForVisit'] ?? json['reason_for_visit'] ?? '',
-      chiefComplaint: json['chiefComplaint'] ?? json['chief_complaint'],
-      urgent: json['urgent'] ?? false,
-      followUpRequired: json['followUpRequired'] ?? json['follow_up_required'],
-      followUpInstructions: json['followUpInstructions'] ?? json['follow_up_instructions'],
-      cancellationReason: json['cancellationReason'] ?? json['cancellation_reason'],
-      cancelledBy: json['cancelledBy'] ?? json['cancelled_by'],
+      status: (json['status'] ?? '') as String,
+      reasonForVisit: (json['reasonForVisit'] ?? json['reason_for_visit'] ?? '') as String,
+      chiefComplaint: (json['chiefComplaint'] ?? json['chief_complaint']) as String?,
+      urgent: (json['urgent'] ?? false) as bool,
+      followUpRequired: (json['followUpRequired'] ?? json['follow_up_required']) as bool?,
+      followUpInstructions: (json['followUpInstructions'] ?? json['follow_up_instructions']) as String?,
+      cancellationReason: (json['cancellationReason'] ?? json['cancellation_reason']) as String?,
+      cancelledBy: (json['cancelledBy'] ?? json['cancelled_by']) as String?,
       cancelledAt: json['cancelledAt'] != null
-          ? DateTime.parse(json['cancelledAt'])
+          ? DateTime.parse(json['cancelledAt'] as String)
           : json['cancelled_at'] != null
-              ? DateTime.parse(json['cancelled_at'])
+              ? DateTime.parse(json['cancelled_at'] as String)
               : null,
-      notes: json['notes'],
+      notes: json['notes'] as String?,
       createdAt: json['createdAt'] != null
-          ? DateTime.parse(json['createdAt'])
+          ? DateTime.parse(json['createdAt'] as String)
           : json['created_at'] != null
-              ? DateTime.parse(json['created_at'])
+              ? DateTime.parse(json['created_at'] as String)
               : null,
       updatedAt: json['updatedAt'] != null
-          ? DateTime.parse(json['updatedAt'])
+          ? DateTime.parse(json['updatedAt'] as String)
           : json['updated_at'] != null
-              ? DateTime.parse(json['updated_at'])
+              ? DateTime.parse(json['updated_at'] as String)
               : null,
       doctor: json['doctor'] != null
           ? Doctor.fromJson(json['doctor'] as Map<String, dynamic>)
           : null,
       patient: json['patient'] as Map<String, dynamic>?,
     );
-  }
   final String id;
   final String patientId;
   final String doctorId;
@@ -287,13 +282,11 @@ class TimeSlot {
     required this.available,
   });
 
-  factory TimeSlot.fromJson(Map<String, dynamic> json) {
-    return TimeSlot(
-      start: DateTime.parse(json['start']),
-      end: DateTime.parse(json['end']),
-      available: json['available'] ?? false,
+  factory TimeSlot.fromJson(Map<String, dynamic> json) => TimeSlot(
+      start: DateTime.parse(json['start'] as String),
+      end: DateTime.parse(json['end'] as String),
+      available: (json['available'] ?? false) as bool,
     );
-  }
   final DateTime start;
   final DateTime end;
   final bool available;

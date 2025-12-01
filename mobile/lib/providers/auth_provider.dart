@@ -1,9 +1,10 @@
 import 'package:flutter/foundation.dart';
+
+import '../models/auth_response_model.dart';
+import '../models/user_model.dart';
+import '../services/api_service.dart';
 import '../services/auth_service.dart';
 import '../services/storage_service.dart';
-import '../services/api_service.dart';
-import '../models/user_model.dart';
-import '../models/auth_response_model.dart';
 
 /// Authentication state
 enum AuthState {
@@ -80,12 +81,12 @@ class AuthProvider extends ChangeNotifier {
         _refreshToken = refreshToken;
         
         // Set token on API service for authenticated requests
-        _apiService.setAuthToken(token);
+        _apiService.setAccessToken(token);
         
         // Validate token with backend
         final response = await _authService.getCurrentUser(token);
         
-        if (response.isSuccess && response.data != null) {
+        if (response.success && response.data != null) {
           _user = response.data!;
           
           // Load saved active role or default to user's primary role
@@ -107,7 +108,7 @@ class AuthProvider extends ChangeNotifier {
         } else {
           // Try to refresh token if we have a refresh token
           if (refreshToken != null) {
-            final refreshResult = await this.refreshToken();
+            final refreshResult = await _refreshAuthToken();
             if (refreshResult) return;
           }
         }
@@ -128,7 +129,7 @@ class AuthProvider extends ChangeNotifier {
     await _storageService.removeSecureValue('refresh_token');
     await _storageService.removeValue('user_data');
     await _storageService.removeValue('active_role');
-    _apiService.clearAuthToken();
+    _apiService.setAccessToken(null);
     _user = null;
     _accessToken = null;
     _refreshToken = null;
@@ -144,7 +145,7 @@ class AuthProvider extends ChangeNotifier {
       // Call real auth service
       final response = await _authService.login(email, password, rememberMe);
       
-      if (response.isSuccess && response.data != null) {
+      if (response.success && response.data != null) {
         final authResponse = response.data!;
         
         // Store tokens and user data
@@ -163,7 +164,7 @@ class AuthProvider extends ChangeNotifier {
         await _storageService.setValue('active_role', _roleToString(_activeRole!));
         
         // Set token on API service for subsequent requests
-        _apiService.setAuthToken(_accessToken!);
+        _apiService.setAccessToken(_accessToken!);
         
         _setState(AuthState.authenticated);
         return true;
@@ -186,7 +187,7 @@ class AuthProvider extends ChangeNotifier {
       // Call real auth service with user data
       final response = await _authService.register(userData);
       
-      if (response.isSuccess && response.data != null) {
+      if (response.success && response.data != null) {
         final authResponse = response.data!;
         
         // Store tokens and user data
@@ -205,7 +206,7 @@ class AuthProvider extends ChangeNotifier {
         await _storageService.setValue('active_role', _roleToString(_activeRole!));
         
         // Set token on API service for subsequent requests
-        _apiService.setAuthToken(_accessToken!);
+        _apiService.setAccessToken(_accessToken!);
         
         _setState(AuthState.authenticated);
         return true;
@@ -253,14 +254,14 @@ class AuthProvider extends ChangeNotifier {
   }
 
   /// Refresh authentication token
-  Future<bool> refreshToken() async {
+  Future<bool> _refreshAuthToken() async {
     try {
       if (_refreshToken == null) return false;
 
       // Call real auth service to refresh token
       final response = await _authService.refreshToken(_refreshToken!);
       
-      if (response.isSuccess && response.data != null) {
+      if (response.success && response.data != null) {
         final tokens = response.data!;
         
         // Update tokens
@@ -276,11 +277,11 @@ class AuthProvider extends ChangeNotifier {
         }
         
         // Update API service with new token
-        _apiService.setAuthToken(_accessToken!);
+        _apiService.setAccessToken(_accessToken!);
         
         // Fetch updated user profile with new token
         final userResponse = await _authService.getCurrentUser(_accessToken!);
-        if (userResponse.isSuccess && userResponse.data != null) {
+        if (userResponse.success && userResponse.data != null) {
           _user = userResponse.data!;
           await _storageService.setValue('user_data', _user!.toJson());
           
@@ -317,7 +318,7 @@ class AuthProvider extends ChangeNotifier {
       // Call real auth service to request password reset
       final response = await _authService.requestPasswordReset(email);
       
-      if (response.isSuccess) {
+      if (response.success) {
         _setState(_user != null ? AuthState.authenticated : AuthState.unauthenticated);
         return true;
       } else {
@@ -344,7 +345,7 @@ class AuthProvider extends ChangeNotifier {
       // Call real auth service to update profile
       final response = await _authService.updateProfile(_accessToken!, updates);
       
-      if (response.isSuccess && response.data != null) {
+      if (response.success && response.data != null) {
         // Update local user data with response
         _user = response.data!;
         await _storageService.setValue('user_data', _user!.toJson());

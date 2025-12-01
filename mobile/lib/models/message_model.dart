@@ -1,34 +1,59 @@
-import 'package:json_annotation/json_annotation.dart';
 import 'user_model.dart';
 
-part 'message_model.g.dart';
-
 /// Represents a message in a conversation
-@JsonSerializable(explicitToJson: true)
 class Message {
 
   Message({
     required this.id,
     required this.conversationId,
     required this.senderId,
-    this.parentMessageId,
-    required this.messageType,
+    required this.messageType, required this.createdAt, required this.updatedAt, this.parentMessageId,
     this.content,
     this.metadata,
     this.readBy = const [],
     this.deliveredTo = const [],
     this.isEdited = false,
     this.isDeleted = false,
-    required this.createdAt,
-    required this.updatedAt,
     this.sender,
     this.isPending = false,
     this.isFailed = false,
   });
 
   /// Creates a Message from JSON
-  factory Message.fromJson(Map<String, dynamic> json) =>
-      _$MessageFromJson(json);
+  factory Message.fromJson(Map<String, dynamic> json) => Message(
+      id: json['id']?.toString() ?? '',
+      conversationId: (json['conversation_id'] as String?) ?? (json['conversationId'] as String?) ?? '',
+      senderId: (json['sender_id'] as String?) ?? (json['senderId'] as String?) ?? '',
+      parentMessageId: (json['parent_message_id'] as String?) ?? (json['parentMessageId'] as String?),
+      messageType: (json['message_type'] as String?) ?? (json['messageType'] as String?) ?? 'text',
+      content: json['content'] as String?,
+      metadata: json['metadata'] as Map<String, dynamic>?,
+      readBy: json['read_by'] != null
+          ? List<String>.from(json['read_by'] as List)
+          : json['readBy'] != null
+              ? List<String>.from(json['readBy'] as List)
+              : [],
+      deliveredTo: json['delivered_to'] != null
+          ? List<String>.from(json['delivered_to'] as List)
+          : json['deliveredTo'] != null
+              ? List<String>.from(json['deliveredTo'] as List)
+              : [],
+      isEdited: (json['is_edited'] as bool?) ?? (json['isEdited'] as bool?) ?? false,
+      isDeleted: (json['is_deleted'] as bool?) ?? (json['isDeleted'] as bool?) ?? false,
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'] as String)
+          : json['createdAt'] != null
+              ? DateTime.parse(json['createdAt'] as String)
+              : DateTime.now(),
+      updatedAt: json['updated_at'] != null
+          ? DateTime.parse(json['updated_at'] as String)
+          : json['updatedAt'] != null
+              ? DateTime.parse(json['updatedAt'] as String)
+              : DateTime.now(),
+      sender: json['sender'] != null
+          ? User.fromJson(json['sender'] as Map<String, dynamic>)
+          : null,
+    );
 
   /// Creates a temporary message for optimistic updates
   factory Message.pending({
@@ -55,52 +80,55 @@ class Message {
   }
   final String id;
   
-  @JsonKey(name: 'conversation_id')
   final String conversationId;
   
-  @JsonKey(name: 'sender_id')
   final String senderId;
   
-  @JsonKey(name: 'parent_message_id')
   final String? parentMessageId;
   
-  @JsonKey(name: 'message_type')
   final String messageType; // 'text', 'image', 'file', 'system'
   
   final String? content;
   
   final Map<String, dynamic>? metadata;
   
-  @JsonKey(name: 'read_by')
   final List<String> readBy;
   
-  @JsonKey(name: 'delivered_to')
   final List<String> deliveredTo;
   
-  @JsonKey(name: 'is_edited')
   final bool isEdited;
   
-  @JsonKey(name: 'is_deleted')
   final bool isDeleted;
   
-  @JsonKey(name: 'created_at')
   final DateTime createdAt;
   
-  @JsonKey(name: 'updated_at')
   final DateTime updatedAt;
   
   // Virtual field from API
   final User? sender;
   
   // Local-only field for optimistic updates
-  @JsonKey(includeFromJson: false, includeToJson: false)
   final bool isPending;
   
-  @JsonKey(includeFromJson: false, includeToJson: false)
   final bool isFailed;
 
   /// Converts Message to JSON
-  Map<String, dynamic> toJson() => _$MessageToJson(this);
+  Map<String, dynamic> toJson() => {
+      'id': id,
+      'conversation_id': conversationId,
+      'sender_id': senderId,
+      'parent_message_id': parentMessageId,
+      'message_type': messageType,
+      'content': content,
+      'metadata': metadata,
+      'read_by': readBy,
+      'delivered_to': deliveredTo,
+      'is_edited': isEdited,
+      'is_deleted': isDeleted,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+      if (sender != null) 'sender': sender!.toJson(),
+    };
 
   /// Creates a copy of the message with updated fields
   Message copyWith({

@@ -5,12 +5,12 @@ import '../../models/appointment_model.dart';
 class TimeSlotPicker extends StatelessWidget {
 
   const TimeSlotPicker({
-    Key? key,
+    super.key,
     required this.slots,
     required this.selectedSlot,
     required this.onSlotSelected,
     this.slotsPerRow = 3,
-  }) : super(key: key);
+  });
   final List<TimeSlot> slots;
   final TimeSlot? selectedSlot;
   final Function(TimeSlot) onSlotSelected;

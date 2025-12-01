@@ -8,7 +8,7 @@ import '../../utils/constants.dart';
 class DocumentUploadWidget extends StatefulWidget {
 
   const DocumentUploadWidget({
-    Key? key,
+    super.key,
     required this.documentType,
     required this.title,
     required this.description,
@@ -21,7 +21,7 @@ class DocumentUploadWidget extends StatefulWidget {
     this.error,
     this.isLoading = false,
     this.enabled = true,
-  }) : super(key: key);
+  });
   final String documentType;
   final String title;
   final String description;
@@ -546,7 +546,7 @@ class _DocumentUploadWidgetState extends State<DocumentUploadWidget> {
 class BatchDocumentUpload extends StatelessWidget {
 
   const BatchDocumentUpload({
-    Key? key,
+    super.key,
     required this.documents,
     required this.selectedFiles,
     this.errors = const {},
@@ -554,7 +554,7 @@ class BatchDocumentUpload extends StatelessWidget {
     this.onFileSelected,
     this.onFileRemoved,
     this.enabled = true,
-  }) : super(key: key);
+  });
   final List<DocumentUploadConfig> documents;
   final Map<String, File> selectedFiles;
   final Map<String, String> errors;
@@ -565,8 +565,7 @@ class BatchDocumentUpload extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Column(
-      children: documents.map((config) {
-        return DocumentUploadWidget(
+      children: documents.map((config) => DocumentUploadWidget(
           documentType: config.type,
           title: config.title,
           description: config.description,
@@ -579,8 +578,7 @@ class BatchDocumentUpload extends StatelessWidget {
           enabled: enabled,
           onFileSelected: (file) => onFileSelected?.call(config.type, file!),
           onFileRemoved: () => onFileRemoved?.call(config.type),
-        );
-      }).toList(),
+        )).toList(),
     );
 }
 

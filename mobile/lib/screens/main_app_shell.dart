@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
-import '../providers/auth_provider.dart';
+import 'package:provider/provider.dart';
+
 import '../models/user_model.dart';
-import '../config/theme.dart';
-import 'home/patient_home_screen.dart';
+import '../providers/auth_provider.dart';
 import 'doctor/doctor_dashboard_screen.dart';
+import 'home/patient_home_screen.dart';
 import 'profile/profile_screen.dart';
 
 /// Main application shell with role-based bottom navigation
@@ -48,7 +48,7 @@ class _MainAppShellState extends State<MainAppShell> {
             currentIndex: _currentIndex,
             onTap: _onTabTapped,
             type: BottomNavigationBarType.fixed,
-            selectedItemColor: AppTheme.primaryColor,
+            selectedItemColor: Theme.of(context).colorScheme.primary,
             unselectedItemColor: Colors.grey,
             items: navItems,
           ),
@@ -168,18 +168,6 @@ class _MainAppShellState extends State<MainAppShell> {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (_currentIndex == 1) {
             context.go('/doctor/appointments');
-          }
-        });
-        return const Center(child: CircularProgressIndicator());
-      },
-    );
-
-  /// Navigate to chat screen
-  Widget _buildChatScreen() => Builder(
-      builder: (context) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (_currentIndex == 2) {
-            context.go('/chat');
           }
         });
         return const Center(child: CircularProgressIndicator());

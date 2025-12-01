@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+
+import '../../models/appointment_model.dart';
 import '../../providers/appointment_provider.dart';
 import '../../widgets/doctor/dashboard_stat_card.dart';
 import '../../widgets/doctor/doctor_appointment_card.dart';
@@ -31,7 +33,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
     ]);
   }
 
-  List<dynamic> _getTodayAppointments(List appointments) {
+  List<Appointment> _getTodayAppointments(List<Appointment> appointments) {
     final today = DateTime.now();
     return appointments.where((apt) {
       final scheduledStart = apt.scheduledStart;

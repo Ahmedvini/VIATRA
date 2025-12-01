@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import '../../models/user_model.dart';
 import '../../providers/registration_provider.dart';
 import '../../widgets/common/custom_button.dart';
 import '../../widgets/common/error_widget.dart' as custom_error;
@@ -16,7 +13,7 @@ import '../../widgets/registration/professional_info_step.dart';
 import '../../widgets/registration/verification_step.dart';
 
 class RegistrationFormScreen extends StatefulWidget {
-  const RegistrationFormScreen({Key? key}) : super(key: key);
+  const RegistrationFormScreen({super.key});
 
   @override
   State<RegistrationFormScreen> createState() => _RegistrationFormScreenState();
@@ -26,15 +23,10 @@ class _RegistrationFormScreenState extends State<RegistrationFormScreen> {
   final _formKey = GlobalKey<FormState>();
 
   @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    return Scaffold(
+  Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(
         key: const Key('registration_app_bar'),
-        title: Text(l10n.registrationTitle),
+        title: const Text('Registration'),
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: Consumer<RegistrationProvider>(
@@ -56,8 +48,8 @@ class _RegistrationFormScreenState extends State<RegistrationFormScreen> {
       body: Consumer<RegistrationProvider>(
         builder: (context, registrationProvider, _) {
           if (registrationProvider.isLoading) {
-            return LoadingWidget(
-              message: l10n.loadingMessage,
+            return const LoadingWidget(
+              message: 'Loading...',
             );
           }
 
@@ -72,7 +64,7 @@ class _RegistrationFormScreenState extends State<RegistrationFormScreen> {
                   Padding(
                     padding: const EdgeInsetsDirectional.all(16.0),
                     child: custom_error.ErrorDisplayWidget(
-                      error: registrationProvider.error!,
+                      message: registrationProvider.error!,
                       onRetry: () => registrationProvider.clearError(),
                     ),
                   ),
@@ -93,13 +85,11 @@ class _RegistrationFormScreenState extends State<RegistrationFormScreen> {
         },
       ),
     );
-  }
 
   Widget _buildProgressIndicator(
     BuildContext context,
     RegistrationProvider registrationProvider,
   ) {
-    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -119,7 +109,7 @@ class _RegistrationFormScreenState extends State<RegistrationFormScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                _getStepTitle(l10n, registrationProvider.currentStep),
+                _getStepTitle(registrationProvider.currentStep),
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
@@ -138,7 +128,7 @@ class _RegistrationFormScreenState extends State<RegistrationFormScreen> {
             child: LinearProgressIndicator(
               value: progress,
               minHeight: 6,
-              backgroundColor: colorScheme.surfaceVariant,
+              backgroundColor: colorScheme.surfaceContainerHighest,
               valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
             ),
           ),
@@ -193,7 +183,6 @@ class _RegistrationFormScreenState extends State<RegistrationFormScreen> {
   }
 
   Widget _buildCompleteStep(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -210,7 +199,7 @@ class _RegistrationFormScreenState extends State<RegistrationFormScreen> {
             ),
             const SizedBox(height: 24),
             Text(
-              l10n.verificationCompleteMessage,
+              'Registration Complete!',
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -218,7 +207,7 @@ class _RegistrationFormScreenState extends State<RegistrationFormScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              l10n.buttonBackToHome,
+              'Your account has been successfully created.',
               style: theme.textTheme.bodyLarge?.copyWith(
                 color: colorScheme.onSurface.withOpacity(0.7),
               ),
@@ -227,7 +216,7 @@ class _RegistrationFormScreenState extends State<RegistrationFormScreen> {
             const SizedBox(height: 32),
             CustomButton(
               key: const Key('complete_go_home_button'),
-              text: l10n.buttonBackToHome,
+              text: 'Go to Home',
               onPressed: () => context.go('/'),
               variant: ButtonVariant.primary,
               size: ButtonSize.large,
@@ -243,8 +232,6 @@ class _RegistrationFormScreenState extends State<RegistrationFormScreen> {
     BuildContext context,
     RegistrationProvider registrationProvider,
   ) {
-    final l10n = AppLocalizations.of(context)!;
-
     if (registrationProvider.currentStep == RegistrationStep.verification ||
         registrationProvider.currentStep == RegistrationStep.complete) {
       return const SizedBox.shrink();
@@ -266,10 +253,11 @@ class _RegistrationFormScreenState extends State<RegistrationFormScreen> {
         children: [
           if (registrationProvider.canGoBack)
             Expanded(
-              child: OutlinedCustomButton(
+              child: CustomButton(
                 key: const Key('registration_back_button_bottom'),
-                text: l10n.buttonBack,
+                text: 'Back',
                 onPressed: () => registrationProvider.previousStep(),
+                variant: ButtonVariant.outlined,
                 size: ButtonSize.large,
               ),
             ),
@@ -278,7 +266,7 @@ class _RegistrationFormScreenState extends State<RegistrationFormScreen> {
             flex: registrationProvider.canGoBack ? 1 : 2,
             child: CustomButton(
               key: const Key('registration_next_button'),
-              text: _getNextButtonText(l10n, registrationProvider.currentStep),
+              text: _getNextButtonText(registrationProvider.currentStep),
               onPressed: registrationProvider.canGoNext
                   ? () => _handleNext(context, registrationProvider)
                   : null,
@@ -293,31 +281,31 @@ class _RegistrationFormScreenState extends State<RegistrationFormScreen> {
     );
   }
 
-  String _getStepTitle(AppLocalizations l10n, RegistrationStep step) {
+  String _getStepTitle(RegistrationStep step) {
     switch (step) {
       case RegistrationStep.basicInfo:
-        return l10n.stepPersonalInfo;
+        return 'Personal Information';
       case RegistrationStep.professionalInfo:
-        return l10n.stepProfessionalInfo;
+        return 'Professional Information';
       case RegistrationStep.addressInfo:
-        return l10n.labelAddress;
+        return 'Address';
       case RegistrationStep.documentUpload:
-        return l10n.stepDocuments;
+        return 'Documents';
       case RegistrationStep.verification:
-        return l10n.verificationPending;
+        return 'Verification Pending';
       case RegistrationStep.complete:
-        return l10n.verificationCompleteMessage;
+        return 'Complete';
       default:
         return '';
     }
   }
 
-  String _getNextButtonText(AppLocalizations l10n, RegistrationStep step) {
+  String _getNextButtonText(RegistrationStep step) {
     switch (step) {
       case RegistrationStep.documentUpload:
-        return l10n.buttonSubmit;
+        return 'Submit';
       default:
-        return l10n.buttonNext;
+        return 'Next';
     }
   }
 
@@ -331,21 +319,19 @@ class _RegistrationFormScreenState extends State<RegistrationFormScreen> {
   }
 
   Future<void> _showExitConfirmation(BuildContext context) async {
-    final l10n = AppLocalizations.of(context)!;
-
     final result = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(l10n.buttonCancel),
-        content: Text(l10n.confirmLogout),
+        title: const Text('Cancel Registration'),
+        content: const Text('Are you sure you want to cancel registration? All progress will be lost.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text(l10n.buttonCancel),
+            child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text(l10n.buttonSubmit),
+            child: const Text('Confirm'),
           ),
         ],
       ),

@@ -5,8 +5,7 @@ import '../../models/health_profile_model.dart';
 class AllergyTile extends StatelessWidget {
 
   const AllergyTile({
-    super.key,
-    required this.allergy,
+    required this.allergy, super.key,
     this.onTap,
     this.onDelete,
   });

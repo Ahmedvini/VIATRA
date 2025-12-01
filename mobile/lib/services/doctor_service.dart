@@ -1,4 +1,3 @@
-import 'dart:convert';
 import '../models/doctor_model.dart';
 import '../models/doctor_search_filter.dart';
 import 'api_service.dart';
@@ -26,14 +25,12 @@ class PaginationMetadata {
     required this.totalPages,
   });
 
-  factory PaginationMetadata.fromJson(Map<String, dynamic> json) {
-    return PaginationMetadata(
-      total: json['total'] ?? 0,
-      page: json['page'] ?? 1,
-      limit: json['limit'] ?? 20,
-      totalPages: json['totalPages'] ?? json['total_pages'] ?? 0,
+  factory PaginationMetadata.fromJson(Map<String, dynamic> json) => PaginationMetadata(
+      total: (json['total'] ?? 0) as int,
+      page: (json['page'] ?? 1) as int,
+      limit: (json['limit'] ?? 20) as int,
+      totalPages: (json['totalPages'] ?? json['total_pages'] ?? 0) as int,
     );
-  }
   final int total;
   final int page;
   final int limit;
@@ -72,17 +69,17 @@ class DoctorService {
         queryParams: queryParams,
       );
 
-      if (response.statusCode == 200) {
-        final jsonData = json.decode(response.body);
+      if (response.success && response.data != null) {
+        final jsonData = response.data as Map<String, dynamic>;
         
         // Parse doctors list
-        final List<dynamic> doctorsJson = jsonData['data']['doctors'] ?? [];
+        final doctorsJson = (jsonData['data']['doctors'] ?? []) as List<dynamic>;
         final doctors = doctorsJson
             .map((json) => Doctor.fromJson(json as Map<String, dynamic>))
             .toList();
 
         // Parse pagination
-        final paginationJson = jsonData['data']['pagination'] ?? {};
+        final paginationJson = (jsonData['data']['pagination'] ?? {}) as Map<String, dynamic>;
         final pagination = PaginationMetadata.fromJson(paginationJson);
 
         final result = DoctorSearchResult(
@@ -92,15 +89,14 @@ class DoctorService {
 
         return ApiResponse(
           success: true,
-          message: jsonData['message'],
+          message: jsonData['message'] as String?,
           data: result,
         );
       } else {
-        final errorData = json.decode(response.body);
         return ApiResponse(
           success: false,
-          message: errorData['message'] ?? 'Failed to search doctors',
-          error: errorData,
+          message: response.message ?? 'Failed to search doctors',
+          error: response.error,
         );
       }
     } catch (e) {
@@ -117,13 +113,13 @@ class DoctorService {
     try {
       final response = await _apiService.get('/doctors/$doctorId');
 
-      if (response.statusCode == 200) {
-        final jsonData = json.decode(response.body);
+      if (response.success && response.data != null) {
+        final jsonData = response.data as Map<String, dynamic>;
         final doctor = Doctor.fromJson(jsonData['data'] as Map<String, dynamic>);
 
         return ApiResponse(
           success: true,
-          message: jsonData['message'],
+          message: jsonData['message'] as String?,
           data: doctor,
         );
       } else if (response.statusCode == 404) {
@@ -133,11 +129,10 @@ class DoctorService {
           error: 'NOT_FOUND',
         );
       } else {
-        final errorData = json.decode(response.body);
         return ApiResponse(
           success: false,
-          message: errorData['message'] ?? 'Failed to fetch doctor',
-          error: errorData,
+          message: response.message ?? 'Failed to fetch doctor',
+          error: response.error,
         );
       }
     } catch (e) {
@@ -155,13 +150,13 @@ class DoctorService {
     try {
       final response = await _apiService.get('/doctors/$doctorId/availability');
 
-      if (response.statusCode == 200) {
-        final jsonData = json.decode(response.body);
+      if (response.success && response.data != null) {
+        final jsonData = response.data as Map<String, dynamic>;
         final availability = jsonData['data'] as Map<String, dynamic>;
 
         return ApiResponse(
           success: true,
-          message: jsonData['message'],
+          message: jsonData['message'] as String?,
           data: availability,
         );
       } else if (response.statusCode == 404) {
@@ -171,11 +166,10 @@ class DoctorService {
           error: 'NOT_FOUND',
         );
       } else {
-        final errorData = json.decode(response.body);
         return ApiResponse(
           success: false,
-          message: errorData['message'] ?? 'Failed to fetch availability',
-          error: errorData,
+          message: response.message ?? 'Failed to fetch availability',
+          error: response.error,
         );
       }
     } catch (e) {

@@ -14,23 +14,19 @@ class ApiResponse<T> {
     this.error,
   });
 
-  factory ApiResponse.success(T data, {String? message, int? statusCode}) {
-    return ApiResponse(
+  factory ApiResponse.success(T data, {String? message, int? statusCode}) => ApiResponse(
       success: true,
       data: data,
       message: message,
       statusCode: statusCode ?? 200,
     );
-  }
 
-  factory ApiResponse.error(String message, {int? statusCode, Map<String, dynamic>? error}) {
-    return ApiResponse(
+  factory ApiResponse.error(String message, {int? statusCode, Map<String, dynamic>? error}) => ApiResponse(
       success: false,
       message: message,
       statusCode: statusCode ?? 500,
       error: error,
     );
-  }
   final bool success;
   final T? data;
   final String? message;
@@ -52,6 +48,16 @@ class ApiService {
   /// Set authentication token
   void setAccessToken(String? token) {
     _accessToken = token;
+  }
+
+  /// Set authentication token (alias for consistency)
+  void setAuthToken(String? token) {
+    _accessToken = token;
+  }
+
+  /// Clear authentication token
+  void clearAuthToken() {
+    _accessToken = null;
   }
 
   /// Get default headers
@@ -220,7 +226,7 @@ class ApiService {
         return ApiResponse.error(
           responseData['message'] as String? ?? 'HTTP ${response.statusCode}',
           statusCode: response.statusCode,
-          error: responseData,
+          error: Map<String, dynamic>.from(responseData),
         );
       }
     } catch (e) {

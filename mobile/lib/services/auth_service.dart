@@ -1,6 +1,6 @@
-import '../services/api_service.dart';
 import '../models/auth_response_model.dart';
 import '../models/user_model.dart';
+import '../services/api_service.dart';
 
 class AuthService {
 
@@ -10,10 +10,10 @@ class AuthService {
   /// Register a new user
   Future<ApiResponse<AuthResponse>> register(Map<String, dynamic> userData) async {
     try {
-      final response = await _apiService.post('/auth/register', userData);
+      final response = await _apiService.post('/auth/register', body: userData);
       
-      if (response.isSuccess && response.data != null) {
-        final authResponse = AuthResponse.fromJson(response.data!);
+      if (response.success && response.data != null) {
+        final authResponse = AuthResponse.fromJson(response.data as Map<String, dynamic>);
         
         // Set tokens in ApiService headers for subsequent requests
         if (authResponse.tokens.hasValidTokens) {
@@ -42,10 +42,10 @@ class AuthService {
         'remember': rememberMe,
       };
       
-      final response = await _apiService.post('/auth/login', loginData);
+      final response = await _apiService.post('/auth/login', body: loginData);
       
-      if (response.isSuccess && response.data != null) {
-        final authResponse = AuthResponse.fromJson(response.data!);
+      if (response.success && response.data != null) {
+        final authResponse = AuthResponse.fromJson(response.data as Map<String, dynamic>);
         
         // Set tokens in ApiService headers for subsequent requests
         if (authResponse.tokens.hasValidTokens) {
@@ -67,12 +67,12 @@ class AuthService {
       // Set token for logout request
       _apiService.setAuthToken(token);
       
-      final response = await _apiService.post('/auth/logout', {});
+      final response = await _apiService.post('/auth/logout', body: {});
       
       // Clear token from ApiService regardless of response
       _apiService.clearAuthToken();
       
-      if (response.isSuccess) {
+      if (response.success) {
         return ApiResponse.success(null);
       }
       
@@ -92,9 +92,9 @@ class AuthService {
         'code': code,
       };
       
-      final response = await _apiService.post('/auth/verify-email', verifyData);
+      final response = await _apiService.post('/auth/verify-email', body: verifyData);
       
-      if (response.isSuccess) {
+      if (response.success) {
         return ApiResponse.success(null);
       }
       
@@ -112,9 +112,10 @@ class AuthService {
       
       final response = await _apiService.get('/auth/me');
       
-      if (response.isSuccess && response.data != null) {
-        final userData = response.data!['data'] ?? response.data!;
-        final user = User.fromJson(userData);
+      if (response.success && response.data != null) {
+        final responseData = response.data as Map<String, dynamic>;
+        final userData = responseData['data'] ?? responseData;
+        final user = User.fromJson(userData as Map<String, dynamic>);
         return ApiResponse.success(user);
       }
       
@@ -131,11 +132,12 @@ class AuthService {
         'refreshToken': refreshToken,
       };
       
-      final response = await _apiService.post('/auth/refresh-token', refreshData);
+      final response = await _apiService.post('/auth/refresh-token', body: refreshData);
       
-      if (response.isSuccess && response.data != null) {
-        final tokensData = response.data!['data'] ?? response.data!;
-        final tokens = AuthTokens.fromJson(tokensData);
+      if (response.success && response.data != null) {
+        final responseData = response.data as Map<String, dynamic>;
+        final tokensData = responseData['data'] ?? responseData;
+        final tokens = AuthTokens.fromJson(tokensData as Map<String, dynamic>);
         
         // Update ApiService with new access token
         if (tokens.accessToken.isNotEmpty) {
@@ -158,9 +160,9 @@ class AuthService {
         'email': email,
       };
       
-      final response = await _apiService.post('/auth/request-password-reset', resetData);
+      final response = await _apiService.post('/auth/request-password-reset', body: resetData);
       
-      if (response.isSuccess) {
+      if (response.success) {
         return ApiResponse.success(null);
       }
       
@@ -178,9 +180,9 @@ class AuthService {
         'newPassword': newPassword,
       };
       
-      final response = await _apiService.post('/auth/reset-password', resetData);
+      final response = await _apiService.post('/auth/reset-password', body: resetData);
       
-      if (response.isSuccess) {
+      if (response.success) {
         return ApiResponse.success(null);
       }
       
@@ -198,10 +200,11 @@ class AuthService {
       
       final response = await _apiService.get('/auth/validate-token');
       
-      if (response.isSuccess && response.data != null) {
-        final userData = response.data!['data']?['user'] ?? response.data!['user'];
+      if (response.success && response.data != null) {
+        final responseData = response.data as Map<String, dynamic>;
+        final userData = responseData['data']?['user'] ?? responseData['user'];
         if (userData != null) {
-          final user = User.fromJson(userData);
+          final user = User.fromJson(userData as Map<String, dynamic>);
           return ApiResponse.success(user);
         }
       }
@@ -218,11 +221,12 @@ class AuthService {
       // Set token for authenticated request
       _apiService.setAuthToken(token);
       
-      final response = await _apiService.put('/auth/profile', updates);
+      final response = await _apiService.put('/auth/profile', body: updates);
       
-      if (response.isSuccess && response.data != null) {
-        final userData = response.data!['data'] ?? response.data!;
-        final user = User.fromJson(userData);
+      if (response.success && response.data != null) {
+        final responseData = response.data as Map<String, dynamic>;
+        final userData = responseData['data'] ?? responseData;
+        final user = User.fromJson(userData as Map<String, dynamic>);
         return ApiResponse.success(user);
       }
       

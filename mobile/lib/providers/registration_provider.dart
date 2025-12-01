@@ -1,8 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import '../models/user_model.dart';
-import '../models/doctor_model.dart';
-import '../models/patient_model.dart';
 import '../models/verification_model.dart';
 import '../services/auth_service.dart';
 import '../services/verification_service.dart';
@@ -235,7 +233,7 @@ class RegistrationProvider with ChangeNotifier {
 
     try {
       // Create user data based on role
-      var userData = <String, dynamic>{
+      final userData = <String, dynamic>{
         'firstName': _formData['firstName'],
         'lastName': _formData['lastName'],
         'email': _formData['email'],
@@ -337,7 +335,11 @@ class RegistrationProvider with ChangeNotifier {
       _isLoading = true;
       notifyListeners();
 
-      _verifications = await _verificationService.getVerificationStatus(_accessToken!);
+      final response = await _verificationService.getVerificationStatus(_accessToken!);
+      
+      if (response.success && response.data != null) {
+        _verifications = response.data!;
+      }
       
       // Check if all required verifications are completed
       if (_areAllVerificationsCompleted()) {
@@ -381,7 +383,7 @@ class RegistrationProvider with ChangeNotifier {
       _isLoading = true;
       notifyListeners();
 
-      await _verificationService.resendVerificationEmail(_accessToken!, 'en');
+      await _verificationService.resendVerificationEmail(_accessToken!, language: 'en');
     } catch (e) {
       _error = e.toString();
     } finally {

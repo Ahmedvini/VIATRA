@@ -63,33 +63,29 @@ const dbConfig = {
       freezeTableName: true
     }
   },
-  production: {
-    username: config.user,
-    password: config.password,
-    database: config.name,
-    host: config.host,
-    port: config.port,
-    dialect: 'postgres',
-    logging: false,
-    ssl: isProduction,
-    dialectOptions: isProduction ? {
-      ssl: {
-        require: true,
-        rejectUnauthorized: false
-      }
-    } : {},
-    pool: {
-      max: 20,
-      min: 5,
-      acquire: 60000,
-      idle: 10000
-    },
-    define: {
-      timestamps: true,
-      underscored: true,
-      freezeTableName: true
+production: {
+  use_env_variable: 'DATABASE_URL',
+  dialect: 'postgres',
+  logging: false,
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false
     }
+  },
+  pool: {
+    max: 20,
+    min: 5,
+    acquire: 60000,
+    idle: 10000
+  },
+  define: {
+    timestamps: true,
+    underscored: true,
+    freezeTableName: true
   }
+}
 };
+
 
 module.exports = dbConfig;

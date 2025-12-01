@@ -1,125 +1,116 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+/// Helper class for localization - Currently using hardcoded English strings
+/// TODO: Implement proper localization when l10n files are available
 class LocalizationHelper {
-  static AppLocalizations of(BuildContext context) => AppLocalizations.of(context)!;
-
   static bool isRTL(BuildContext context) => Directionality.of(context) == TextDirection.rtl;
 
   static String getLocalizedGreeting(BuildContext context) {
     final hour = DateTime.now().hour;
-    final l10n = of(context);
 
     if (hour < 12) {
-      return l10n.greetingMorning;
+      return 'Good Morning';
     } else if (hour < 18) {
-      return l10n.greetingAfternoon;
+      return 'Good Afternoon';
     } else {
-      return l10n.greetingEvening;
+      return 'Good Evening';
     }
   }
 
   static String getLocalizedRole(BuildContext context, String role) {
-    final l10n = of(context);
     switch (role.toLowerCase()) {
       case 'doctor':
-        return l10n.roleDoctor;
+        return 'Doctor';
       case 'patient':
-        return l10n.rolePatient;
+        return 'Patient';
       default:
         return role;
     }
   }
 
   static String getLocalizedGender(BuildContext context, String gender) {
-    final l10n = of(context);
     switch (gender.toLowerCase()) {
       case 'male':
-        return l10n.genderMale;
+        return 'Male';
       case 'female':
-        return l10n.genderFemale;
+        return 'Female';
       case 'other':
-        return l10n.genderOther;
+        return 'Other';
       default:
-        return l10n.genderPreferNotToSay;
+        return 'Prefer not to say';
     }
   }
 
   static String getLocalizedSeverity(BuildContext context, String severity) {
-    final l10n = of(context);
     switch (severity.toLowerCase()) {
       case 'mild':
-        return l10n.severityMild;
+        return 'Mild';
       case 'moderate':
-        return l10n.severityModerate;
+        return 'Moderate';
       case 'severe':
-        return l10n.severitySevere;
+        return 'Severe';
       case 'life-threatening':
       case 'lifethreatening':
-        return l10n.severityLifeThreatening;
+        return 'Life-threatening';
       default:
         return severity;
     }
   }
 
   static String getLocalizedAppointmentStatus(BuildContext context, String status) {
-    final l10n = of(context);
     switch (status.toLowerCase()) {
       case 'scheduled':
-        return l10n.statusScheduled;
+        return 'Scheduled';
       case 'completed':
-        return l10n.statusCompleted;
+        return 'Completed';
       case 'cancelled':
-        return l10n.statusCancelled;
+        return 'Cancelled';
       case 'pending':
-        return l10n.statusPending;
+        return 'Pending';
       case 'confirmed':
-        return l10n.filterConfirmed;
+        return 'Confirmed';
       default:
         return status;
     }
   }
 
   static String getLocalizedVerificationStatus(BuildContext context, String status) {
-    final l10n = of(context);
     switch (status.toLowerCase()) {
       case 'pending':
-        return l10n.verificationPending;
+        return 'Pending';
       case 'approved':
-        return l10n.verificationApproved;
+        return 'Approved';
       case 'rejected':
-        return l10n.verificationRejected;
+        return 'Rejected';
       case 'under_review':
       case 'underreview':
-        return l10n.verificationUnderReview;
+        return 'Under Review';
       default:
         return status;
     }
   }
 
   static String getLocalizedBMICategory(BuildContext context, double bmi) {
-    final l10n = of(context);
     if (bmi < 18.5) {
-      return l10n.bmiUnderweight;
+      return 'Underweight';
     } else if (bmi < 25) {
-      return l10n.bmiNormal;
+      return 'Normal';
     } else if (bmi < 30) {
-      return l10n.bmiOverweight;
+      return 'Overweight';
     } else {
-      return l10n.bmiObese;
+      return 'Obese';
     }
   }
 
   static String getLocalizedConsultationType(BuildContext context, String type) {
-    final l10n = of(context);
     switch (type.toLowerCase()) {
       case 'in_person':
       case 'inperson':
-        return l10n.consultationTypeInPerson;
+        return 'In Person';
       case 'video':
-        return l10n.consultationTypeVideo;
+        return 'Video';
       case 'phone':
-        return l10n.consultationTypePhone;
+        return 'Phone';
       default:
         return type;
     }

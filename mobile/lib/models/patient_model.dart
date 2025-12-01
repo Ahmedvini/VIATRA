@@ -10,25 +10,23 @@ class Patient {
     this.address,
   });
 
-  factory Patient.fromJson(Map<String, dynamic> json) {
-    return Patient(
+  factory Patient.fromJson(Map<String, dynamic> json) => Patient(
       id: json['id']?.toString() ?? '',
-      userId: json['userId'] ?? json['user_id']?.toString() ?? '',
+      userId: (json['userId'] as String?) ?? json['user_id']?.toString() ?? '',
       dateOfBirth: json['dateOfBirth'] != null
-          ? DateTime.parse(json['dateOfBirth'])
+          ? DateTime.parse(json['dateOfBirth'] as String)
           : json['date_of_birth'] != null
-              ? DateTime.parse(json['date_of_birth'])
+              ? DateTime.parse(json['date_of_birth'] as String)
               : null,
-      gender: json['gender'],
-      bloodType: json['bloodType'] ?? json['blood_type'],
+      gender: json['gender'] as String?,
+      bloodType: (json['bloodType'] as String?) ?? (json['blood_type'] as String?),
       emergencyContact: json['emergencyContact'] != null
-          ? EmergencyContact.fromJson(json['emergencyContact'])
+          ? EmergencyContact.fromJson(json['emergencyContact'] as Map<String, dynamic>)
           : json['emergency_contact'] != null
-              ? EmergencyContact.fromJson(json['emergency_contact'])
+              ? EmergencyContact.fromJson(json['emergency_contact'] as Map<String, dynamic>)
               : null,
-      address: json['address'] != null ? Address.fromJson(json['address']) : null,
+      address: json['address'] != null ? Address.fromJson(json['address'] as Map<String, dynamic>) : null,
     );
-  }
   final String id;
   final String userId;
   final DateTime? dateOfBirth;
@@ -97,13 +95,11 @@ class EmergencyContact {
     required this.relationship,
   });
 
-  factory EmergencyContact.fromJson(Map<String, dynamic> json) {
-    return EmergencyContact(
-      name: json['name'] ?? '',
-      phone: json['phone'] ?? '',
-      relationship: json['relationship'] ?? '',
+  factory EmergencyContact.fromJson(Map<String, dynamic> json) => EmergencyContact(
+      name: (json['name'] as String?) ?? '',
+      phone: (json['phone'] as String?) ?? '',
+      relationship: (json['relationship'] as String?) ?? '',
     );
-  }
   final String name;
   final String phone;
   final String relationship;
@@ -137,14 +133,12 @@ class Address {
     required this.postalCode,
   });
 
-  factory Address.fromJson(Map<String, dynamic> json) {
-    return Address(
-      street: json['street'] ?? '',
-      city: json['city'] ?? '',
-      country: json['country'] ?? '',
-      postalCode: json['postalCode'] ?? json['postal_code'] ?? '',
+  factory Address.fromJson(Map<String, dynamic> json) => Address(
+      street: (json['street'] as String?) ?? '',
+      city: (json['city'] as String?) ?? '',
+      country: (json['country'] as String?) ?? '',
+      postalCode: (json['postalCode'] as String?) ?? (json['postal_code'] as String?) ?? '',
     );
-  }
   final String street;
   final String city;
   final String country;

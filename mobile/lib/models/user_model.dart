@@ -21,29 +21,27 @@ class User {
     this.activeRole,
   });
 
-  factory User.fromJson(Map<String, dynamic> json) {
-    return User(
+  factory User.fromJson(Map<String, dynamic> json) => User(
       id: json['id']?.toString() ?? '',
-      email: json['email'] ?? '',
-      firstName: json['firstName'] ?? json['first_name'] ?? '',
-      lastName: json['lastName'] ?? json['last_name'] ?? '',
-      phone: json['phone'] ?? '',
-      role: _parseRole(json['role']),
-      isActive: json['isActive'] ?? json['is_active'] ?? true,
-      emailVerified: json['emailVerified'] ?? json['email_verified'] ?? false,
+      email: (json['email'] as String?) ?? '',
+      firstName: (json['firstName'] as String?) ?? (json['first_name'] as String?) ?? '',
+      lastName: (json['lastName'] as String?) ?? (json['last_name'] as String?) ?? '',
+      phone: (json['phone'] as String?) ?? '',
+      role: _parseRole(json['role'] as String?),
+      isActive: (json['isActive'] as bool?) ?? (json['is_active'] as bool?) ?? true,
+      emailVerified: (json['emailVerified'] as bool?) ?? (json['email_verified'] as bool?) ?? false,
       createdAt: _parseDateTime(json['createdAt'] ?? json['created_at']),
       updatedAt: _parseDateTime(json['updatedAt'] ?? json['updated_at']),
       doctorProfile: json['doctorProfile'] != null 
-          ? Doctor.fromJson(json['doctorProfile']) 
+          ? Doctor.fromJson(json['doctorProfile'] as Map<String, dynamic>) 
           : null,
       patientProfile: json['patientProfile'] != null 
-          ? Patient.fromJson(json['patientProfile']) 
+          ? Patient.fromJson(json['patientProfile'] as Map<String, dynamic>) 
           : null,
       activeRole: json['activeRole'] != null 
-          ? _parseRole(json['activeRole']) 
+          ? _parseRole(json['activeRole'] as String?) 
           : null,
     );
-  }
   final String id;
   final String email;
   final String firstName;

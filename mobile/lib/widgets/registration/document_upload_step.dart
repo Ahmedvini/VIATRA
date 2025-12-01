@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../models/user_model.dart';
 import '../../utils/constants.dart';
@@ -8,12 +7,12 @@ import '../../utils/constants.dart';
 class DocumentUploadStep extends StatefulWidget {
 
   const DocumentUploadStep({
-    Key? key,
+    super.key,
     required this.userRole,
     required this.documents,
     required this.onDocumentAdded,
     required this.onDocumentRemoved,
-  }) : super(key: key);
+  });
   final UserRole userRole;
   final Map<String, File> documents;
   final Function(String, File) onDocumentAdded;
@@ -28,7 +27,6 @@ class _DocumentUploadStepState extends State<DocumentUploadStep> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final requiredDocuments = DocumentTypes.getRequiredDocuments(
       widget.userRole == UserRole.doctor ? 'doctor' : 'patient',
@@ -40,7 +38,7 @@ class _DocumentUploadStepState extends State<DocumentUploadStep> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            l10n.stepDocuments,
+            'Documents',
             style: theme.textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
             ),
@@ -65,7 +63,7 @@ class _DocumentUploadStepState extends State<DocumentUploadStep> {
               docLabel,
               hasDocument,
             );
-          }).toList(),
+          }),
 
           const SizedBox(height: 16),
           Container(

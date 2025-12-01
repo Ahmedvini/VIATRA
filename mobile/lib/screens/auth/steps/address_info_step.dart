@@ -2,13 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../providers/registration_provider.dart';
-import '../../../utils/validators.dart';
 import '../../../widgets/common/custom_button.dart';
 import '../../../widgets/common/custom_dropdown.dart';
 import '../../../widgets/common/custom_text_field.dart';
 
 class AddressInfoStep extends StatefulWidget {
-  const AddressInfoStep({Key? key}) : super(key: key);
+  const AddressInfoStep({super.key});
 
   @override
   State<AddressInfoStep> createState() => _AddressInfoStepState();
@@ -56,11 +55,11 @@ class _AddressInfoStepState extends State<AddressInfoStep> {
     final provider = context.read<RegistrationProvider>();
     final data = provider.formData;
     
-    _streetAddressController.text = data['streetAddress'] ?? '';
-    _cityController.text = data['city'] ?? '';
-    _stateController.text = data['state'] ?? '';
-    _postalCodeController.text = data['postalCode'] ?? '';
-    _selectedCountry = data['country'];
+    _streetAddressController.text = (data['streetAddress'] as String?) ?? '';
+    _cityController.text = (data['city'] as String?) ?? '';
+    _stateController.text = (data['state'] as String?) ?? '';
+    _postalCodeController.text = (data['postalCode'] as String?) ?? '';
+    _selectedCountry = data['country'] as String?;
   }
 
   @override
@@ -87,7 +86,7 @@ class _AddressInfoStepState extends State<AddressInfoStep> {
     final provider = context.read<RegistrationProvider>();
     
     // Update form data
-    provider.updateFormData({
+    provider.updateMultipleFormData({
       'streetAddress': _streetAddressController.text.trim(),
       'city': _cityController.text.trim(),
       'state': _stateController.text.trim(),
@@ -130,10 +129,9 @@ class _AddressInfoStepState extends State<AddressInfoStep> {
           // Street Address
           CustomTextField(
             controller: _streetAddressController,
-            labelText: 'Street Address',
-            hintText: 'Enter your street address',
-            prefixIcon: Icons.home,
-            isRequired: true,
+            label: 'Street Address',
+            hint: 'Enter your street address',
+            prefixIcon: const Icon(Icons.home),
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
                 return 'Street address is required';
@@ -146,10 +144,9 @@ class _AddressInfoStepState extends State<AddressInfoStep> {
           // City
           CustomTextField(
             controller: _cityController,
-            labelText: 'City',
-            hintText: 'Enter your city',
-            prefixIcon: Icons.location_city,
-            isRequired: true,
+            label: 'City',
+            hint: 'Enter your city',
+            prefixIcon: const Icon(Icons.location_city),
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
                 return 'City is required';
@@ -162,10 +159,9 @@ class _AddressInfoStepState extends State<AddressInfoStep> {
           // State/Province
           CustomTextField(
             controller: _stateController,
-            labelText: 'State/Province',
-            hintText: 'Enter your state or province',
-            prefixIcon: Icons.map,
-            isRequired: true,
+            label: 'State/Province',
+            hint: 'Enter your state or province',
+            prefixIcon: const Icon(Icons.map),
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
                 return 'State/Province is required';
@@ -178,10 +174,9 @@ class _AddressInfoStepState extends State<AddressInfoStep> {
           // Postal Code
           CustomTextField(
             controller: _postalCodeController,
-            labelText: 'Postal/ZIP Code',
-            hintText: 'Enter your postal or ZIP code',
-            prefixIcon: Icons.markunread_mailbox,
-            isRequired: true,
+            label: 'Postal/ZIP Code',
+            hint: 'Enter your postal or ZIP code',
+            prefixIcon: const Icon(Icons.markunread_mailbox),
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
                 return 'Postal/ZIP code is required';
@@ -194,20 +189,25 @@ class _AddressInfoStepState extends State<AddressInfoStep> {
           // Country
           CustomDropdown<String>(
             value: _selectedCountry,
-            labelText: 'Country',
-            hintText: 'Select your country',
-            prefixIcon: Icons.public,
-            isRequired: true,
+            label: 'Country',
+            hint: 'Select your country',
+            prefixIcon: const Icon(Icons.public),
             items: _countries
-                .map((country) => DropdownMenuItem(
+                .map((country) => DropdownItem<String>(
                       value: country,
-                      child: Text(country),
+                      text: country,
                     ))
                 .toList(),
             onChanged: (value) {
               setState(() {
                 _selectedCountry = value;
               });
+            },
+            validator: (value) {
+              if (value == null) {
+                return 'Country is required';
+              }
+              return null;
             },
           ),
           const SizedBox(height: 32),
@@ -219,7 +219,7 @@ class _AddressInfoStepState extends State<AddressInfoStep> {
                 child: CustomButton(
                   text: 'Back',
                   onPressed: _back,
-                  type: ButtonType.outlined,
+                  variant: ButtonVariant.outlined,
                 ),
               ),
               const SizedBox(width: 16),
@@ -227,7 +227,7 @@ class _AddressInfoStepState extends State<AddressInfoStep> {
                 child: CustomButton(
                   text: 'Continue',
                   onPressed: _continue,
-                  type: ButtonType.primary,
+                  variant: ButtonVariant.primary,
                 ),
               ),
             ],

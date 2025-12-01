@@ -2,15 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../providers/appointment_provider.dart';
-import '../../models/appointment_model.dart';
 import '../../widgets/doctor/appointment_action_buttons.dart';
-import '../../widgets/common/custom_button.dart';
 
 class DoctorAppointmentDetailScreen extends StatefulWidget {
 
   const DoctorAppointmentDetailScreen({
-    super.key,
-    required this.appointmentId,
+    required this.appointmentId, super.key,
   });
   final String appointmentId;
 
@@ -150,12 +147,12 @@ class _DoctorAppointmentDetailScreenState extends State<DoctorAppointmentDetailS
                           children: [
                             CircleAvatar(
                               radius: 32,
-                              backgroundImage: appointment.patient?.user?.profileImage != null
-                                  ? NetworkImage(appointment.patient!.user!.profileImage!)
+                              backgroundImage: appointment.patient?['profileImage'] != null
+                                  ? NetworkImage(appointment.patient!['profileImage'] as String)
                                   : null,
-                              child: appointment.patient?.user?.profileImage == null
+                              child: appointment.patient?['profileImage'] == null
                                   ? Text(
-                                      appointment.patient?.user?.firstName[0].toUpperCase() ?? 'P',
+                                      ((appointment.patient?['firstName'] as String?) ?? 'P')[0].toUpperCase(),
                                       style: const TextStyle(fontSize: 24),
                                     )
                                   : null,
@@ -166,17 +163,17 @@ class _DoctorAppointmentDetailScreenState extends State<DoctorAppointmentDetailS
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    '${appointment.patient?.user?.firstName ?? ''} ${appointment.patient?.user?.lastName ?? ''}',
+                                    '${appointment.patient?['firstName'] ?? ''} ${appointment.patient?['lastName'] ?? ''}',
                                     style: Theme.of(context).textTheme.titleLarge,
                                   ),
-                                  if (appointment.patient?.user?.email != null)
+                                  if (appointment.patient?['email'] != null)
                                     Text(
-                                      appointment.patient!.user!.email,
+                                      appointment.patient!['email'] as String,
                                       style: Theme.of(context).textTheme.bodyMedium,
                                     ),
-                                  if (appointment.patient?.user?.phone != null)
+                                  if (appointment.patient?['phone'] != null)
                                     Text(
-                                      appointment.patient!.user!.phone!,
+                                      appointment.patient!['phone'] as String,
                                       style: Theme.of(context).textTheme.bodyMedium,
                                     ),
                                 ],
@@ -240,10 +237,10 @@ class _DoctorAppointmentDetailScreenState extends State<DoctorAppointmentDetailS
                           ],
                         ),
                         if (appointment.urgent)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8),
+                          const Padding(
+                            padding: EdgeInsets.only(top: 8),
                             child: Chip(
-                              label: const Text(
+                              label: Text(
                                 'URGENT',
                                 style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                               ),

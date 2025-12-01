@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import '../../models/user_model.dart';
-import '../../config/theme.dart';
+
 
 /// User information card widget
 class UserInfoCard extends StatelessWidget {
 
   const UserInfoCard({
-    super.key,
-    required this.user,
+    required this.user, super.key,
     this.onEditPressed,
     this.activeRole,
   });
@@ -37,7 +36,7 @@ class UserInfoCard extends StatelessWidget {
                   IconButton(
                     icon: const Icon(Icons.edit),
                     onPressed: onEditPressed,
-                    color: AppTheme.primaryColor,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
               ],
             ),
@@ -46,13 +45,13 @@ class UserInfoCard extends StatelessWidget {
             // Profile avatar
             CircleAvatar(
               radius: 50,
-              backgroundColor: AppTheme.primaryColor.withOpacity(0.1),
+              backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
               child: Text(
                 _getInitials(user.fullName),
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
-                  color: AppTheme.primaryColor,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
             ),

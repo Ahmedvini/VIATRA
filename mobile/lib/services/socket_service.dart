@@ -1,8 +1,9 @@
 import 'dart:async';
-import 'package:socket_io_client/socket_io_client.dart' as IO;
+
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
+
 import '../models/message_model.dart';
-import '../models/user_model.dart';
 
 /// Service for managing Socket.io WebSocket connections
 class SocketService {

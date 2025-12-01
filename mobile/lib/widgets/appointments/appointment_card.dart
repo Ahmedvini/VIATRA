@@ -5,12 +5,12 @@ import '../../models/appointment_model.dart';
 class AppointmentCard extends StatelessWidget {
 
   const AppointmentCard({
-    Key? key,
+    super.key,
     required this.appointment,
     this.onTap,
     this.onCancel,
     this.onReschedule,
-  }) : super(key: key);
+  });
   final Appointment appointment;
   final VoidCallback? onTap;
   final VoidCallback? onCancel;
@@ -22,7 +22,6 @@ class AppointmentCard extends StatelessWidget {
     final formattedTime = DateFormat('h:mm a').format(appointment.scheduledStart);
     final statusColor = _getStatusColor(appointment.status);
     final isUpcoming = appointment.isUpcoming;
-    final isPast = appointment.isPast;
 
     return Card(
       elevation: 2,
@@ -76,7 +75,7 @@ class AppointmentCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          appointment.specialty!,
+                          appointment.specialty,
                           style: TextStyle(
                             fontSize: 13,
                             color: Colors.grey[600],
@@ -218,7 +217,7 @@ class AppointmentCard extends StatelessWidget {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        appointment.reasonForVisit!,
+                        appointment.reasonForVisit,
                         style: TextStyle(
                           fontSize: 13,
                           color: Colors.grey[800],
@@ -233,11 +232,11 @@ class AppointmentCard extends StatelessWidget {
             ],
 
               // Action Buttons for Upcoming Appointments
-              if (isUpcoming && (appointment.canBeCancelled() || appointment.canBeRescheduled())) ...[
+              if (isUpcoming && (appointment.canBeCancelled || appointment.canBeRescheduled)) ...[
                 const SizedBox(height: 16),
                 Row(
                   children: [
-                    if (appointment.canBeRescheduled() && onReschedule != null)
+                    if (appointment.canBeRescheduled && onReschedule != null)
                       Expanded(
                         child: OutlinedButton.icon(
                           onPressed: onReschedule,
@@ -248,9 +247,9 @@ class AppointmentCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                    if (appointment.canBeRescheduled() && appointment.canBeCancelled())
+                    if (appointment.canBeRescheduled && appointment.canBeCancelled)
                       const SizedBox(width: 8),
-                    if (appointment.canBeCancelled() && onCancel != null)
+                    if (appointment.canBeCancelled && onCancel != null)
                       Expanded(
                         child: OutlinedButton.icon(
                           onPressed: onCancel,

@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 
 class BasicInfoStep extends StatefulWidget {
-
   const BasicInfoStep({
-    Key? key,
+    super.key,
     required this.formData,
     required this.onDataChanged,
-  }) : super(key: key);
+  });
+
   final Map<String, dynamic> formData;
   final Function(String, dynamic) onDataChanged;
 
@@ -31,13 +30,13 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
   @override
   void initState() {
     super.initState();
-    _emailController.text = widget.formData['email'] ?? '';
-    _passwordController.text = widget.formData['password'] ?? '';
-    _confirmPasswordController.text = widget.formData['confirmPassword'] ?? '';
-    _fullNameController.text = widget.formData['fullName'] ?? '';
-    _phoneController.text = widget.formData['phone'] ?? '';
-    _selectedDate = widget.formData['dateOfBirth'];
-    _selectedGender = widget.formData['gender'];
+    _emailController.text = (widget.formData['email'] as String?) ?? '';
+    _passwordController.text = (widget.formData['password'] as String?) ?? '';
+    _confirmPasswordController.text = (widget.formData['confirmPassword'] as String?) ?? '';
+    _fullNameController.text = (widget.formData['fullName'] as String?) ?? '';
+    _phoneController.text = (widget.formData['phone'] as String?) ?? '';
+    _selectedDate = widget.formData['dateOfBirth'] as DateTime?;
+    _selectedGender = widget.formData['gender'] as String?;
   }
 
   @override
@@ -52,23 +51,22 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
     return SingleChildScrollView(
-      padding: const EdgeInsetsDirectional.all(24.0),
+      padding: const EdgeInsets.all(24.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            l10n.stepPersonalInfo,
+            'Personal Information',
             style: theme.textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            l10n.loginSubtitle,
+            'Please provide your personal information',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurface.withOpacity(0.6),
             ),
@@ -79,14 +77,14 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
           TextFormField(
             key: const Key('registration_full_name_field'),
             controller: _fullNameController,
-            decoration: InputDecoration(
-              labelText: l10n.labelFullName,
-              prefixIcon: const Icon(Icons.person),
+            decoration: const InputDecoration(
+              labelText: 'Full Name',
+              prefixIcon: Icon(Icons.person),
             ),
             textInputAction: TextInputAction.next,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return l10n.errorRequiredField;
+                return 'This field is required';
               }
               return null;
             },
@@ -98,18 +96,18 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
           TextFormField(
             key: const Key('registration_email_field'),
             controller: _emailController,
-            decoration: InputDecoration(
-              labelText: l10n.labelEmail,
-              prefixIcon: const Icon(Icons.email),
+            decoration: const InputDecoration(
+              labelText: 'Email',
+              prefixIcon: Icon(Icons.email),
             ),
             keyboardType: TextInputType.emailAddress,
             textInputAction: TextInputAction.next,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return l10n.errorRequiredField;
+                return 'This field is required';
               }
-              if (!value.contains('@')) {
-                return l10n.errorInvalidEmail;
+              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                return 'Please enter a valid email';
               }
               return null;
             },
@@ -121,18 +119,18 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
           TextFormField(
             key: const Key('registration_phone_field'),
             controller: _phoneController,
-            decoration: InputDecoration(
-              labelText: l10n.labelPhone,
-              prefixIcon: const Icon(Icons.phone),
+            decoration: const InputDecoration(
+              labelText: 'Phone',
+              prefixIcon: Icon(Icons.phone),
             ),
             keyboardType: TextInputType.phone,
             textInputAction: TextInputAction.next,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return l10n.errorRequiredField;
+                return 'This field is required';
               }
               if (value.length < 10) {
-                return l10n.errorInvalidPhone;
+                return 'Please enter a valid phone number';
               }
               return null;
             },
@@ -145,14 +143,14 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
             key: const Key('registration_dob_field'),
             onTap: () => _selectDate(context),
             child: InputDecorator(
-              decoration: InputDecoration(
-                labelText: l10n.labelDateOfBirth,
-                prefixIcon: const Icon(Icons.calendar_today),
+              decoration: const InputDecoration(
+                labelText: 'Date of Birth',
+                prefixIcon: Icon(Icons.calendar_today),
               ),
               child: Text(
                 _selectedDate != null
                     ? DateFormat('yyyy-MM-dd').format(_selectedDate!)
-                    : l10n.labelDateOfBirth,
+                    : 'Select date of birth',
                 style: _selectedDate != null
                     ? theme.textTheme.bodyLarge
                     : theme.textTheme.bodyLarge?.copyWith(
@@ -166,22 +164,22 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
           // Gender
           DropdownButtonFormField<String>(
             key: const Key('registration_gender_field'),
-            value: _selectedGender,
-            decoration: InputDecoration(
-              labelText: l10n.labelGender,
-              prefixIcon: const Icon(Icons.wc),
+            initialValue: _selectedGender,
+            decoration: const InputDecoration(
+              labelText: 'Gender',
+              prefixIcon: Icon(Icons.wc),
             ),
-            items: [
-              DropdownMenuItem(value: 'male', child: Text(l10n.genderMale)),
-              DropdownMenuItem(value: 'female', child: Text(l10n.genderFemale)),
-              DropdownMenuItem(value: 'other', child: Text(l10n.genderOther)),
+            items: const [
+              DropdownMenuItem(value: 'male', child: Text('Male')),
+              DropdownMenuItem(value: 'female', child: Text('Female')),
+              DropdownMenuItem(value: 'other', child: Text('Other')),
               DropdownMenuItem(
                   value: 'prefer_not_to_say',
-                  child: Text(l10n.genderPreferNotToSay)),
+                  child: Text('Prefer not to say')),
             ],
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return l10n.errorRequiredField;
+                return 'This field is required';
               }
               return null;
             },
@@ -197,7 +195,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
             key: const Key('registration_password_field'),
             controller: _passwordController,
             decoration: InputDecoration(
-              labelText: l10n.labelPassword,
+              labelText: 'Password',
               prefixIcon: const Icon(Icons.lock),
               suffixIcon: IconButton(
                 icon: Icon(
@@ -211,10 +209,10 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
             textInputAction: TextInputAction.next,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return l10n.errorRequiredField;
+                return 'This field is required';
               }
               if (value.length < 8) {
-                return l10n.errorInvalidPassword;
+                return 'Password must be at least 8 characters';
               }
               return null;
             },
@@ -227,7 +225,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
             key: const Key('registration_confirm_password_field'),
             controller: _confirmPasswordController,
             decoration: InputDecoration(
-              labelText: '${l10n.labelPassword} (Confirm)',
+              labelText: 'Confirm Password',
               prefixIcon: const Icon(Icons.lock),
               suffixIcon: IconButton(
                 icon: Icon(
@@ -243,7 +241,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
             textInputAction: TextInputAction.done,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return l10n.errorRequiredField;
+                return 'This field is required';
               }
               if (value != _passwordController.text) {
                 return 'Passwords do not match';
@@ -259,7 +257,6 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
   }
 
   Future<void> _selectDate(BuildContext context) async {
-    final l10n = AppLocalizations.of(context)!;
     final now = DateTime.now();
     final initialDate = _selectedDate ?? DateTime(now.year - 25);
     
@@ -268,7 +265,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
       initialDate: initialDate,
       firstDate: DateTime(1900),
       lastDate: DateTime(now.year - 13), // Minimum age 13
-      helpText: l10n.labelDateOfBirth,
+      helpText: 'Date of Birth',
     );
 
     if (pickedDate != null) {

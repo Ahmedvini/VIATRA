@@ -51,7 +51,7 @@ class _HealthProfileEditScreenState extends State<HealthProfileEditScreen> {
       _bloodGlucoseController.text = widget.profile!.bloodGlucose?.toString() ?? '';
       _oxygenSaturationController.text = 
           widget.profile!.oxygenSaturation?.toString() ?? '';
-      _medicationsController.text = widget.profile!.medications?.join(', ') ?? '';
+      _medicationsController.text = widget.profile!.currentMedications.map((m) => m.name).join(', ');
       _notesController.text = widget.profile!.notes ?? '';
     }
   }
@@ -119,9 +119,40 @@ class _HealthProfileEditScreenState extends State<HealthProfileEditScreen> {
       }
 
       if (widget.profile == null) {
-        await provider.createProfile(data);
+        await provider.createHealthProfile(HealthProfile(
+          id: '', // Will be set by server
+          patientId: '', // Will be set by server
+          bloodType: data['bloodType'] as String?,
+          height: data['height'] as double?,
+          weight: data['weight'] as double?,
+          bloodPressureSystolic: data['bloodPressureSystolic'] as int?,
+          bloodPressureDiastolic: data['bloodPressureDiastolic'] as int?,
+          heartRate: data['heartRate'] as int?,
+          bloodGlucose: data['bloodGlucose'] as double?,
+          oxygenSaturation: data['oxygenSaturation'] as int?,
+          notes: data['notes'] as String?,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        ));
       } else {
-        await provider.updateProfile(data);
+        await provider.updateHealthProfile(HealthProfile(
+          id: widget.profile!.id,
+          patientId: widget.profile!.patientId,
+          bloodType: data['bloodType'] as String? ?? widget.profile!.bloodType,
+          height: data['height'] as double? ?? widget.profile!.height,
+          weight: data['weight'] as double? ?? widget.profile!.weight,
+          bloodPressureSystolic: data['bloodPressureSystolic'] as int? ?? widget.profile!.bloodPressureSystolic,
+          bloodPressureDiastolic: data['bloodPressureDiastolic'] as int? ?? widget.profile!.bloodPressureDiastolic,
+          heartRate: data['heartRate'] as int? ?? widget.profile!.heartRate,
+          bloodGlucose: data['bloodGlucose'] as double? ?? widget.profile!.bloodGlucose,
+          oxygenSaturation: data['oxygenSaturation'] as int? ?? widget.profile!.oxygenSaturation,
+          allergies: widget.profile!.allergies,
+          chronicConditions: widget.profile!.chronicConditions,
+          currentMedications: widget.profile!.currentMedications,
+          notes: data['notes'] as String? ?? widget.profile!.notes,
+          createdAt: widget.profile!.createdAt,
+          updatedAt: DateTime.now(),
+        ));
       }
 
       if (mounted) {
@@ -182,7 +213,7 @@ class _HealthProfileEditScreenState extends State<HealthProfileEditScreen> {
             const SizedBox(height: 16),
             
             DropdownButtonFormField<String>(
-              value: _bloodTypeController.text.isEmpty ? null : _bloodTypeController.text,
+              initialValue: _bloodTypeController.text.isEmpty ? null : _bloodTypeController.text,
               decoration: const InputDecoration(
                 labelText: 'Blood Type',
                 border: OutlineInputBorder(),

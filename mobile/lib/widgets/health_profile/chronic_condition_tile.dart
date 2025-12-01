@@ -5,8 +5,7 @@ import '../../models/health_profile_model.dart';
 class ChronicConditionTile extends StatelessWidget {
 
   const ChronicConditionTile({
-    super.key,
-    required this.condition,
+    required this.condition, super.key,
     this.onTap,
     this.onDelete,
   });

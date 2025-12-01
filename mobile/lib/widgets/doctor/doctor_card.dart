@@ -4,10 +4,10 @@ import '../../models/doctor_model.dart';
 class DoctorCard extends StatelessWidget {
 
   const DoctorCard({
-    Key? key,
+    super.key,
     required this.doctor,
     this.onTap,
-  }) : super(key: key);
+  });
   final Doctor doctor;
   final VoidCallback? onTap;
 
@@ -69,7 +69,7 @@ class DoctorCard extends StatelessWidget {
                           ),
                         ),
                         if (doctor.isVerified)
-                          Icon(
+                          const Icon(
                             Icons.verified,
                             color: Colors.blue,
                             size: 20,

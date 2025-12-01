@@ -89,7 +89,7 @@ class AppConfig {
       _packageInfo = await PackageInfo.fromPlatform();
       
       // Initialize storage
-      await StorageService.initialize();
+      await StorageService().initialize();
       
       _initialized = true;
       Logger.info('AppConfig initialized successfully');

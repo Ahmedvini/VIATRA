@@ -24,8 +24,7 @@ class CachedSearchResult {
   });
 
   /// Create from JSON from storage
-  factory CachedSearchResult.fromJson(Map<String, dynamic> json) {
-    return CachedSearchResult(
+  factory CachedSearchResult.fromJson(Map<String, dynamic> json) => CachedSearchResult(
       doctors: (json['doctors'] as List<dynamic>)
           .map((d) => Doctor.fromJson(d as Map<String, dynamic>))
           .toList(),
@@ -33,7 +32,6 @@ class CachedSearchResult {
       totalResults: json['totalResults'] as int,
       timestamp: DateTime.parse(json['timestamp'] as String),
     );
-  }
   final List<Doctor> doctors;
   final int totalPages;
   final int totalResults;

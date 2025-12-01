@@ -5,8 +5,7 @@ import '../../models/appointment_model.dart';
 class DoctorAppointmentCard extends StatelessWidget {
 
   const DoctorAppointmentCard({
-    super.key,
-    required this.appointment,
+    required this.appointment, super.key,
     this.onTap,
   });
   final Appointment appointment;
@@ -16,7 +15,7 @@ class DoctorAppointmentCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final patient = appointment.patient;
     final patientName = patient != null
-        ? '${patient.user?.firstName ?? ''} ${patient.user?.lastName ?? ''}'
+        ? '${patient['firstName'] ?? patient['first_name'] ?? ''} ${patient['lastName'] ?? patient['last_name'] ?? ''}'.trim()
         : 'Unknown Patient';
 
     return Card(

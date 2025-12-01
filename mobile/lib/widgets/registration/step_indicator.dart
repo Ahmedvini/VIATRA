@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class StepIndicator extends StatelessWidget {
 
   const StepIndicator({
-    Key? key,
+    super.key,
     required this.currentStep,
     required this.totalSteps,
     this.stepLabels,
@@ -15,7 +15,7 @@ class StepIndicator extends StatelessWidget {
     this.showLabels = true,
     this.labelStyle,
     this.padding,
-  }) : super(key: key);
+  });
   final int currentStep;
   final int totalSteps;
   final List<String>? stepLabels;
@@ -148,7 +148,7 @@ class StepIndicator extends StatelessWidget {
 class LinearStepIndicator extends StatelessWidget {
 
   const LinearStepIndicator({
-    Key? key,
+    super.key,
     required this.currentStep,
     required this.totalSteps,
     this.title,
@@ -158,7 +158,7 @@ class LinearStepIndicator extends StatelessWidget {
     this.height = 8,
     this.borderRadius,
     this.padding,
-  }) : super(key: key);
+  });
   final int currentStep;
   final int totalSteps;
   final String? title;
@@ -263,7 +263,7 @@ class LinearStepIndicator extends StatelessWidget {
 class MinimalStepIndicator extends StatelessWidget {
 
   const MinimalStepIndicator({
-    Key? key,
+    super.key,
     required this.currentStep,
     required this.totalSteps,
     this.activeColor,
@@ -271,7 +271,7 @@ class MinimalStepIndicator extends StatelessWidget {
     this.dotSize = 8,
     this.spacing = 8,
     this.padding,
-  }) : super(key: key);
+  });
   final int currentStep;
   final int totalSteps;
   final Color? activeColor;

@@ -1,5 +1,3 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import '../models/health_profile_model.dart';
 import 'api_service.dart';
 
@@ -24,13 +22,13 @@ class HealthProfileService {
     try {
       final response = await _apiService.get('/health-profiles/me');
 
-      if (response.statusCode == 200) {
-        final jsonData = json.decode(response.body);
-        final profile = HealthProfile.fromJson(jsonData['data']);
+      if (response.success && response.data != null) {
+        final jsonData = response.data as Map<String, dynamic>;
+        final profile = HealthProfile.fromJson(jsonData['data'] as Map<String, dynamic>);
         
         return ApiResponse(
           success: true,
-          message: jsonData['message'],
+          message: jsonData['message'] as String?,
           data: profile,
         );
       } else if (response.statusCode == 404) {
@@ -40,11 +38,10 @@ class HealthProfileService {
           error: 'NOT_FOUND',
         );
       } else {
-        final jsonData = json.decode(response.body);
         return ApiResponse(
           success: false,
-          message: jsonData['message'] ?? 'Failed to fetch health profile',
-          error: jsonData['error'],
+          message: response.message ?? 'Failed to fetch health profile',
+          error: response.error,
         );
       }
     } catch (e) {
@@ -64,21 +61,20 @@ class HealthProfileService {
         body: profile.toJson(),
       );
 
-      if (response.statusCode == 201) {
-        final jsonData = json.decode(response.body);
-        final createdProfile = HealthProfile.fromJson(jsonData['data']);
+      if (response.success && response.data != null) {
+        final jsonData = response.data as Map<String, dynamic>;
+        final createdProfile = HealthProfile.fromJson(jsonData['data'] as Map<String, dynamic>);
         
         return ApiResponse(
           success: true,
-          message: jsonData['message'],
+          message: jsonData['message'] as String?,
           data: createdProfile,
         );
       } else {
-        final jsonData = json.decode(response.body);
         return ApiResponse(
           success: false,
-          message: jsonData['message'] ?? 'Failed to create health profile',
-          error: jsonData['error'],
+          message: response.message ?? 'Failed to create health profile',
+          error: response.error,
         );
       }
     } catch (e) {
@@ -98,21 +94,20 @@ class HealthProfileService {
         body: profile.toJson(),
       );
 
-      if (response.statusCode == 200) {
-        final jsonData = json.decode(response.body);
-        final updatedProfile = HealthProfile.fromJson(jsonData['data']);
+      if (response.success && response.data != null) {
+        final jsonData = response.data as Map<String, dynamic>;
+        final updatedProfile = HealthProfile.fromJson(jsonData['data'] as Map<String, dynamic>);
         
         return ApiResponse(
           success: true,
-          message: jsonData['message'],
+          message: jsonData['message'] as String?,
           data: updatedProfile,
         );
       } else {
-        final jsonData = json.decode(response.body);
         return ApiResponse(
           success: false,
-          message: jsonData['message'] ?? 'Failed to update health profile',
-          error: jsonData['error'],
+          message: response.message ?? 'Failed to update health profile',
+          error: response.error,
         );
       }
     } catch (e) {
@@ -132,21 +127,20 @@ class HealthProfileService {
         body: condition.toJson(),
       );
 
-      if (response.statusCode == 200) {
-        final jsonData = json.decode(response.body);
-        final updatedProfile = HealthProfile.fromJson(jsonData['data']);
+      if (response.success && response.data != null) {
+        final jsonData = response.data as Map<String, dynamic>;
+        final updatedProfile = HealthProfile.fromJson(jsonData['data'] as Map<String, dynamic>);
         
         return ApiResponse(
           success: true,
-          message: jsonData['message'],
+          message: jsonData['message'] as String?,
           data: updatedProfile,
         );
       } else {
-        final jsonData = json.decode(response.body);
         return ApiResponse(
           success: false,
-          message: jsonData['message'] ?? 'Failed to add chronic condition',
-          error: jsonData['error'],
+          message: response.message ?? 'Failed to add chronic condition',
+          error: response.error,
         );
       }
     } catch (e) {
@@ -165,21 +159,20 @@ class HealthProfileService {
         '/health-profiles/me/chronic-conditions/$conditionId',
       );
 
-      if (response.statusCode == 200) {
-        final jsonData = json.decode(response.body);
-        final updatedProfile = HealthProfile.fromJson(jsonData['data']);
+      if (response.success && response.data != null) {
+        final jsonData = response.data as Map<String, dynamic>;
+        final updatedProfile = HealthProfile.fromJson(jsonData['data'] as Map<String, dynamic>);
         
         return ApiResponse(
           success: true,
-          message: jsonData['message'],
+          message: jsonData['message'] as String?,
           data: updatedProfile,
         );
       } else {
-        final jsonData = json.decode(response.body);
         return ApiResponse(
           success: false,
-          message: jsonData['message'] ?? 'Failed to remove chronic condition',
-          error: jsonData['error'],
+          message: response.message ?? 'Failed to remove chronic condition',
+          error: response.error,
         );
       }
     } catch (e) {
@@ -198,21 +191,20 @@ class HealthProfileService {
         body: allergy.toJson(),
       );
 
-      if (response.statusCode == 200) {
-        final jsonData = json.decode(response.body);
-        final updatedProfile = HealthProfile.fromJson(jsonData['data']);
+      if (response.success && response.data != null) {
+        final jsonData = response.data as Map<String, dynamic>;
+        final updatedProfile = HealthProfile.fromJson(jsonData['data'] as Map<String, dynamic>);
         
         return ApiResponse(
           success: true,
-          message: jsonData['message'],
+          message: jsonData['message'] as String?,
           data: updatedProfile,
         );
       } else {
-        final jsonData = json.decode(response.body);
         return ApiResponse(
           success: false,
-          message: jsonData['message'] ?? 'Failed to add allergy',
-          error: jsonData['error'],
+          message: response.message ?? 'Failed to add allergy',
+          error: response.error,
         );
       }
     } catch (e) {
@@ -231,21 +223,20 @@ class HealthProfileService {
         '/health-profiles/me/allergies/$encodedAllergen',
       );
 
-      if (response.statusCode == 200) {
-        final jsonData = json.decode(response.body);
-        final updatedProfile = HealthProfile.fromJson(jsonData['data']);
+      if (response.success && response.data != null) {
+        final jsonData = response.data as Map<String, dynamic>;
+        final updatedProfile = HealthProfile.fromJson(jsonData['data'] as Map<String, dynamic>);
         
         return ApiResponse(
           success: true,
-          message: jsonData['message'],
+          message: jsonData['message'] as String?,
           data: updatedProfile,
         );
       } else {
-        final jsonData = json.decode(response.body);
         return ApiResponse(
           success: false,
-          message: jsonData['message'] ?? 'Failed to remove allergy',
-          error: jsonData['error'],
+          message: response.message ?? 'Failed to remove allergy',
+          error: response.error,
         );
       }
     } catch (e) {
@@ -273,21 +264,20 @@ class HealthProfileService {
         body: body,
       );
 
-      if (response.statusCode == 200) {
-        final jsonData = json.decode(response.body);
-        final updatedProfile = HealthProfile.fromJson(jsonData['data']);
+      if (response.success && response.data != null) {
+        final jsonData = response.data as Map<String, dynamic>;
+        final updatedProfile = HealthProfile.fromJson(jsonData['data'] as Map<String, dynamic>);
         
         return ApiResponse(
           success: true,
-          message: jsonData['message'],
+          message: jsonData['message'] as String?,
           data: updatedProfile,
         );
       } else {
-        final jsonData = json.decode(response.body);
         return ApiResponse(
           success: false,
-          message: jsonData['message'] ?? 'Failed to update vitals',
-          error: jsonData['error'],
+          message: response.message ?? 'Failed to update vitals',
+          error: response.error,
         );
       }
     } catch (e) {

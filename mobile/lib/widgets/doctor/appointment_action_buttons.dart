@@ -6,11 +6,7 @@ import '../common/custom_button.dart';
 class AppointmentActionButtons extends StatefulWidget {
 
   const AppointmentActionButtons({
-    super.key,
-    required this.appointment,
-    required this.onAccept,
-    required this.onReschedule,
-    required this.onCancel,
+    required this.appointment, required this.onAccept, required this.onReschedule, required this.onCancel, super.key,
   });
   final Appointment appointment;
   final Function(String appointmentId) onAccept;

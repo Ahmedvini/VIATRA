@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ProfessionalInfoStep extends StatefulWidget {
 
   const ProfessionalInfoStep({
-    Key? key,
+    super.key,
     required this.formData,
     required this.onDataChanged,
-  }) : super(key: key);
+  });
   final Map<String, dynamic> formData;
   final Function(String, dynamic) onDataChanged;
 
@@ -26,13 +25,13 @@ class _ProfessionalInfoStepState extends State<ProfessionalInfoStep> {
   @override
   void initState() {
     super.initState();
-    _licenseNumberController.text = widget.formData['licenseNumber'] ?? '';
+    _licenseNumberController.text = (widget.formData['licenseNumber'] as String?) ?? '';
     _yearsOfExperienceController.text = 
         widget.formData['yearsOfExperience']?.toString() ?? '';
     _consultationFeeController.text = 
         widget.formData['consultationFee']?.toString() ?? '';
-    _bioController.text = widget.formData['bio'] ?? '';
-    _selectedSpecialty = widget.formData['specialty'];
+    _bioController.text = (widget.formData['bio'] as String?) ?? '';
+    _selectedSpecialty = widget.formData['specialty'] as String?;
   }
 
   @override
@@ -46,7 +45,6 @@ class _ProfessionalInfoStepState extends State<ProfessionalInfoStep> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
     return SingleChildScrollView(
@@ -55,7 +53,7 @@ class _ProfessionalInfoStepState extends State<ProfessionalInfoStep> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            l10n.stepProfessionalInfo,
+            'Professional Information',
             style: theme.textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
             ),
@@ -73,14 +71,14 @@ class _ProfessionalInfoStepState extends State<ProfessionalInfoStep> {
           TextFormField(
             key: const Key('registration_license_number_field'),
             controller: _licenseNumberController,
-            decoration: InputDecoration(
-              labelText: l10n.labelLicenseNumber,
-              prefixIcon: const Icon(Icons.badge),
+            decoration: const InputDecoration(
+              labelText: 'License Number',
+              prefixIcon: Icon(Icons.badge),
             ),
             textInputAction: TextInputAction.next,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return l10n.errorRequiredField;
+                return 'This field is required';
               }
               return null;
             },
@@ -91,10 +89,10 @@ class _ProfessionalInfoStepState extends State<ProfessionalInfoStep> {
           // Specialty
           DropdownButtonFormField<String>(
             key: const Key('registration_specialty_field'),
-            value: _selectedSpecialty,
-            decoration: InputDecoration(
-              labelText: l10n.labelSpecialty,
-              prefixIcon: const Icon(Icons.medical_services),
+            initialValue: _selectedSpecialty,
+            decoration: const InputDecoration(
+              labelText: 'Specialty',
+              prefixIcon: Icon(Icons.medical_services),
             ),
             items: const [
               DropdownMenuItem(value: 'general', child: Text('General Medicine')),
@@ -108,7 +106,7 @@ class _ProfessionalInfoStepState extends State<ProfessionalInfoStep> {
             ],
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return l10n.errorRequiredField;
+                return 'This field is required';
               }
               return null;
             },
@@ -123,15 +121,15 @@ class _ProfessionalInfoStepState extends State<ProfessionalInfoStep> {
           TextFormField(
             key: const Key('registration_experience_field'),
             controller: _yearsOfExperienceController,
-            decoration: InputDecoration(
-              labelText: l10n.labelYearsOfExperience,
-              prefixIcon: const Icon(Icons.work),
+            decoration: const InputDecoration(
+              labelText: 'Years of Experience',
+              prefixIcon: Icon(Icons.work),
             ),
             keyboardType: TextInputType.number,
             textInputAction: TextInputAction.next,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return l10n.errorRequiredField;
+                return 'This field is required';
               }
               final years = int.tryParse(value);
               if (years == null || years < 0 || years > 60) {
@@ -152,16 +150,16 @@ class _ProfessionalInfoStepState extends State<ProfessionalInfoStep> {
           TextFormField(
             key: const Key('registration_fee_field'),
             controller: _consultationFeeController,
-            decoration: InputDecoration(
-              labelText: l10n.labelConsultationFee,
-              prefixIcon: const Icon(Icons.attach_money),
-              suffix: const Text('EGP'),
+            decoration: const InputDecoration(
+              labelText: 'Consultation Fee',
+              prefixIcon: Icon(Icons.attach_money),
+              suffix: Text('EGP'),
             ),
             keyboardType: TextInputType.number,
             textInputAction: TextInputAction.next,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return l10n.errorRequiredField;
+                return 'This field is required';
               }
               final fee = double.tryParse(value);
               if (fee == null || fee < 0) {
@@ -182,16 +180,16 @@ class _ProfessionalInfoStepState extends State<ProfessionalInfoStep> {
           TextFormField(
             key: const Key('registration_bio_field'),
             controller: _bioController,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               labelText: 'Bio',
-              prefixIcon: const Icon(Icons.description),
+              prefixIcon: Icon(Icons.description),
               hintText: 'Tell us about yourself and your practice',
             ),
             maxLines: 4,
             textInputAction: TextInputAction.done,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return l10n.errorRequiredField;
+                return 'This field is required';
               }
               if (value.length < 50) {
                 return 'Please provide a bio of at least 50 characters';

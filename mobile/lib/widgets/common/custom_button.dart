@@ -17,7 +17,7 @@ enum ButtonSize {
 class CustomButton extends StatelessWidget {
 
   const CustomButton({
-    Key? key,
+    super.key,
     required this.text,
     this.onPressed,
     this.variant = ButtonVariant.primary,
@@ -35,7 +35,7 @@ class CustomButton extends StatelessWidget {
     this.textStyle,
     this.elevation,
     this.focusNode,
-  }) : super(key: key);
+  });
   final String text;
   final VoidCallback? onPressed;
   final ButtonVariant variant;
@@ -117,7 +117,7 @@ class CustomButton extends StatelessWidget {
     ColorScheme colorScheme,
     bool isEnabled,
   ) {
-    final var buttonChild = _buildButtonContent(context, theme, colorScheme);
+    final buttonChild = _buildButtonContent(context, theme, colorScheme);
 
     switch (variant) {
       case ButtonVariant.primary:
@@ -281,7 +281,7 @@ class CustomButton extends StatelessWidget {
 class PrimaryButton extends StatelessWidget {
 
   const PrimaryButton({
-    Key? key,
+    super.key,
     required this.text,
     this.onPressed,
     this.isLoading = false,
@@ -289,7 +289,7 @@ class PrimaryButton extends StatelessWidget {
     this.icon,
     this.size = ButtonSize.medium,
     this.width,
-  }) : super(key: key);
+  });
   final String text;
   final VoidCallback? onPressed;
   final bool isLoading;
@@ -314,7 +314,7 @@ class PrimaryButton extends StatelessWidget {
 class SecondaryButton extends StatelessWidget {
 
   const SecondaryButton({
-    Key? key,
+    super.key,
     required this.text,
     this.onPressed,
     this.isLoading = false,
@@ -322,7 +322,7 @@ class SecondaryButton extends StatelessWidget {
     this.icon,
     this.size = ButtonSize.medium,
     this.width,
-  }) : super(key: key);
+  });
   final String text;
   final VoidCallback? onPressed;
   final bool isLoading;
@@ -347,7 +347,7 @@ class SecondaryButton extends StatelessWidget {
 class OutlinedCustomButton extends StatelessWidget {
 
   const OutlinedCustomButton({
-    Key? key,
+    super.key,
     required this.text,
     this.onPressed,
     this.isLoading = false,
@@ -355,7 +355,7 @@ class OutlinedCustomButton extends StatelessWidget {
     this.icon,
     this.size = ButtonSize.medium,
     this.width,
-  }) : super(key: key);
+  });
   final String text;
   final VoidCallback? onPressed;
   final bool isLoading;
@@ -380,7 +380,7 @@ class OutlinedCustomButton extends StatelessWidget {
 class TextCustomButton extends StatelessWidget {
 
   const TextCustomButton({
-    Key? key,
+    super.key,
     required this.text,
     this.onPressed,
     this.isLoading = false,
@@ -388,7 +388,7 @@ class TextCustomButton extends StatelessWidget {
     this.icon,
     this.size = ButtonSize.medium,
     this.width,
-  }) : super(key: key);
+  });
   final String text;
   final VoidCallback? onPressed;
   final bool isLoading;
@@ -413,7 +413,7 @@ class TextCustomButton extends StatelessWidget {
 class DangerButton extends StatelessWidget {
 
   const DangerButton({
-    Key? key,
+    super.key,
     required this.text,
     this.onPressed,
     this.isLoading = false,
@@ -421,7 +421,7 @@ class DangerButton extends StatelessWidget {
     this.icon,
     this.size = ButtonSize.medium,
     this.width,
-  }) : super(key: key);
+  });
   final String text;
   final VoidCallback? onPressed;
   final bool isLoading;

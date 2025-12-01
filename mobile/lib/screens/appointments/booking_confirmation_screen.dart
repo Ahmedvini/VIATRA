@@ -8,7 +8,7 @@ import 'appointment_detail_screen.dart';
 class BookingConfirmationScreen extends StatefulWidget {
 
   const BookingConfirmationScreen({
-    Key? key,
+    super.key,
     required this.doctorId,
     required this.doctorName,
     required this.specialty,
@@ -18,7 +18,7 @@ class BookingConfirmationScreen extends StatefulWidget {
     required this.reasonForVisit,
     required this.chiefComplaint,
     required this.urgent,
-  }) : super(key: key);
+  });
   final String doctorId;
   final String doctorName;
   final String specialty;

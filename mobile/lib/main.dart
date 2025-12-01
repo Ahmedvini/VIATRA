@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+// import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // Will be generated
 
 import 'config/app_config.dart';
 import 'config/theme.dart';
@@ -177,8 +177,7 @@ class ViatraApp extends StatelessWidget {
         ),
       ],
       child: Consumer3<ThemeProvider, LocaleProvider, AuthProvider>(
-        builder: (context, themeProvider, localeProvider, authProvider, _) {
-          return MaterialApp.router(
+        builder: (context, themeProvider, localeProvider, authProvider, _) => MaterialApp.router(
             // App Information
             title: 'Viatra Health',
             debugShowCheckedModeBanner: AppConfig.isDebugMode,
@@ -195,7 +194,7 @@ class ViatraApp extends StatelessWidget {
               Locale('ar'), // Arabic
             ],
             localizationsDelegates: const [
-              AppLocalizations.delegate,
+              // AppLocalizations.delegate, // Will be generated
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
@@ -218,8 +217,7 @@ class ViatraApp extends StatelessWidget {
                 child: child ?? const SizedBox.shrink(),
               );
             },
-          );
-        },
+          ),
       ),
     );
 }

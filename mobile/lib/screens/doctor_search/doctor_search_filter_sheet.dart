@@ -5,7 +5,7 @@ import '../../providers/doctor_search_provider.dart';
 import '../../utils/constants.dart';
 
 class DoctorSearchFilterSheet extends StatefulWidget {
-  const DoctorSearchFilterSheet({Key? key}) : super(key: key);
+  const DoctorSearchFilterSheet({super.key});
 
   @override
   State<DoctorSearchFilterSheet> createState() => _DoctorSearchFilterSheetState();
@@ -133,7 +133,7 @@ class _DoctorSearchFilterSheetState extends State<DoctorSearchFilterSheet> {
                     _buildSectionHeader('Specialty', Icons.medical_services),
                     const SizedBox(height: 8),
                     DropdownButtonFormField<String>(
-                      value: _localFilter.specialty,
+                      initialValue: _localFilter.specialty,
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         hintText: 'Select specialty',

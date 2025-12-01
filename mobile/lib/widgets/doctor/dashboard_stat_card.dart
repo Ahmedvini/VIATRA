@@ -3,11 +3,7 @@ import 'package:flutter/material.dart';
 class DashboardStatCard extends StatelessWidget {
 
   const DashboardStatCard({
-    super.key,
-    required this.title,
-    required this.count,
-    required this.icon,
-    required this.color,
+    required this.title, required this.count, required this.icon, required this.color, super.key,
     this.onTap,
   });
   final String title;

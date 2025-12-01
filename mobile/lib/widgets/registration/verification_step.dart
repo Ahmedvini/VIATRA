@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../models/user_model.dart';
 import '../../models/verification_model.dart';
 import 'verification_status_card.dart';
@@ -7,18 +6,17 @@ import 'verification_status_card.dart';
 class VerificationStep extends StatelessWidget {
 
   const VerificationStep({
-    Key? key,
+    super.key,
     required this.userRole,
     required this.verifications,
     this.onRefresh,
-  }) : super(key: key);
+  });
   final UserRole userRole;
   final List<Verification> verifications;
   final VoidCallback? onRefresh;
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
     return SingleChildScrollView(
@@ -27,14 +25,14 @@ class VerificationStep extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            l10n.verificationPending,
+            'Verification Pending',
             style: theme.textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            l10n.verificationPendingMessage,
+            'Your account is currently under review. We will notify you once verification is complete.',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurface.withOpacity(0.6),
             ),

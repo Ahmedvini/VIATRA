@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../models/health_profile_model.dart';
 import '../../providers/health_profile_provider.dart';
 import '../../utils/validators.dart';
 
@@ -29,9 +30,9 @@ class _AllergyFormScreenState extends State<AllergyFormScreen> {
   void initState() {
     super.initState();
     if (widget.existingAllergy != null) {
-      _allergenController.text = widget.existingAllergy!['allergen'] ?? '';
-      _reactionController.text = widget.existingAllergy!['reaction'] ?? '';
-      _severity = widget.existingAllergy!['severity'] ?? 'mild';
+      _allergenController.text = (widget.existingAllergy!['allergen'] as String?) ?? '';
+      _reactionController.text = (widget.existingAllergy!['reaction'] as String?) ?? '';
+      _severity = (widget.existingAllergy!['severity'] as String?) ?? 'mild';
     }
   }
 
@@ -52,13 +53,13 @@ class _AllergyFormScreenState extends State<AllergyFormScreen> {
     try {
       final provider = context.read<HealthProfileProvider>();
       
-      final allergyData = {
-        'allergen': _allergenController.text.trim(),
-        'reaction': _reactionController.text.trim(),
-        'severity': _severity,
-      };
+      final allergy = Allergy(
+        allergen: _allergenController.text.trim(),
+        severity: _severity,
+        notes: _reactionController.text.trim(),
+      );
 
-      await provider.addAllergy(allergyData);
+      await provider.addAllergy(allergy);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -203,8 +204,7 @@ class _AllergyFormScreenState extends State<AllergyFormScreen> {
             ),
             const SizedBox(height: 12),
             
-            ...['mild', 'moderate', 'severe'].map((severity) {
-              return RadioListTile<String>(
+            ...['mild', 'moderate', 'severe'].map((severity) => RadioListTile<String>(
                 value: severity,
                 groupValue: _severity,
                 onChanged: (value) {
@@ -247,8 +247,7 @@ class _AllergyFormScreenState extends State<AllergyFormScreen> {
                   ),
                 ),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              );
-            }).toList(),
+              )),
             
             const SizedBox(height: 24),
 

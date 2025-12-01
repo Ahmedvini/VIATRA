@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class CustomDropdown<T> extends StatefulWidget {
 
   const CustomDropdown({
-    Key? key,
+    super.key,
     this.label,
     this.hint,
     this.value,
@@ -27,7 +27,7 @@ class CustomDropdown<T> extends StatefulWidget {
     this.searchable = false,
     this.searchHint,
     this.focusNode,
-  }) : super(key: key);
+  });
   final String? label;
   final String? hint;
   final T? value;
@@ -126,9 +126,8 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>> {
   }
 
   Widget _buildRegularDropdown(ThemeData theme, ColorScheme colorScheme) => DropdownButtonFormField<T>(
-      value: widget.value,
-      items: widget.items.map((item) {
-        return DropdownMenuItem<T>(
+      initialValue: widget.value,
+      items: widget.items.map((item) => DropdownMenuItem<T>(
           value: item.value,
           enabled: item.enabled,
           child: Row(
@@ -146,8 +145,7 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>> {
               ),
             ],
           ),
-        );
-      }).toList(),
+        )).toList(),
       onChanged: widget.enabled ? widget.onChanged : null,
       onSaved: widget.onSaved,
       validator: widget.validator,
@@ -243,8 +241,7 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>> {
     showDialog(
       context: context,
       builder: (BuildContext context) => StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
+          builder: (context, setState) => AlertDialog(
               title: widget.label != null ? Text(widget.label!) : null,
               content: SizedBox(
                 width: double.maxFinite,
@@ -304,8 +301,7 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>> {
                   child: const Text('Cancel'),
                 ),
               ],
-            );
-          },
+            ),
         ),
     );
   }
@@ -366,7 +362,7 @@ extension ListExtension<T> on List<T> {
 class CountryDropdown extends StatelessWidget {
 
   const CountryDropdown({
-    Key? key,
+    super.key,
     this.label = 'Country',
     this.value,
     required this.countries,
@@ -374,7 +370,7 @@ class CountryDropdown extends StatelessWidget {
     this.onSaved,
     this.validator,
     this.enabled = true,
-  }) : super(key: key);
+  });
   final String? label;
   final String? value;
   final List<String> countries;
@@ -408,7 +404,7 @@ class CountryDropdown extends StatelessWidget {
 class SpecializationDropdown extends StatelessWidget {
 
   const SpecializationDropdown({
-    Key? key,
+    super.key,
     this.label = 'Specialization',
     this.value,
     required this.specializations,
@@ -416,7 +412,7 @@ class SpecializationDropdown extends StatelessWidget {
     this.onSaved,
     this.validator,
     this.enabled = true,
-  }) : super(key: key);
+  });
   final String? label;
   final String? value;
   final List<String> specializations;
@@ -450,7 +446,7 @@ class SpecializationDropdown extends StatelessWidget {
 class BloodTypeDropdown extends StatelessWidget {
 
   const BloodTypeDropdown({
-    Key? key,
+    super.key,
     this.label = 'Blood Type',
     this.value,
     required this.bloodTypes,
@@ -458,7 +454,7 @@ class BloodTypeDropdown extends StatelessWidget {
     this.onSaved,
     this.validator,
     this.enabled = true,
-  }) : super(key: key);
+  });
   final String? label;
   final String? value;
   final List<String> bloodTypes;

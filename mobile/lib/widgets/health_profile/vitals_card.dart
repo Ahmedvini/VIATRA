@@ -4,9 +4,9 @@ import '../../models/health_profile_model.dart';
 class VitalsCard extends StatelessWidget {
 
   const VitalsCard({
-    Key? key,
+    super.key,
     required this.healthProfile,
-  }) : super(key: key);
+  });
   final HealthProfile healthProfile;
 
   @override

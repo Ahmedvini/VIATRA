@@ -45,13 +45,6 @@ resource "google_cloudbuild_trigger" "main_branch" {
     google_project_iam_member.cloud_build_run_admin,
     google_artifact_registry_repository.viatra_repo
   ]
-
-  # Labels for resource organization
-  labels = merge(var.labels, {
-    environment = var.environment
-    service     = "cicd"
-    trigger     = "main-branch"
-  })
 }
 
 # Cloud Build trigger for pull request validation
@@ -150,11 +143,4 @@ resource "google_cloudbuild_trigger" "pull_request" {
     google_service_account.cloud_build,
     google_project_iam_member.cloud_build_run_admin
   ]
-
-  # Labels for resource organization
-  labels = merge(var.labels, {
-    environment = var.environment
-    service     = "cicd"
-    trigger     = "pull-request"
-  })
 }

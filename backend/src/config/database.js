@@ -144,36 +144,32 @@ export const checkDatabaseHealth = async () => {
     };
   }
 };
+
 // Sequelize instance
 let sequelize = null;
-// Helper to create a new Sequelize instance
-const createSequelizeInstance = () => {
-  const environment = process.env.NODE_ENV || 'development';
-  const sequelizeConfig = dbConfig[environment];
 
-  return new Sequelize(
-    sequelizeConfig.database,
-    sequelizeConfig.username,
-    sequelizeConfig.password,
-    sequelizeConfig
-  );
-};
-
-// Initialize Sequelize (اختياري في الـ startup علشان نعمل test للاتصال)
+// Initialize Sequelize
 export const initializeSequelize = async () => {
   try {
-    // لو لسه مفيش instance، أنشئ واحد
-    if (!sequelize) {
-      sequelize = createSequelizeInstance();
-    }
-
-    // اختبر الاتصال
+    const environment = process.env.NODE_ENV || 'development';
+    const sequelizeConfig = dbConfig[environment];
+    
+    sequelize = new Sequelize(
+      sequelizeConfig.database,
+      sequelizeConfig.username,
+      sequelizeConfig.password,
+      sequelizeConfig
+    );
+    
+    // Test the connection
     await sequelize.authenticate();
     logger.info('Sequelize connection established successfully');
-
-    // مهم جدًا: **ما نـعملش import للـ models هنا**
-    // علشان نتجنب الـ circular dependency مع models/index.js
-
+    
+    // Initialize models - this triggers the models/index.js module to load
+    // which will invoke all model factories and setup associations
+    await import('../models/index.js');
+    logger.info('Database models initialized successfully');
+    
     return sequelize;
   } catch (error) {
     logger.error('Unable to connect to the database via Sequelize:', error);
@@ -181,16 +177,13 @@ export const initializeSequelize = async () => {
   }
 };
 
-// Get Sequelize instance (lazy initialization)
+// Get Sequelize instance
 export const getSequelize = () => {
-  // لو أول مرة يتنادي، نعمل initialization sync
   if (!sequelize) {
-    sequelize = createSequelizeInstance();
+    throw new Error('Sequelize not initialized. Call initializeSequelize() first.');
   }
-
   return sequelize;
 };
-
 
 // Close Sequelize connection
 export const closeSequelize = async () => {
@@ -202,6 +195,3 @@ export const closeSequelize = async () => {
 };
 
 export { pool };
-export { sequelize };
-export default sequelize;
-

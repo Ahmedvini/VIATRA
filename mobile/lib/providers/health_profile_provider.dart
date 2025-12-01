@@ -67,7 +67,7 @@ class HealthProfileProvider extends ChangeNotifier {
         final cachedData = await _storageService.getCacheData(_cacheKey);
         if (cachedData != null) {
           try {
-            _healthProfile = HealthProfile.fromJson(cachedData);
+            _healthProfile = HealthProfile.fromJson(cachedData as Map<String, dynamic>);
             _lastFetchTime = DateTime.now();
             _setState(HealthProfileState.loaded);
             return;
@@ -92,7 +92,7 @@ class HealthProfileProvider extends ChangeNotifier {
         await _storageService.setCacheData(
           _cacheKey,
           _healthProfile!.toJson(),
-          _cacheDuration,
+          ttl: _cacheDuration,
         );
 
         _setState(HealthProfileState.loaded);
@@ -120,7 +120,7 @@ class HealthProfileProvider extends ChangeNotifier {
         await _storageService.setCacheData(
           _cacheKey,
           _healthProfile!.toJson(),
-          _cacheDuration,
+          ttl: _cacheDuration,
         );
 
         _setState(HealthProfileState.loaded);
@@ -152,7 +152,7 @@ class HealthProfileProvider extends ChangeNotifier {
         await _storageService.setCacheData(
           _cacheKey,
           _healthProfile!.toJson(),
-          _cacheDuration,
+          ttl: _cacheDuration,
         );
 
         _setState(HealthProfileState.loaded);

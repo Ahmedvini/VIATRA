@@ -1,6 +1,8 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
+
 import '../models/conversation_model.dart';
 import '../models/message_model.dart';
 
@@ -47,7 +49,7 @@ class ChatService {
         final data = json.decode(response.body);
         return {
           'conversations': (data['data']['conversations'] as List)
-              .map((json) => Conversation.fromJson(json))
+              .map((json) => Conversation.fromJson(json as Map<String, dynamic>))
               .toList(),
           'pagination': data['data']['pagination'],
         };
@@ -77,7 +79,7 @@ class ChatService {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = json.decode(response.body);
-        return Conversation.fromJson(data['data']);
+        return Conversation.fromJson(data['data'] as Map<String, dynamic>);
       } else {
         throw Exception('Failed to create conversation: ${response.body}');
       }
@@ -108,7 +110,7 @@ class ChatService {
         final data = json.decode(response.body);
         return {
           'messages': (data['data']['messages'] as List)
-              .map((json) => Message.fromJson(json))
+              .map((json) => Message.fromJson(json as Map<String, dynamic>))
               .toList(),
           'pagination': data['data']['pagination'],
         };
@@ -144,7 +146,7 @@ class ChatService {
 
       if (response.statusCode == 201) {
         final data = json.decode(response.body);
-        return Message.fromJson(data['data']);
+        return Message.fromJson(data['data'] as Map<String, dynamic>);
       } else {
         throw Exception('Failed to send message: ${response.body}');
       }

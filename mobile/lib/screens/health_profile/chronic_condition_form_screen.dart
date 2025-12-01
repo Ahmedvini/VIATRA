@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../models/health_profile_model.dart';
 import '../../providers/health_profile_provider.dart';
 import '../../utils/validators.dart';
 
@@ -52,15 +53,18 @@ class _ChronicConditionFormScreenState extends State<ChronicConditionFormScreen>
     try {
       final provider = context.read<HealthProfileProvider>();
       
-      final conditionData = {
-        'name': _nameController.text.trim(),
-        if (_diagnosedYearController.text.isNotEmpty)
-          'diagnosedYear': int.parse(_diagnosedYearController.text),
-        if (_notesController.text.isNotEmpty)
-          'notes': _notesController.text.trim(),
-      };
+      final condition = ChronicCondition(
+        name: _nameController.text.trim(),
+        severity: 'mild', // Default severity
+        diagnosedDate: _diagnosedYearController.text.isNotEmpty
+            ? DateTime(int.parse(_diagnosedYearController.text))
+            : null,
+        notes: _notesController.text.isNotEmpty 
+            ? _notesController.text.trim() 
+            : null,
+      );
 
-      await provider.addChronicCondition(conditionData);
+      await provider.addChronicCondition(condition);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

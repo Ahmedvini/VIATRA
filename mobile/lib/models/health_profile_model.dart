@@ -3,7 +3,7 @@ class HealthProfile {
   HealthProfile({
     required this.id,
     required this.patientId,
-    this.bloodType,
+    required this.createdAt, required this.updatedAt, this.bloodType,
     this.height,
     this.weight,
     this.bloodPressureSystolic,
@@ -20,22 +20,19 @@ class HealthProfile {
     this.preferredPharmacy,
     this.insurance,
     this.notes,
-    required this.createdAt,
-    required this.updatedAt,
   });
 
-  factory HealthProfile.fromJson(Map<String, dynamic> json) {
-    return HealthProfile(
+  factory HealthProfile.fromJson(Map<String, dynamic> json) => HealthProfile(
       id: json['id']?.toString() ?? '',
       patientId: json['patient_id']?.toString() ?? json['patientId']?.toString() ?? '',
-      bloodType: json['blood_type'] ?? json['bloodType'],
-      height: json['height']?.toDouble(),
-      weight: json['weight']?.toDouble(),
-      bloodPressureSystolic: json['blood_pressure_systolic']?.toInt() ?? json['bloodPressureSystolic']?.toInt(),
-      bloodPressureDiastolic: json['blood_pressure_diastolic']?.toInt() ?? json['bloodPressureDiastolic']?.toInt(),
-      heartRate: json['heart_rate']?.toInt() ?? json['heartRate']?.toInt(),
-      bloodGlucose: json['blood_glucose']?.toDouble() ?? json['bloodGlucose']?.toDouble(),
-      oxygenSaturation: json['oxygen_saturation']?.toInt() ?? json['oxygenSaturation']?.toInt(),
+      bloodType: (json['blood_type'] as String?) ?? (json['bloodType'] as String?),
+      height: (json['height'] as num?)?.toDouble(),
+      weight: (json['weight'] as num?)?.toDouble(),
+      bloodPressureSystolic: (json['blood_pressure_systolic'] as int?) ?? (json['bloodPressureSystolic'] as int?),
+      bloodPressureDiastolic: (json['blood_pressure_diastolic'] as int?) ?? (json['bloodPressureDiastolic'] as int?),
+      heartRate: (json['heart_rate'] as int?) ?? (json['heartRate'] as int?),
+      bloodGlucose: (json['blood_glucose'] as num?)?.toDouble() ?? (json['bloodGlucose'] as num?)?.toDouble(),
+      oxygenSaturation: (json['oxygen_saturation'] as int?) ?? (json['oxygenSaturation'] as int?),
       allergies: (json['allergies'] as List<dynamic>?)
               ?.map((e) => Allergy.fromJson(e as Map<String, dynamic>))
               .toList() ??
@@ -61,28 +58,27 @@ class HealthProfile {
       emergencyContact: json['emergency_contact_name'] != null ||
               json['emergencyContactName'] != null
           ? EmergencyContact(
-              name: json['emergency_contact_name'] ?? json['emergencyContactName'],
-              phone: json['emergency_contact_phone'] ?? json['emergencyContactPhone'],
-              relationship: json['emergency_contact_relationship'] ??
-                  json['emergencyContactRelationship'],
+              name: (json['emergency_contact_name'] as String?) ?? (json['emergencyContactName'] as String?),
+              phone: (json['emergency_contact_phone'] as String?) ?? (json['emergencyContactPhone'] as String?),
+              relationship: (json['emergency_contact_relationship'] as String?) ??
+                  (json['emergencyContactRelationship'] as String?),
             )
           : null,
       preferredPharmacy:
-          json['preferred_pharmacy'] ?? json['preferredPharmacy'],
+          (json['preferred_pharmacy'] as String?) ?? (json['preferredPharmacy'] as String?),
       insurance: json['insurance_provider'] != null ||
               json['insuranceProvider'] != null
           ? Insurance(
-              provider: json['insurance_provider'] ?? json['insuranceProvider'],
-              insuranceId: json['insurance_id'] ?? json['insuranceId'],
+              provider: (json['insurance_provider'] as String?) ?? (json['insuranceProvider'] as String?),
+              insuranceId: (json['insurance_id'] as String?) ?? (json['insuranceId'] as String?),
             )
           : null,
-      notes: json['notes'],
+      notes: json['notes'] as String?,
       createdAt: DateTime.parse(
-          json['created_at'] ?? json['createdAt'] ?? DateTime.now().toIso8601String()),
+          (json['created_at'] as String?) ?? (json['createdAt'] as String?) ?? DateTime.now().toIso8601String()),
       updatedAt: DateTime.parse(
-          json['updated_at'] ?? json['updatedAt'] ?? DateTime.now().toIso8601String()),
+          (json['updated_at'] as String?) ?? (json['updatedAt'] as String?) ?? DateTime.now().toIso8601String()),
     );
-  }
   final String id;
   final String patientId;
   final String? bloodType;
@@ -211,16 +207,14 @@ class Allergy {
     DateTime? dateAdded,
   }) : dateAdded = dateAdded ?? DateTime.now();
 
-  factory Allergy.fromJson(Map<String, dynamic> json) {
-    return Allergy(
-      allergen: json['allergen'] ?? '',
-      severity: json['severity'] ?? 'mild',
-      notes: json['notes'],
+  factory Allergy.fromJson(Map<String, dynamic> json) => Allergy(
+      allergen: (json['allergen'] as String?) ?? '',
+      severity: (json['severity'] as String?) ?? 'mild',
+      notes: json['notes'] as String?,
       dateAdded: json['date_added'] != null || json['dateAdded'] != null
-          ? DateTime.parse(json['date_added'] ?? json['dateAdded'])
+          ? DateTime.parse(((json['date_added'] as String?) ?? (json['dateAdded'] as String?))!)
           : DateTime.now(),
     );
-  }
   final String allergen;
   final String severity;
   final String? notes;
@@ -237,29 +231,25 @@ class Allergy {
 class ChronicCondition {
 
   ChronicCondition({
-    String? id,
-    required this.name,
+    required this.name, required this.severity, String? id,
     this.diagnosedDate,
-    required this.severity,
     this.medications = const [],
     this.notes,
   }) : id = id ?? DateTime.now().millisecondsSinceEpoch.toString();
 
-  factory ChronicCondition.fromJson(Map<String, dynamic> json) {
-    return ChronicCondition(
+  factory ChronicCondition.fromJson(Map<String, dynamic> json) => ChronicCondition(
       id: json['id']?.toString() ?? DateTime.now().millisecondsSinceEpoch.toString(),
-      name: json['name'] ?? '',
+      name: (json['name'] as String?) ?? '',
       diagnosedDate: json['diagnosed_date'] != null || json['diagnosedDate'] != null
-          ? DateTime.parse(json['diagnosed_date'] ?? json['diagnosedDate'])
+          ? DateTime.parse(((json['diagnosed_date'] as String?) ?? (json['diagnosedDate'] as String?))!)
           : null,
-      severity: json['severity'] ?? 'mild',
+      severity: (json['severity'] as String?) ?? 'mild',
       medications: (json['medications'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
           [],
-      notes: json['notes'],
+      notes: json['notes'] as String?,
     );
-  }
   final String id;
   final String name;
   final DateTime? diagnosedDate;
@@ -288,20 +278,18 @@ class Medication {
     this.prescribedBy,
   });
 
-  factory Medication.fromJson(Map<String, dynamic> json) {
-    return Medication(
-      name: json['name'] ?? '',
-      dosage: json['dosage'],
-      frequency: json['frequency'],
+  factory Medication.fromJson(Map<String, dynamic> json) => Medication(
+      name: (json['name'] as String?) ?? '',
+      dosage: json['dosage'] as String?,
+      frequency: json['frequency'] as String?,
       startDate: json['start_date'] != null || json['startDate'] != null
-          ? DateTime.parse(json['start_date'] ?? json['startDate'])
+          ? DateTime.parse(((json['start_date'] as String?) ?? (json['startDate'] as String?))!)
           : null,
       endDate: json['end_date'] != null || json['endDate'] != null
-          ? DateTime.parse(json['end_date'] ?? json['endDate'])
+          ? DateTime.parse(((json['end_date'] as String?) ?? (json['endDate'] as String?))!)
           : null,
-      prescribedBy: json['prescribed_by'] ?? json['prescribedBy'],
+      prescribedBy: (json['prescribed_by'] as String?) ?? (json['prescribedBy'] as String?),
     );
-  }
   final String name;
   final String? dosage;
   final String? frequency;
@@ -328,14 +316,12 @@ class Lifestyle {
     this.diet,
   });
 
-  factory Lifestyle.fromJson(Map<String, dynamic> json) {
-    return Lifestyle(
-      smoking: json['smoking'],
-      alcohol: json['alcohol'],
-      exerciseFrequency: json['exercise_frequency'] ?? json['exerciseFrequency'],
-      diet: json['diet'],
+  factory Lifestyle.fromJson(Map<String, dynamic> json) => Lifestyle(
+      smoking: json['smoking'] as String?,
+      alcohol: json['alcohol'] as String?,
+      exerciseFrequency: (json['exercise_frequency'] as String?) ?? (json['exerciseFrequency'] as String?),
+      diet: json['diet'] as String?,
     );
-  }
   final String? smoking;
   final String? alcohol;
   final String? exerciseFrequency;

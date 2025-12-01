@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AddressInfoStep extends StatefulWidget {
 
   const AddressInfoStep({
-    Key? key,
+    super.key,
     required this.formData,
     required this.onDataChanged,
-  }) : super(key: key);
+  });
   final Map<String, dynamic> formData;
   final Function(String, dynamic) onDataChanged;
 
@@ -24,10 +23,10 @@ class _AddressInfoStepState extends State<AddressInfoStep> {
   @override
   void initState() {
     super.initState();
-    _addressController.text = widget.formData['address'] ?? '';
-    _cityController.text = widget.formData['city'] ?? '';
-    _stateController.text = widget.formData['state'] ?? '';
-    _postalCodeController.text = widget.formData['postalCode'] ?? '';
+    _addressController.text = (widget.formData['address'] as String?) ?? '';
+    _cityController.text = (widget.formData['city'] as String?) ?? '';
+    _stateController.text = (widget.formData['state'] as String?) ?? '';
+    _postalCodeController.text = (widget.formData['postalCode'] as String?) ?? '';
   }
 
   @override
@@ -41,7 +40,6 @@ class _AddressInfoStepState extends State<AddressInfoStep> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
     return SingleChildScrollView(
@@ -50,7 +48,7 @@ class _AddressInfoStepState extends State<AddressInfoStep> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            l10n.labelAddress,
+            'Address',
             style: theme.textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
             ),
@@ -68,15 +66,15 @@ class _AddressInfoStepState extends State<AddressInfoStep> {
           TextFormField(
             key: const Key('registration_address_field'),
             controller: _addressController,
-            decoration: InputDecoration(
-              labelText: l10n.labelAddress,
-              prefixIcon: const Icon(Icons.home),
+            decoration: const InputDecoration(
+              labelText: 'Address',
+              prefixIcon: Icon(Icons.home),
             ),
             maxLines: 2,
             textInputAction: TextInputAction.next,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return l10n.errorRequiredField;
+                return 'This field is required';
               }
               return null;
             },
@@ -88,14 +86,14 @@ class _AddressInfoStepState extends State<AddressInfoStep> {
           TextFormField(
             key: const Key('registration_city_field'),
             controller: _cityController,
-            decoration: InputDecoration(
-              labelText: l10n.labelCity,
-              prefixIcon: const Icon(Icons.location_city),
+            decoration: const InputDecoration(
+              labelText: 'City',
+              prefixIcon: Icon(Icons.location_city),
             ),
             textInputAction: TextInputAction.next,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return l10n.errorRequiredField;
+                return 'This field is required';
               }
               return null;
             },
@@ -114,7 +112,7 @@ class _AddressInfoStepState extends State<AddressInfoStep> {
             textInputAction: TextInputAction.next,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return l10n.errorRequiredField;
+                return 'This field is required';
               }
               return null;
             },
@@ -134,7 +132,7 @@ class _AddressInfoStepState extends State<AddressInfoStep> {
             textInputAction: TextInputAction.done,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return l10n.errorRequiredField;
+                return 'This field is required';
               }
               return null;
             },

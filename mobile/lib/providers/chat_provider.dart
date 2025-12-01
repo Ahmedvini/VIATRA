@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import '../models/conversation_model.dart';
 import '../models/message_model.dart';
-import '../models/user_model.dart';
 import '../services/chat_service.dart';
 import '../services/socket_service.dart';
 

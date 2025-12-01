@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
+
 import '../../models/appointment_model.dart';
 import '../../providers/appointment_provider.dart';
 import '../../widgets/appointments/appointment_card.dart';
 import 'appointment_detail_screen.dart';
 
 class AppointmentListScreen extends StatefulWidget {
-  const AppointmentListScreen({Key? key}) : super(key: key);
+  const AppointmentListScreen({super.key});
 
   @override
   _AppointmentListScreenState createState() => _AppointmentListScreenState();

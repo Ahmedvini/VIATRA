@@ -5,8 +5,7 @@ class Doctor {
     required this.userId,
     required this.licenseNumber,
     required this.specialty,
-    this.subSpecialty,
-    required this.title,
+    required this.title, required this.isVerified, this.subSpecialty,
     this.npiNumber,
     this.deaNumber,
     this.yearsOfExperience,
@@ -27,7 +26,6 @@ class Doctor {
     this.workingHours,
     this.rating,
     this.totalReviews,
-    required this.isVerified,
     this.firstName,
     this.lastName,
     this.email,
@@ -43,56 +41,56 @@ class Doctor {
     
     return Doctor(
       id: json['id']?.toString() ?? '',
-      userId: json['userId'] ?? json['user_id']?.toString() ?? '',
-      licenseNumber: json['licenseNumber'] ?? json['license_number'] ?? '',
-      specialty: json['specialty'] ?? '',
-      subSpecialty: json['subSpecialty'] ?? json['sub_specialty'],
-      title: json['title'] ?? 'Dr.',
-      npiNumber: json['npiNumber'] ?? json['npi_number'],
-      deaNumber: json['deaNumber'] ?? json['dea_number'],
-      yearsOfExperience: json['yearsOfExperience'] ?? json['years_of_experience'],
-      bio: json['bio'],
-      education: json['education'],
+      userId: (json['userId'] as String?) ?? json['user_id']?.toString() ?? '',
+      licenseNumber: (json['licenseNumber'] as String?) ?? (json['license_number'] as String?) ?? '',
+      specialty: (json['specialty'] as String?) ?? '',
+      subSpecialty: (json['subSpecialty'] as String?) ?? (json['sub_specialty'] as String?),
+      title: (json['title'] as String?) ?? 'Dr.',
+      npiNumber: (json['npiNumber'] as String?) ?? (json['npi_number'] as String?),
+      deaNumber: (json['deaNumber'] as String?) ?? (json['dea_number'] as String?),
+      yearsOfExperience: (json['yearsOfExperience'] as int?) ?? (json['years_of_experience'] as int?),
+      bio: json['bio'] as String?,
+      education: json['education'] as String?,
       certifications: json['certifications'] != null
-          ? List<String>.from(json['certifications'])
+          ? List<String>.from(json['certifications'] as List)
           : null,
-      consultationFee: json['consultationFee']?.toDouble() ?? json['consultation_fee']?.toDouble(),
+      consultationFee: (json['consultationFee'] as num?)?.toDouble() ?? (json['consultation_fee'] as num?)?.toDouble(),
       availableSchedule: json['availableSchedule'] != null
-          ? List<String>.from(json['availableSchedule'])
+          ? List<String>.from(json['availableSchedule'] as List)
           : json['available_schedule'] != null
-              ? List<String>.from(json['available_schedule'])
+              ? List<String>.from(json['available_schedule'] as List)
               : null,
       languagesSpoken: json['languagesSpoken'] != null
-          ? List<String>.from(json['languagesSpoken'])
+          ? List<String>.from(json['languagesSpoken'] as List)
           : json['languages_spoken'] != null
-              ? List<String>.from(json['languages_spoken'])
+              ? List<String>.from(json['languages_spoken'] as List)
               : null,
-      telehealthEnabled: json['telehealthEnabled'] ?? json['telehealth_enabled'],
-      isAcceptingPatients: json['isAcceptingPatients'] ?? json['is_accepting_patients'],
-      officeAddressLine1: json['officeAddressLine1'] ?? json['office_address_line1'],
-      officeAddressLine2: json['officeAddressLine2'] ?? json['office_address_line2'],
-      officeCity: json['officeCity'] ?? json['office_city'],
-      officeState: json['officeState'] ?? json['office_state'],
-      officeZipCode: json['officeZipCode'] ?? json['office_zip_code'],
-      officePhone: json['officePhone'] ?? json['office_phone'],
-      workingHours: json['workingHours'] ?? json['working_hours'],
-      rating: json['rating']?.toDouble(),
-      totalReviews: json['totalReviews'] ?? json['total_reviews'],
-      isVerified: json['isVerified'] ?? json['is_verified'] ?? false,
-      firstName: user?['firstName'] ?? user?['first_name'],
-      lastName: user?['lastName'] ?? user?['last_name'],
-      email: user?['email'],
-      phone: user?['phone'],
-      profileImage: user?['profileImage'] ?? user?['profile_image'],
+      telehealthEnabled: (json['telehealthEnabled'] as bool?) ?? (json['telehealth_enabled'] as bool?),
+      isAcceptingPatients: (json['isAcceptingPatients'] as bool?) ?? (json['is_accepting_patients'] as bool?),
+      officeAddressLine1: (json['officeAddressLine1'] as String?) ?? (json['office_address_line1'] as String?),
+      officeAddressLine2: (json['officeAddressLine2'] as String?) ?? (json['office_address_line2'] as String?),
+      officeCity: (json['officeCity'] as String?) ?? (json['office_city'] as String?),
+      officeState: (json['officeState'] as String?) ?? (json['office_state'] as String?),
+      officeZipCode: (json['officeZipCode'] as String?) ?? (json['office_zip_code'] as String?),
+      officePhone: (json['officePhone'] as String?) ?? (json['office_phone'] as String?),
+      workingHours: (json['workingHours'] as Map<String, dynamic>?) ?? (json['working_hours'] as Map<String, dynamic>?),
+      rating: (json['rating'] as num?)?.toDouble(),
+      totalReviews: (json['totalReviews'] as int?) ?? (json['total_reviews'] as int?),
+      isVerified: (json['isVerified'] as bool?) ?? (json['is_verified'] as bool?) ?? false,
+      firstName: (user?['firstName'] as String?) ?? (user?['first_name'] as String?),
+      lastName: (user?['lastName'] as String?) ?? (user?['last_name'] as String?),
+      email: user?['email'] as String?,
+      phone: user?['phone'] as String?,
+      profileImage: (user?['profileImage'] as String?) ?? (user?['profile_image'] as String?),
       createdAt: json['createdAt'] != null
-          ? DateTime.parse(json['createdAt'])
+          ? DateTime.parse(json['createdAt'] as String)
           : json['created_at'] != null
-              ? DateTime.parse(json['created_at'])
+              ? DateTime.parse(json['created_at'] as String)
               : null,
       updatedAt: json['updatedAt'] != null
-          ? DateTime.parse(json['updatedAt'])
+          ? DateTime.parse(json['updatedAt'] as String)
           : json['updated_at'] != null
-              ? DateTime.parse(json['updated_at'])
+              ? DateTime.parse(json['updated_at'] as String)
               : null,
     );
   }

@@ -21,8 +21,7 @@ class CachedAppointmentResult {
     required this.timestamp,
   });
 
-  factory CachedAppointmentResult.fromJson(Map<String, dynamic> json) {
-    return CachedAppointmentResult(
+  factory CachedAppointmentResult.fromJson(Map<String, dynamic> json) => CachedAppointmentResult(
       appointments: (json['appointments'] as List<dynamic>)
           .map((a) => Appointment.fromJson(a as Map<String, dynamic>))
           .toList(),
@@ -30,7 +29,6 @@ class CachedAppointmentResult {
       totalResults: json['totalResults'] as int,
       timestamp: DateTime.parse(json['timestamp'] as String),
     );
-  }
   final List<Appointment> appointments;
   final int totalPages;
   final int totalResults;
@@ -104,10 +102,10 @@ class AppointmentProvider extends ChangeNotifier {
 
   // Doctor dashboard getters
   Map<String, dynamic>? get doctorDashboardStats => _doctorDashboardStats;
-  int get todayAppointmentsCount => _doctorDashboardStats?['todayCount'] ?? 0;
-  int get upcomingAppointmentsCount => _doctorDashboardStats?['upcomingCount'] ?? 0;
-  int get totalPatientsCount => _doctorDashboardStats?['totalPatients'] ?? 0;
-  int get pendingRequestsCount => _doctorDashboardStats?['pendingCount'] ?? 0;
+  int get todayAppointmentsCount => (_doctorDashboardStats?['todayCount'] as int?) ?? 0;
+  int get upcomingAppointmentsCount => (_doctorDashboardStats?['upcomingCount'] as int?) ?? 0;
+  int get totalPatientsCount => (_doctorDashboardStats?['totalPatients'] as int?) ?? 0;
+  int get pendingRequestsCount => (_doctorDashboardStats?['pendingCount'] as int?) ?? 0;
   bool get isStatsExpired =>
       _statsLastFetched == null ||
       DateTime.now().difference(_statsLastFetched!).inMinutes >= 5;
@@ -585,74 +583,6 @@ class AppointmentProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Load doctor's appointments with filters
-  Future<void> loadDoctorAppointments({
-    String? status,
-    bool refresh = false,
-  }) async {
-    if (!refresh) {
-      // Check cache first
-      final cacheKey = _getCacheKey(status: status);
-      final cachedResult = _cachedResults[cacheKey];
-
-      if (cachedResult != null &&
-          DateTime.now().difference(cachedResult.timestamp).inMinutes < 5) {
-        _appointments = cachedResult.appointments;
-        _currentPage = 1;
-        _totalPages = cachedResult.totalPages;
-        _totalResults = cachedResult.totalResults;
-        _filterStatus = status;
-        _state = AppointmentState.loaded;
-        notifyListeners();
-        return;
-      }
-    }
-
-    _state = AppointmentState.loading;
-    _errorMessage = null;
-    _filterStatus = status;
-    notifyListeners();
-
-    try {
-      final response = await _appointmentService.getDoctorAppointments(
-        status: status,
-        page: 1,
-        limit: 20,
-      );
-
-      if (response.success && response.data != null) {
-        _appointments = response.data!.appointments;
-        _currentPage = response.data!.pagination.page;
-        _totalPages = response.data!.pagination.totalPages;
-        _totalResults = response.data!.pagination.total;
-        _state = AppointmentState.loaded;
-
-        // Cache results
-        final cacheKey = _getCacheKey(status: status);
-        _cachedResults[cacheKey] = CachedAppointmentResult(
-          appointments: _appointments,
-          totalPages: _totalPages,
-          totalResults: _totalResults,
-          timestamp: DateTime.now(),
-        );
-
-        // Save to storage
-        await _storageService.setCacheData(
-          'doctor_appointments_$cacheKey',
-          _cachedResults[cacheKey]!.toJson(),
-        );
-      } else {
-        _state = AppointmentState.error;
-        _errorMessage = response.message ?? 'Failed to load appointments';
-      }
-    } catch (e) {
-      _state = AppointmentState.error;
-      _errorMessage = 'An error occurred: $e';
-    }
-
-    notifyListeners();
-  }
-
   /// Load doctor dashboard statistics
   Future<void> loadDoctorDashboardStats({bool refresh = false}) async {
     // Check if stats are expired or refresh is forced
@@ -712,7 +642,7 @@ class AppointmentProvider extends ChangeNotifier {
         clearCache();
         _doctorDashboardStats = null;
         _statsLastFetched = null;
-        await _storageService.deleteCacheData('doctor_dashboard_stats');
+        await _storageService.remove('cache_doctor_dashboard_stats');
 
         notifyListeners();
         return true;
@@ -754,7 +684,7 @@ class AppointmentProvider extends ChangeNotifier {
         clearCache();
         _doctorDashboardStats = null;
         _statsLastFetched = null;
-        await _storageService.deleteCacheData('doctor_dashboard_stats');
+        await _storageService.remove('cache_doctor_dashboard_stats');
 
         notifyListeners();
         return true;

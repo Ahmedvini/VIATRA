@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
-import '../../providers/auth_provider.dart';
+import 'package:provider/provider.dart';
+
 import '../../models/user_model.dart';
-import '../../widgets/profile/user_info_card.dart';
+import '../../providers/auth_provider.dart';
 import '../../widgets/profile/role_switcher_widget.dart';
-import '../../config/theme.dart';
+import '../../widgets/profile/user_info_card.dart';
+
 
 /// Comprehensive profile screen
 class ProfileScreen extends StatelessWidget {
@@ -55,7 +56,7 @@ class ProfileScreen extends StatelessWidget {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text('Switched to ${_getRoleLabel(newRole)} mode'),
-                              backgroundColor: AppTheme.primaryColor,
+                              backgroundColor: Theme.of(context).colorScheme.primary,
                             ),
                           );
                         } else if (!success && context.mounted) {
