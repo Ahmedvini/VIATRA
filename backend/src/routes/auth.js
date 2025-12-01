@@ -153,14 +153,6 @@ router.get('/validate-token',
  */
 router.post('/fcm-token',
   authenticate,
-  rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 10,
-    message: {
-      error: 'Too many requests',
-      message: 'Too many FCM token update attempts'
-    }
-  }),
   updateFcmToken
 );
 
