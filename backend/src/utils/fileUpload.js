@@ -6,9 +6,20 @@ import config from '../config/index.js';
 import logger from '../config/logger.js';
 
 // Initialize Google Cloud Storage
-const storage = new Storage({
+let storageConfig = {
   projectId: config.gcp.projectId
-});
+};
+
+// If credentials JSON is provided as environment variable (for Railway/cloud deployment)
+if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
+  try {
+    storageConfig.credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
+  } catch (error) {
+    logger.error('Failed to parse GOOGLE_APPLICATION_CREDENTIALS_JSON:', error);
+  }
+}
+
+const storage = new Storage(storageConfig);
 
 const bucket = storage.bucket(config.gcp.bucketName);
 
