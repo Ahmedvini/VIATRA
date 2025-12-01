@@ -539,8 +539,8 @@ export const validate = (schema, property = 'body') => {
   return (req, res, next) => {
     const { error, value } = schema.validate(req[property], {
       abortEarly: false, // Collect all errors
-      allowUnknown: false, // Don't allow unknown fields
-      stripUnknown: true // Remove unknown fields
+      allowUnknown: true, // Allow unknown fields (will be passed to service layer)
+      stripUnknown: false // Keep unknown fields for service layer processing
     });
     
     if (error) {
