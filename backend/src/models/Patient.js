@@ -49,28 +49,23 @@ export default (sequelize, DataTypes) => {
     },
     address_line1: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true  // Made optional to match database schema
     },
     address_line2: {
-      type: DataTypes.STRING
+      type: DataTypes.STRING,
+      allowNull: true
     },
     city: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true  // Made optional to match database schema
     },
     state: {
       type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        len: [2, 2] // US state abbreviation
-      }
+      allowNull: true  // Made optional to match database schema
     },
     zip_code: {
       type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        is: /^\d{5}(-\d{4})?$/
-      }
+      allowNull: true  // Made optional to match database schema
     },
     emergency_contact_name: {
       type: DataTypes.STRING

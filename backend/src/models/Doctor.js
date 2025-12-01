@@ -58,17 +58,10 @@ export default (sequelize, DataTypes) => {
     },
     npi_number: {
       type: DataTypes.STRING,
-      unique: true,
-      validate: {
-        len: [10, 10],
-        isNumeric: true
-      }
+      unique: true
     },
     dea_number: {
-      type: DataTypes.STRING,
-      validate: {
-        is: /^[A-Z]{2}\d{7}$/
-      }
+      type: DataTypes.STRING
     },
     years_of_experience: {
       type: DataTypes.INTEGER,
@@ -115,16 +108,10 @@ export default (sequelize, DataTypes) => {
       type: DataTypes.STRING
     },
     office_state: {
-      type: DataTypes.STRING,
-      validate: {
-        len: [2, 2] // US state abbreviation
-      }
+      type: DataTypes.STRING
     },
     office_zip_code: {
-      type: DataTypes.STRING,
-      validate: {
-        is: /^\d{5}(-\d{4})?$/
-      }
+      type: DataTypes.STRING
     },
     office_phone: {
       type: DataTypes.STRING,
