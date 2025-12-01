@@ -33,26 +33,27 @@ class _LoginScreenState extends State<LoginScreen> {
 
     final authProvider = context.read<AuthProvider>();
     
-    try {
-      await authProvider.login(
-        _emailController.text.trim(),
-        _passwordController.text,
-        rememberMe: _rememberMe,
-      );
+    final success = await authProvider.login(
+      _emailController.text.trim(),
+      _passwordController.text,
+      rememberMe: _rememberMe,
+    );
 
-      if (mounted) {
-        // Navigate to home on successful login
-        context.go('/home');
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString()),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
-      }
+    if (!mounted) return;
+
+    if (success) {
+      // Navigate to home on successful login
+      context.go('/home');
+    } else {
+      // Show error message from auth provider
+      final error = authProvider.errorMessage ?? 'Login failed';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error),
+          backgroundColor: Theme.of(context).colorScheme.error,
+          duration: const Duration(seconds: 4),
+        ),
+      );
     }
   }
 
