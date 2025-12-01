@@ -9,7 +9,6 @@ import { connectDatabase, disconnectDatabase, initializeSequelize, closeSequeliz
 import { connectRedis, disconnectRedis } from './config/redis.js';
 import logger, { requestLogger } from './config/logger.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
-import { authenticate, authorize } from './middleware/auth.js';
 
 const app = express();
 const httpServer = createServer(app);
