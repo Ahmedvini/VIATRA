@@ -32,8 +32,7 @@ const router = express.Router();
  * @body    { email, password, firstName, lastName, phone, role, ...roleSpecificFields }
  */
 router.post('/register', 
-  // registerLimiter, // TEMPORARILY DISABLED FOR TESTING
-  validate(registerSchema),
+  // validate(registerSchema), // TEMPORARILY DISABLED FOR TESTING
   register
 );
 
