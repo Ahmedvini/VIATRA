@@ -10,7 +10,6 @@ import { connectRedis, disconnectRedis } from './config/redis.js';
 import logger, { requestLogger } from './config/logger.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import { authenticate, authorize } from './middleware/auth.js';
-import { initializeSocketServer } from './socket/index.js';
 
 const app = express();
 const httpServer = createServer(app);
@@ -154,7 +153,8 @@ const startServer = async () => {
     // Initialize and mount routes after Sequelize is ready
     await initializeRoutes();
     
-    // Initialize Socket.io server
+    // Initialize Socket.io server (dynamic import to avoid loading models too early)
+    const { initializeSocketServer } = await import('./socket/index.js');
     io = initializeSocketServer(httpServer);
     
     // Make io instance available to routes
