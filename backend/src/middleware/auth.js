@@ -371,3 +371,7 @@ export const requireOwnership = (ownerField = 'userId', source = 'params') => {
     }
   };
 };
+
+// Export aliases for backward compatibility
+export const requireAuth = authenticate;
+export const requireRole = authorize;
