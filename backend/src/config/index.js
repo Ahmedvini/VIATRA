@@ -157,7 +157,8 @@ const validateConfig = () => {
       throw new Error('REDIS_PORT is required in production environment');
     }
     // Redis auth is optional but recommended - just log a warning if missing
-    if (!config.redis.auth) {
+    // Skip warning if REDIS_URL is set (Railway, Heroku, etc. - auth is in the URL)
+    if (!config.redis.auth && !process.env.REDIS_URL) {
       console.warn('WARNING: REDIS_AUTH is not set. Consider enabling Redis authentication for production.');
     }
   }
