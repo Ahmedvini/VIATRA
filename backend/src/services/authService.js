@@ -31,14 +31,19 @@ export const registerUser = async (userData) => {
   const { email, password, firstName, lastName, phone, role, preferredLanguage = 'en', ...roleSpecificData } = userData;
   
   try {
+    logger.info('DEBUG: Starting registration', { email, role });
+    
     // Check if user already exists
+    logger.info('DEBUG: Checking for existing user');
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
       throw new Error('User with this email already exists');
     }
     
+    logger.info('DEBUG: Starting transaction');
     // Start transaction
     const result = await sequelize.transaction(async (transaction) => {
+      logger.info('DEBUG: Creating user record');
       // Create user record
       const user = await User.create({
         email,
@@ -51,9 +56,12 @@ export const registerUser = async (userData) => {
         email_verified: false
       }, { transaction });
       
+      logger.info('DEBUG: User created', { userId: user.id, role });
+      
       // Create role-specific profile
       let profile = null;
       if (role === 'patient') {
+        logger.info('DEBUG: Creating patient profile');
         profile = await Patient.create({
           user_id: user.id,
           date_of_birth: roleSpecificData.dateOfBirth || new Date('1990-01-01'),
@@ -61,6 +69,7 @@ export const registerUser = async (userData) => {
           preferred_language: preferredLanguage
         }, { transaction });
       } else if (role === 'doctor') {
+        logger.info('DEBUG: Creating doctor profile');
         profile = await Doctor.create({
           user_id: user.id,
           license_number: roleSpecificData.licenseNumber,
