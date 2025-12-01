@@ -2,7 +2,7 @@ import { Op } from 'sequelize';
 import initModels from '../models/index.js';
 import redisClient from '../config/redis.js';
 import logger from '../config/logger.js';
-import { sequelize } from '../config/database.js';
+import { getSequelize } from '../config/database.js';
 
 // Initialize models
 const models = initModels();
@@ -46,7 +46,7 @@ export const invalidateChatCache = async (userId, conversationId) => {
  * Get or create a conversation between participants
  */
 export const getOrCreateConversation = async (participantIds) => {
-  const transaction = await sequelize.transaction();
+  const transaction = await getSequelize().transaction();
   
   try {
     // Sort participant IDs for consistent matching
@@ -214,7 +214,7 @@ export const getUserConversations = async (userId, page = 1, limit = 20) => {
  * Send a message in a conversation
  */
 export const sendMessage = async (conversationId, senderId, content, messageType = 'text', metadata = {}) => {
-  const transaction = await sequelize.transaction();
+  const transaction = await getSequelize().transaction();
   
   try {
     // Verify conversation exists and user is a participant
@@ -324,7 +324,7 @@ export const getConversationMessages = async (conversationId, userId, page = 1, 
  * Mark messages as read by user
  */
 export const markMessagesAsRead = async (conversationId, userId, messageIds) => {
-  const transaction = await sequelize.transaction();
+  const transaction = await getSequelize().transaction();
   
   try {
     // Verify user is a participant
@@ -364,7 +364,7 @@ export const markMessagesAsRead = async (conversationId, userId, messageIds) => 
  * Mark messages as delivered to user
  */
 export const markMessagesAsDelivered = async (conversationId, userId, messageIds) => {
-  const transaction = await sequelize.transaction();
+  const transaction = await getSequelize().transaction();
   
   try {
     const messages = await Message.findAll({
@@ -394,7 +394,7 @@ export const markMessagesAsDelivered = async (conversationId, userId, messageIds
  * Delete a message (soft delete)
  */
 export const deleteMessage = async (messageId, userId) => {
-  const transaction = await sequelize.transaction();
+  const transaction = await getSequelize().transaction();
   
   try {
     const message = await Message.findByPk(messageId, { transaction });

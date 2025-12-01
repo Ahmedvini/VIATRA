@@ -146,7 +146,7 @@ export const checkDatabaseHealth = async () => {
 };
 
 // Sequelize instance
-let sequelize = null;
+let sequelizeInstance = null;
 
 // Initialize Sequelize
 export const initializeSequelize = async () => {
@@ -154,7 +154,7 @@ export const initializeSequelize = async () => {
     const environment = process.env.NODE_ENV || 'development';
     const sequelizeConfig = dbConfig[environment];
     
-    sequelize = new Sequelize(
+    sequelizeInstance = new Sequelize(
       sequelizeConfig.database,
       sequelizeConfig.username,
       sequelizeConfig.password,
@@ -162,7 +162,7 @@ export const initializeSequelize = async () => {
     );
     
     // Test the connection
-    await sequelize.authenticate();
+    await sequelizeInstance.authenticate();
     logger.info('Sequelize connection established successfully');
     
     // Initialize models - this triggers the models/index.js module to load
@@ -170,7 +170,7 @@ export const initializeSequelize = async () => {
     await import('../models/index.js');
     logger.info('Database models initialized successfully');
     
-    return sequelize;
+    return sequelizeInstance;
   } catch (error) {
     logger.error('Unable to connect to the database via Sequelize:', error);
     throw error;
@@ -179,19 +179,22 @@ export const initializeSequelize = async () => {
 
 // Get Sequelize instance
 export const getSequelize = () => {
-  if (!sequelize) {
+  if (!sequelizeInstance) {
     throw new Error('Sequelize not initialized. Call initializeSequelize() first.');
   }
-  return sequelize;
+  return sequelizeInstance;
 };
 
 // Close Sequelize connection
 export const closeSequelize = async () => {
-  if (sequelize) {
-    await sequelize.close();
-    sequelize = null;
+  if (sequelizeInstance) {
+    await sequelizeInstance.close();
+    sequelizeInstance = null;
     logger.info('Sequelize connection closed');
   }
 };
+
+// Export sequelize getter as named export for backward compatibility
+export const sequelize = () => getSequelize();
 
 export { pool };

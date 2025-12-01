@@ -2,7 +2,7 @@ import { Op } from 'sequelize';
 import { Appointment, Doctor, Patient, User } from '../models/index.js';
 import redisClient from '../config/redis.js';
 import logger from '../config/logger.js';
-import { sequelize } from '../config/database.js';
+import { getSequelize } from '../config/database.js';
 
 /**
  * Generate Redis cache key for appointments
@@ -209,7 +209,7 @@ export const getAvailableTimeSlots = async (doctorId, date, duration = 30) => {
  * Create new appointment
  */
 export const createAppointment = async (patientId, doctorId, appointmentData) => {
-  const transaction = await sequelize.transaction();
+  const transaction = await getSequelize().transaction();
   
   try {
     // Validate doctor exists
@@ -439,7 +439,7 @@ export const getPatientAppointments = async (patientId, filters = {}) => {
  * Update appointment
  */
 export const updateAppointment = async (appointmentId, userId, userRole, updateData) => {
-  const transaction = await sequelize.transaction();
+  const transaction = await getSequelize().transaction();
   
   try {
     // Fetch appointment
@@ -525,7 +525,7 @@ export const updateAppointment = async (appointmentId, userId, userRole, updateD
  * Cancel appointment
  */
 export const cancelAppointment = async (appointmentId, userId, userRole, reason) => {
-  const transaction = await sequelize.transaction();
+  const transaction = await getSequelize().transaction();
   
   try {
     // Fetch appointment
@@ -736,7 +736,7 @@ export const getDoctorStatistics = async (doctorId) => {
  * Accept and confirm appointment
  */
 export const acceptAppointment = async (appointmentId, doctorId) => {
-  const transaction = await sequelize.transaction();
+  const transaction = await getSequelize().transaction();
   
   try {
     // Fetch appointment
@@ -802,7 +802,7 @@ export const acceptAppointment = async (appointmentId, doctorId) => {
  * Reschedule appointment to new time
  */
 export const rescheduleAppointment = async (appointmentId, doctorId, updateData) => {
-  const transaction = await sequelize.transaction();
+  const transaction = await getSequelize().transaction();
   
   try {
     // Fetch appointment

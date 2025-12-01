@@ -2,7 +2,7 @@ import HealthProfile from '../models/HealthProfile.js';
 import Patient from '../models/Patient.js';
 import logger from '../config/logger.js';
 import redisClient from '../config/redis.js';
-import { sequelize } from '../config/database.js';
+import { getSequelize } from '../config/database.js';
 
 const CACHE_TTL = 300; // 5 minutes
 const CACHE_KEY_PREFIX = 'health_profile:';
@@ -57,7 +57,7 @@ class HealthProfileService {
    * @returns {Promise<HealthProfile>}
    */
   async createHealthProfile(patientId, profileData) {
-    const transaction = await sequelize.transaction();
+    const transaction = await getSequelize().transaction();
 
     try {
       // Check if profile already exists
@@ -111,7 +111,7 @@ class HealthProfileService {
    * @returns {Promise<HealthProfile>}
    */
   async updateHealthProfile(patientId, updates) {
-    const transaction = await sequelize.transaction();
+    const transaction = await getSequelize().transaction();
 
     try {
       const profile = await HealthProfile.findOne({
