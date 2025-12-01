@@ -67,30 +67,21 @@ export default (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true  // Made optional to match database schema
     },
-    emergency_contact_name: {
-      type: DataTypes.STRING
-    },
-    emergency_contact_phone: {
-      type: DataTypes.STRING,
-      validate: {
-        is: /^\+?[\d\s\-\(\)]+$/
-      }
-    },
-    emergency_contact_relationship: {
-      type: DataTypes.STRING
-    },
-    medical_history: {
-      type: DataTypes.TEXT
-    },
-    allergies: {
-      type: DataTypes.TEXT
-    },
-    current_medications: {
-      type: DataTypes.TEXT
-    },
     preferred_language: {
       type: DataTypes.STRING,
       defaultValue: 'en'
+    },
+    marital_status: {
+      type: DataTypes.ENUM('single', 'married', 'divorced', 'widowed', 'other'),
+      allowNull: true
+    },
+    occupation: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    employer: {
+      type: DataTypes.STRING,
+      allowNull: true
     },
     created_at: {
       type: DataTypes.DATE,

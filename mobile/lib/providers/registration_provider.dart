@@ -194,13 +194,17 @@ class RegistrationProvider with ChangeNotifier {
 
   // Validation methods
   bool _validateBasicInfo() {
-    // Check basic fields
-    final hasBasicFields = _formData['firstName']?.toString().isNotEmpty == true &&
-           _formData['lastName']?.toString().isNotEmpty == true &&
+    // Check basic fields - support both fullName and firstName+lastName
+    final hasName = (_formData['fullName']?.toString().isNotEmpty == true) ||
+                    (_formData['firstName']?.toString().isNotEmpty == true &&
+                     _formData['lastName']?.toString().isNotEmpty == true);
+    
+    final hasBasicFields = hasName &&
            _formData['email']?.toString().isNotEmpty == true &&
            _formData['password']?.toString().isNotEmpty == true &&
            _formData['phone']?.toString().isNotEmpty == true &&
-           _formData['dateOfBirth'] != null;
+           _formData['dateOfBirth'] != null &&
+           _formData['gender']?.toString().isNotEmpty == true;
     
     // Check if password matches confirm password
     final password = _formData['password']?.toString() ?? '';
@@ -213,25 +217,41 @@ class RegistrationProvider with ChangeNotifier {
   bool _validateProfessionalInfo() {
     if (_selectedRole != UserRole.doctor) return true;
     
-    return _formData['specialization']?.toString().isNotEmpty == true &&
+    // Support both 'specialty' and 'specialization' field names
+    final hasSpecialty = (_formData['specialty']?.toString().isNotEmpty == true) ||
+                        (_formData['specialization']?.toString().isNotEmpty == true);
+    
+    // Support both 'bio' and 'hospitalAffiliation' field names
+    final hasBioOrHospital = (_formData['bio']?.toString().isNotEmpty == true) ||
+                            (_formData['hospitalAffiliation']?.toString().isNotEmpty == true);
+    
+    return hasSpecialty &&
            _formData['licenseNumber']?.toString().isNotEmpty == true &&
            _formData['yearsOfExperience'] != null &&
-           _formData['hospitalAffiliation']?.toString().isNotEmpty == true;
+           _formData['consultationFee'] != null &&
+           hasBioOrHospital;
   }
 
-  bool _validateAddressInfo() => _formData['addressLine1']?.toString().isNotEmpty == true &&
+  bool _validateAddressInfo() {
+    // Support both 'address' and 'addressLine1' field names
+    final hasAddress = (_formData['address']?.toString().isNotEmpty == true) ||
+                      (_formData['addressLine1']?.toString().isNotEmpty == true);
+    
+    return hasAddress &&
            _formData['city']?.toString().isNotEmpty == true &&
            _formData['state']?.toString().isNotEmpty == true &&
-           _formData['country']?.toString().isNotEmpty == true &&
            _formData['postalCode']?.toString().isNotEmpty == true;
+  }
 
   bool _validateDocuments() {
     if (_selectedRole == UserRole.doctor) {
-      return _documents.containsKey('medicalLicense') &&
-             _documents.containsKey('identityDocument') &&
-             _documents.containsKey('educationCertificate');
+      // Support both camelCase and snake_case key names
+      return (_documents.containsKey('medicalLicense') || _documents.containsKey('medical_license')) &&
+             (_documents.containsKey('identityDocument') || _documents.containsKey('identity_document')) &&
+             (_documents.containsKey('educationCertificate') || _documents.containsKey('education_certificate'));
     } else {
-      return _documents.containsKey('identityDocument');
+      // For patients, only identity document is required
+      return _documents.containsKey('identityDocument') || _documents.containsKey('identity_document');
     }
   }
 
@@ -244,8 +264,6 @@ class RegistrationProvider with ChangeNotifier {
     try {
       // Create user data based on role
       final userData = <String, dynamic>{
-        'firstName': _formData['firstName'],
-        'lastName': _formData['lastName'],
         'email': _formData['email'],
         'password': _formData['password'],
         'phone': _formData['phone'],
@@ -260,6 +278,21 @@ class RegistrationProvider with ChangeNotifier {
           'postalCode': _formData['postalCode'],
         },
       };
+      
+      // Handle name fields - support both fullName and firstName/lastName
+      if (_formData['firstName'] != null && _formData['lastName'] != null) {
+        userData['firstName'] = _formData['firstName'];
+        userData['lastName'] = _formData['lastName'];
+      } else if (_formData['fullName'] != null) {
+        // Split fullName into firstName and lastName
+        final nameParts = (_formData['fullName'] as String).trim().split(' ');
+        userData['firstName'] = nameParts.first;
+        userData['lastName'] = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : nameParts.first;
+      } else {
+        // Fallback
+        userData['firstName'] = 'User';
+        userData['lastName'] = 'Name';
+      }
 
       // Add role-specific data
       if (_selectedRole == UserRole.doctor) {
