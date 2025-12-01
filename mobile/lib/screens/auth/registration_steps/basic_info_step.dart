@@ -60,6 +60,7 @@ class _BasicInfoStepState extends State<BasicInfoStep> {
         'lastName': _lastNameController.text.trim(),
         'email': _emailController.text.trim(),
         'password': _passwordController.text,
+        'confirmPassword': _confirmPasswordController.text,
         'phone': _phoneController.text.trim(),
         'dateOfBirth': _dateOfBirth,
       });

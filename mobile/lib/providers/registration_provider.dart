@@ -193,12 +193,22 @@ class RegistrationProvider with ChangeNotifier {
   }
 
   // Validation methods
-  bool _validateBasicInfo() => _formData['firstName']?.toString().isNotEmpty == true &&
+  bool _validateBasicInfo() {
+    // Check basic fields
+    final hasBasicFields = _formData['firstName']?.toString().isNotEmpty == true &&
            _formData['lastName']?.toString().isNotEmpty == true &&
            _formData['email']?.toString().isNotEmpty == true &&
            _formData['password']?.toString().isNotEmpty == true &&
            _formData['phone']?.toString().isNotEmpty == true &&
            _formData['dateOfBirth'] != null;
+    
+    // Check if password matches confirm password
+    final password = _formData['password']?.toString() ?? '';
+    final confirmPassword = _formData['confirmPassword']?.toString() ?? '';
+    final passwordsMatch = password.isNotEmpty && password == confirmPassword;
+    
+    return hasBasicFields && passwordsMatch;
+  }
 
   bool _validateProfessionalInfo() {
     if (_selectedRole != UserRole.doctor) return true;
