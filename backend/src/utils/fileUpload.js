@@ -20,7 +20,6 @@ if (process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
 }
 
 const storage = new Storage(storageConfig);
-
 const bucket = storage.bucket(config.gcp.bucketName);
 
 /**
@@ -121,7 +120,7 @@ export const uploadSingle = (fieldName = 'document') => {
     storage: multerStorage,
     fileFilter: fileFilter,
     limits: {
-      fileSize: config.upload.maxSize, // From config
+      fileSize: config.fileUpload.maxSize, // From config
       files: 1
     }
   }).single(fieldName);
@@ -132,7 +131,7 @@ export const uploadSingle = (fieldName = 'document') => {
         if (error.code === 'LIMIT_FILE_SIZE') {
           return res.status(400).json({
             error: 'File too large',
-            message: `File size cannot exceed ${config.upload.maxSize / 1024 / 1024}MB`
+            message: `File size cannot exceed ${config.fileUpload.maxSize / 1024 / 1024}MB`
           });
         }
         return res.status(400).json({
@@ -166,7 +165,7 @@ export const uploadMultiple = (fieldName = 'documents', maxCount = 5) => {
     storage: multerStorage,
     fileFilter: fileFilter,
     limits: {
-      fileSize: config.upload.maxSize,
+      fileSize: config.fileUpload.maxSize,
       files: maxCount
     }
   }).array(fieldName, maxCount);
@@ -177,7 +176,7 @@ export const uploadMultiple = (fieldName = 'documents', maxCount = 5) => {
         if (error.code === 'LIMIT_FILE_SIZE') {
           return res.status(400).json({
             error: 'File too large',
-            message: `File size cannot exceed ${config.upload.maxSize / 1024 / 1024}MB`
+            message: `File size cannot exceed ${config.fileUpload.maxSize / 1024 / 1024}MB`
           });
         } else if (error.code === 'LIMIT_FILE_COUNT') {
           return res.status(400).json({
