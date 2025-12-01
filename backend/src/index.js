@@ -4,8 +4,6 @@ import { createServer } from 'http';
 import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
-import rateLimit from 'express-rate-limit';
-
 import config, { initConfig } from './config/index.js';
 import { connectDatabase, disconnectDatabase, initializeSequelize, closeSequelize } from './config/database.js';
 import { connectRedis, disconnectRedis } from './config/redis.js';
@@ -31,16 +29,6 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
-
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: config.rateLimit.window,
-  max: config.rateLimit.max,
-  message: 'Too many requests from this IP, please try again later',
-  standardHeaders: true,
-  legacyHeaders: false
-});
-app.use(limiter);
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));

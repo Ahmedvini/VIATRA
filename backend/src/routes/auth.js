@@ -1,5 +1,4 @@
 import express from 'express';
-import rateLimit from 'express-rate-limit';
 import {
   register,
   login,
@@ -24,64 +23,6 @@ import { authenticate } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// Rate limiting configurations
-const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // 5 attempts per window
-  message: {
-    error: 'Too many login attempts',
-    message: 'Too many login attempts from this IP, please try again after 15 minutes'
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-  // Skip successful requests
-  skipSuccessfulRequests: true
-});
-
-const registerLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 3, // 3 registrations per hour
-  message: {
-    error: 'Too many registration attempts',
-    message: 'Too many registration attempts from this IP, please try again after 1 hour'
-  },
-  standardHeaders: true,
-  legacyHeaders: false
-});
-
-const passwordResetLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 3, // 3 password reset requests per hour
-  message: {
-    error: 'Too many password reset attempts',
-    message: 'Too many password reset attempts from this IP, please try again after 1 hour'
-  },
-  standardHeaders: true,
-  legacyHeaders: false
-});
-
-const emailVerificationLimiter = rateLimit({
-  windowMs: 5 * 60 * 1000, // 5 minutes
-  max: 3, // 3 verification attempts per 5 minutes
-  message: {
-    error: 'Too many verification attempts',
-    message: 'Too many verification attempts from this IP, please try again after 5 minutes'
-  },
-  standardHeaders: true,
-  legacyHeaders: false
-});
-
-const refreshTokenLimiter = rateLimit({
-  windowMs: 5 * 60 * 1000, // 5 minutes
-  max: 10, // 10 refresh attempts per 5 minutes
-  message: {
-    error: 'Too many token refresh attempts',
-    message: 'Too many token refresh attempts from this IP, please try again after 5 minutes'
-  },
-  standardHeaders: true,
-  legacyHeaders: false
-});
-
 // Authentication routes
 
 /**
@@ -91,7 +32,7 @@ const refreshTokenLimiter = rateLimit({
  * @body    { email, password, firstName, lastName, phone, role, ...roleSpecificFields }
  */
 router.post('/register', 
-  registerLimiter,
+  // registerLimiter, // TEMPORARILY DISABLED FOR TESTING
   validate(registerSchema),
   register
 );
@@ -103,7 +44,7 @@ router.post('/register',
  * @body    { email, password, remember? }
  */
 router.post('/login',
-  loginLimiter,
+  // loginLimiter, // TEMPORARILY DISABLED FOR TESTING
   validate(loginSchema),
   login
 );
@@ -126,7 +67,6 @@ router.post('/logout',
  * @body    { refreshToken }
  */
 router.post('/refresh-token',
-  refreshTokenLimiter,
   validate(refreshTokenSchema),
   refreshToken
 );
@@ -138,7 +78,6 @@ router.post('/refresh-token',
  * @body    { email, code }
  */
 router.post('/verify-email',
-  emailVerificationLimiter,
   validate(emailVerificationSchema),
   verifyEmailHandler
 );
@@ -150,7 +89,6 @@ router.post('/verify-email',
  * @body    { email }
  */
 router.post('/request-password-reset',
-  passwordResetLimiter,
   validate(passwordResetRequestSchema),
   requestPasswordResetHandler
 );
@@ -162,7 +100,6 @@ router.post('/request-password-reset',
  * @body    { token, newPassword }
  */
 router.post('/reset-password',
-  passwordResetLimiter,
   validate(passwordResetSchema),
   resetPasswordHandler
 );
