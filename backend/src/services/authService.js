@@ -6,9 +6,6 @@ import { User, Patient, Doctor, Verification, sequelize } from '../models/index.
 import logger from '../config/logger.js';
 import config from '../config/index.js';
 
-// Create models object for easier access
-const models = { User, Patient, Doctor, Verification, sequelize };
-
 /**
  * Generate 6-digit verification code
  * @returns {string} - 6-digit numeric code
@@ -35,15 +32,15 @@ export const registerUser = async (userData) => {
   
   try {
     // Check if user already exists
-    const existingUser = await models.User.findOne({ where: { email } });
+    const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
       throw new Error('User with this email already exists');
     }
     
     // Start transaction
-    const result = await models.sequelize.transaction(async (transaction) => {
+    const result = await sequelize.transaction(async (transaction) => {
       // Create user record
-      const user = await models.User.create({
+      const user = await User.create({
         email,
         password_hash: password, // Will be hashed by the User model hook
         first_name: firstName,
@@ -57,14 +54,14 @@ export const registerUser = async (userData) => {
       // Create role-specific profile
       let profile = null;
       if (role === 'patient') {
-        profile = await models.Patient.create({
+        profile = await Patient.create({
           user_id: user.id,
           date_of_birth: roleSpecificData.dateOfBirth || new Date('1990-01-01'),
           gender: roleSpecificData.gender || 'prefer_not_to_say',
           preferred_language: preferredLanguage
         }, { transaction });
       } else if (role === 'doctor') {
-        profile = await models.Doctor.create({
+        profile = await Doctor.create({
           user_id: user.id,
           license_number: roleSpecificData.licenseNumber,
           specialty: roleSpecificData.specialty,
@@ -82,7 +79,7 @@ export const registerUser = async (userData) => {
       const expiresAt = new Date(Date.now() + config.email.verificationCodeExpiry);
       
       // Create email verification record
-      await models.Verification.create({
+      await Verification.create({
         user_id: user.id,
         doctor_id: profile && role === 'doctor' ? profile.id : null,
         type: 'email',
@@ -187,16 +184,16 @@ export const registerUser = async (userData) => {
 export const loginUser = async (email, password, rememberMe = false) => {
   try {
     // Find user by email
-    const user = await models.User.findOne({
+    const user = await User.findOne({
       where: { email },
       include: [
         {
-          model: models.Patient,
+          model: Patient,
           as: 'patientProfile',
           required: false
         },
         {
-          model: models.Doctor,
+          model: Doctor,
           as: 'doctorProfile',
           required: false
         }
@@ -301,14 +298,14 @@ export const loginUser = async (email, password, rememberMe = false) => {
 export const verifyEmail = async (code, email = null) => {
   try {
     // Find verification record
-    const verification = await models.Verification.findOne({
+    const verification = await Verification.findOne({
       where: {
         verification_code: code,
         type: 'email',
         status: 'pending'
       },
       include: [{
-        model: models.User,
+        model: User,
         as: 'user',
         where: email ? { email } : {},
         required: true
@@ -330,7 +327,7 @@ export const verifyEmail = async (code, email = null) => {
     }
     
     // Start transaction
-    await models.sequelize.transaction(async (transaction) => {
+    await sequelize.transaction(async (transaction) => {
       // Mark verification as verified
       await verification.update({
         status: 'verified',
@@ -371,7 +368,7 @@ export const verifyEmail = async (code, email = null) => {
 export const requestPasswordReset = async (email) => {
   try {
     // Find user by email
-    const user = await models.User.findOne({ where: { email } });
+    const user = await User.findOne({ where: { email } });
     if (!user) {
       // Don't reveal if user exists or not
       logger.info('Password reset requested for non-existent email', { email });
@@ -383,7 +380,7 @@ export const requestPasswordReset = async (email) => {
     const expiresAt = new Date(Date.now() + config.email.resetTokenExpiry);
     
     // Create or update reset verification record
-    const [verification] = await models.Verification.findOrCreate({
+    const [verification] = await Verification.findOrCreate({
       where: {
         user_id: user.id,
         type: 'password_reset',
@@ -439,14 +436,14 @@ export const requestPasswordReset = async (email) => {
 export const resetPassword = async (token, newPassword) => {
   try {
     // Find verification record
-    const verification = await models.Verification.findOne({
+    const verification = await Verification.findOne({
       where: {
         verification_code: token,
         type: 'password_reset',
         status: 'pending'
       },
       include: [{
-        model: models.User,
+        model: User,
         as: 'user',
         required: true
       }]
@@ -467,7 +464,7 @@ export const resetPassword = async (token, newPassword) => {
     }
     
     // Start transaction
-    await models.sequelize.transaction(async (transaction) => {
+    await sequelize.transaction(async (transaction) => {
       // Update user password
       await verification.user.update({
         password_hash: newPassword // Will be hashed by the User model hook
@@ -481,14 +478,14 @@ export const resetPassword = async (token, newPassword) => {
       }, { transaction });
       
       // Invalidate all other reset tokens for this user
-      await models.Verification.update({
+      await Verification.update({
         status: 'expired'
       }, {
         where: {
           user_id: verification.user.id,
           type: 'password_reset',
           status: 'pending',
-          id: { [models.sequelize.Op.ne]: verification.id }
+          id: { [sequelize.Op.ne]: verification.id }
         },
         transaction
       });
@@ -528,7 +525,7 @@ export const refreshAccessToken = async (refreshToken) => {
     }
     
     // Find user to get latest data
-    const user = await models.User.findByPk(decoded.userId);
+    const user = await User.findByPk(decoded.userId);
     if (!user || !user.is_active) {
       throw new Error('User not found or inactive');
     }
