@@ -13,6 +13,10 @@ import '../screens/auth/verification_pending_screen.dart';
 import '../screens/doctor/doctor_appointment_detail_screen.dart';
 import '../screens/doctor/doctor_appointment_list_screen.dart';
 import '../screens/doctor/doctor_dashboard_screen.dart';
+import '../screens/admin/admin_dashboard_screen.dart';
+import '../screens/admin/admin_users_list_screen.dart';
+import '../screens/admin/admin_user_status_list_screen.dart';
+import '../screens/admin/admin_user_detail_screen.dart';
 import '../screens/doctor_search/doctor_detail_screen.dart';
 import '../screens/doctor_search/doctor_search_screen.dart';
 import '../screens/health_profile/allergy_form_screen.dart';
@@ -169,6 +173,49 @@ class AppRouter {
         builder: (context, state) {
           final appointmentId = state.pathParameters['id']!;
           return DoctorAppointmentDetailScreen(appointmentId: appointmentId);
+        },
+      ),
+
+      // Admin routes
+      GoRoute(
+        path: '/admin',
+        name: 'admin-dashboard',
+        builder: (context, state) => const AdminDashboardScreen(),
+      ),
+      GoRoute(
+        path: '/admin/:role/select-status',
+        name: 'admin-select-status',
+        builder: (context, state) {
+          final role = state.pathParameters['role']!;
+          final roleTitle = role == 'patient' ? 'Patients' : 'Doctors';
+          return AdminUsersListScreen(
+            userRole: role,
+            title: 'Review $roleTitle',
+          );
+        },
+      ),
+      GoRoute(
+        path: '/admin/:role/:status',
+        name: 'admin-user-list',
+        builder: (context, state) {
+          final role = state.pathParameters['role']!;
+          final status = state.pathParameters['status']!;
+          final roleTitle = role == 'patient' ? 'Patients' : 'Doctors';
+          final statusTitle = status[0].toUpperCase() + status.substring(1);
+          return AdminUserStatusListScreen(
+            userRole: role,
+            status: status,
+            title: '$statusTitle $roleTitle',
+          );
+        },
+      ),
+      GoRoute(
+        path: '/admin/user/:userId',
+        name: 'admin-user-detail',
+        builder: (context, state) {
+          final userId = state.pathParameters['userId']!;
+          final status = state.uri.queryParameters['status'] ?? 'pending';
+          return AdminUserDetailScreen(userId: userId, userStatus: status);
         },
       ),
     ],

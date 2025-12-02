@@ -94,6 +94,17 @@ class ProfileScreen extends StatelessWidget {
       elevation: 2,
       child: Column(
         children: [
+          // Admin Panel - only shown for admin users
+          if (_isAdminUser(authProvider.user)) ...[
+            _buildSettingsTile(
+              context,
+              icon: Icons.admin_panel_settings,
+              title: 'Admin Panel',
+              iconColor: Colors.purple,
+              onTap: () => context.go('/admin'),
+            ),
+            const Divider(height: 1),
+          ],
           _buildSettingsTile(
             context,
             icon: Icons.settings,
@@ -205,6 +216,20 @@ class ProfileScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  /// Check if user has admin privileges
+  /// TODO: Update this logic based on your actual admin role/permission system
+  bool _isAdminUser(User? user) {
+    if (user == null) return false;
+    // Check if user email is an admin email or has admin role
+    // For now, checking email - update based on your backend admin logic
+    final adminEmails = [
+      'admin@viatra.com',
+      'ahmedvini@gmail.com',
+      // Add more admin emails as needed
+    ];
+    return adminEmails.contains(user.email.toLowerCase());
   }
 
   String _getRoleLabel(UserRole role) {
