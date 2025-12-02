@@ -1,5 +1,7 @@
 import { DataTypes, Model } from 'sequelize';
-import sequelize from '../config/database.js';
+import { getSequelize } from '../config/database.js';
+
+const sequelize = getSequelize();
 
 /**
  * PsychologicalAssessment Model - PHQ-9 Depression Screening
