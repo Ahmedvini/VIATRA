@@ -20,6 +20,9 @@ import '../screens/admin/admin_user_detail_screen.dart';
 import '../screens/doctor_search/doctor_detail_screen.dart';
 import '../screens/doctor_search/doctor_search_screen.dart';
 import '../screens/food_tracking/food_tracking_main_screen.dart';
+import '../screens/food_tracking/track_options_screen.dart';
+import '../screens/food_tracking/manual_entry_screen.dart';
+import '../screens/food_tracking/ai_photo_analysis_screen.dart';
 import '../screens/health_profile/allergy_form_screen.dart';
 import '../screens/health_profile/chronic_condition_form_screen.dart';
 import '../screens/health_profile/health_profile_edit_screen.dart';
@@ -173,9 +176,17 @@ class AppRouter {
       GoRoute(
         path: '/food-tracking/track-options',
         name: 'food-tracking-track-options',
-        builder: (context, state) => const Placeholder(
-          child: Center(child: Text('Track Options - Coming Soon')),
-        ),
+        builder: (context, state) => const TrackOptionsScreen(),
+      ),
+      GoRoute(
+        path: '/food-tracking/manual-entry',
+        name: 'food-tracking-manual-entry',
+        builder: (context, state) => const ManualEntryScreen(),
+      ),
+      GoRoute(
+        path: '/food-tracking/ai-analysis',
+        name: 'food-tracking-ai-analysis',
+        builder: (context, state) => const AiPhotoAnalysisScreen(),
       ),
 
       // Doctor routes
