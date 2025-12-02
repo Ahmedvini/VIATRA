@@ -1,0 +1,2 @@
+# Ignore package-lock.json to force npm install instead of npm ci
+package-lock.json

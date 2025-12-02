@@ -2,7 +2,7 @@
 nixPkgs = ['nodejs_20']
 
 [phases.install]
-cmds = ['npm install --legacy-peer-deps']
+cmds = ['rm -f package-lock.json', 'npm install --legacy-peer-deps --no-package-lock']
 
 [phases.build]
 cmds = ['echo "No build step required"']
