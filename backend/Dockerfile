@@ -35,6 +35,9 @@ COPY --chown=viatra:nodejs backend/package*.json ./
 # Copy source code from backend directory
 COPY --chown=viatra:nodejs backend/src/ ./src/
 
+# Create logs directory with proper permissions
+RUN mkdir -p logs && chown -R viatra:nodejs logs
+
 # Set environment variables
 ENV NODE_ENV=production
 ENV PORT=8080
