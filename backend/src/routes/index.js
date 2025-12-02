@@ -6,6 +6,7 @@ import doctorRoutes from './doctor.js';
 import appointmentRoutes from './appointment.js';
 import chatRoutes from './chat.js';
 import adminRoutes from './admin.js';
+import foodTrackingRoutes from './foodTracking.js';
 
 const router = express.Router();
 
@@ -69,6 +70,17 @@ router.get('/', (req, res) => {
         getDoctorDashboard: 'GET /appointments/doctor/dashboard',
         acceptAppointment: 'POST /appointments/:id/accept',
         rescheduleAppointment: 'POST /appointments/:id/reschedule'
+      },
+      foodTracking: {
+        logFood: 'POST /food-tracking/log',
+        getFoodLog: 'GET /food-tracking/log',
+        updateFoodLog: 'PATCH /food-tracking/log/:id',
+        deleteFoodLog: 'DELETE /food-tracking/log/:id',
+        getNutrientAnalysis: 'GET /food-tracking/nutrients',
+        getCalorieGoals: 'GET /food-tracking/goals/calories',
+        updateCalorieGoals: 'PATCH /food-tracking/goals/calories',
+        getMacroGoals: 'GET /food-tracking/goals/macros',
+        updateMacroGoals: 'PATCH /food-tracking/goals/macros'
       }
     },
     rateLimits: {
@@ -102,6 +114,17 @@ router.get('/', (req, res) => {
         doctorDashboard: '60 per minute',
         accept: '10 per hour',
         reschedule: '10 per hour'
+      },
+      foodTracking: {
+        logFood: '60 per minute',
+        getFoodLog: '60 per minute',
+        updateFoodLog: '60 per minute',
+        deleteFoodLog: '60 per minute',
+        getNutrientAnalysis: '30 per minute',
+        getCalorieGoals: '30 per minute',
+        updateCalorieGoals: '30 per minute',
+        getMacroGoals: '30 per minute',
+        updateMacroGoals: '30 per minute'
       }
     }
   });
@@ -115,6 +138,7 @@ router.use('/doctors', doctorRoutes);
 router.use('/appointments', appointmentRoutes);
 router.use('/chat', chatRoutes);
 router.use('/admin', adminRoutes);
+router.use('/food-tracking', foodTrackingRoutes);
 
 // API status endpoint
 router.get('/status', (req, res) => {
@@ -147,7 +171,8 @@ router.get('/features', (req, res) => {
       rbac: true, // Role-based access control
       healthProfileManagement: true,
       doctorSearch: true,
-      appointmentBooking: true
+      appointmentBooking: true,
+      foodTracking: true
     },
     supportedRoles: ['patient', 'doctor', 'admin'],
     supportedDocumentTypes: [
