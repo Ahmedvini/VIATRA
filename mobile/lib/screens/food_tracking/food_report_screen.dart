@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:provider/provider.dart';
-import '../../models/food_tracking/food_log.dart' hide NutritionSummary;
+import '../../models/food_tracking/food_log.dart';
 import '../../models/food_tracking/nutrition_summary.dart';
 import '../../services/food_tracking_service.dart';
 import '../../services/api_service.dart';

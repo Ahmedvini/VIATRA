@@ -1,5 +1,5 @@
 import 'dart:io';
-import '../models/food_tracking/food_log.dart' hide NutritionSummary;
+import '../models/food_tracking/food_log.dart';
 import '../models/food_tracking/nutrition_summary.dart';
 import 'api_service.dart';
 import '../utils/logger.dart';
