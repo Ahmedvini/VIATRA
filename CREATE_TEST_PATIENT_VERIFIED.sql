@@ -63,9 +63,7 @@ BEGIN
         user_id,
         date_of_birth,
         gender,
-        blood_type,
-        emergency_contact_name,
-        emergency_contact_phone,
+        preferred_language,
         created_at,
         updated_at
     ) VALUES (
@@ -73,9 +71,7 @@ BEGIN
         v_user_id,
         '1990-01-01',
         'other',
-        'O+',
-        'Emergency Contact',
-        '+1234567891',
+        'en',
         NOW(),
         NOW()
     )
@@ -90,21 +86,29 @@ BEGIN
     INSERT INTO health_profiles (
         id,
         patient_id,
-        height_cm,
-        weight_kg,
+        blood_type,
+        height,
+        weight,
         allergies,
         chronic_conditions,
         current_medications,
+        emergency_contact_name,
+        emergency_contact_phone,
+        emergency_contact_relationship,
         created_at,
         updated_at
     ) VALUES (
         v_health_profile_id,
         v_patient_id,
+        'O+',
         170.0,
         70.0,
-        ARRAY['None']::TEXT[],
-        ARRAY['None']::TEXT[],
-        ARRAY['None']::TEXT[],
+        '[]'::JSON,
+        '[]'::JSON,
+        '[]'::JSON,
+        'Emergency Contact',
+        '+1234567891',
+        'Family',
         NOW(),
         NOW()
     )
@@ -240,10 +244,13 @@ WHERE u.email = 'testpatient@viatra.com';
 SELECT 
     hp.id,
     hp.patient_id,
-    hp.height_cm,
-    hp.weight_kg,
+    hp.blood_type,
+    hp.height,
+    hp.weight,
     hp.allergies,
     hp.chronic_conditions,
+    hp.emergency_contact_name,
+    hp.emergency_contact_phone,
     u.email
 FROM health_profiles hp
 JOIN patients p ON hp.patient_id = p.id
