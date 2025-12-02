@@ -121,6 +121,13 @@ class PatientHomeScreen extends StatelessWidget {
         'color': Colors.green,
       },
       {
+        'icon': Icons.restaurant_menu,
+        'title': 'Food Tracking',
+        'subtitle': 'Track your nutrition',
+        'route': '/food-tracking',
+        'color': Colors.orange,
+      },
+      {
         'icon': Icons.favorite,
         'title': 'Health Profile',
         'subtitle': 'Manage your health data',
@@ -155,6 +162,9 @@ class PatientHomeScreen extends StatelessWidget {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Chat feature coming soon!')),
               );
+            } else if (route == '/food-tracking') {
+              // Food tracking route
+              context.go('/food-tracking');
             } else {
               context.go(route);
             }

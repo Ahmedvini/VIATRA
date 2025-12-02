@@ -19,6 +19,7 @@ import '../screens/admin/admin_user_status_list_screen.dart';
 import '../screens/admin/admin_user_detail_screen.dart';
 import '../screens/doctor_search/doctor_detail_screen.dart';
 import '../screens/doctor_search/doctor_search_screen.dart';
+import '../screens/food_tracking/food_tracking_main_screen.dart';
 import '../screens/health_profile/allergy_form_screen.dart';
 import '../screens/health_profile/chronic_condition_form_screen.dart';
 import '../screens/health_profile/health_profile_edit_screen.dart';
@@ -154,6 +155,27 @@ class AppRouter {
           final appointmentId = state.pathParameters['id']!;
           return AppointmentDetailScreen(appointmentId: appointmentId);
         },
+      ),
+
+      // Food Tracking routes (Patients only)
+      GoRoute(
+        path: '/food-tracking',
+        name: 'food-tracking',
+        builder: (context, state) => const FoodTrackingMainScreen(),
+      ),
+      GoRoute(
+        path: '/food-tracking/report',
+        name: 'food-tracking-report',
+        builder: (context, state) => const Placeholder(
+          child: Center(child: Text('Food Report - Coming Soon')),
+        ),
+      ),
+      GoRoute(
+        path: '/food-tracking/track-options',
+        name: 'food-tracking-track-options',
+        builder: (context, state) => const Placeholder(
+          child: Center(child: Text('Track Options - Coming Soon')),
+        ),
       ),
 
       // Doctor routes
