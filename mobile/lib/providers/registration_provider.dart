@@ -254,37 +254,20 @@ class RegistrationProvider with ChangeNotifier {
     print('DEBUG: Current documents: ${_documents.keys.toList()}');
     
     if (_selectedRole == UserRole.doctor) {
-      // Check for medical license (support multiple variants)
-      final hasMedicalLicense = _documents.containsKey('medicalLicense') ||
-          _documents.containsKey('medical_license') ||
-          _documents.containsKey('Medical License');
+      // SIMPLIFIED: Doctors only need to upload at least ONE document
+      final hasAnyDocument = _documents.isNotEmpty;
       
-      // Check for identity document (support multiple variants)
-      final hasIdentityDocument = _documents.containsKey('identityDocument') ||
-          _documents.containsKey('identity_document') ||
-          _documents.containsKey('Identity Document');
+      print('DEBUG: Doctor validation - Has at least one document: $hasAnyDocument, '
+          'Document count: ${_documents.length}, Valid: $hasAnyDocument');
       
-      // Check for education certificate (support multiple variants)
-      final hasEducationCertificate = _documents.containsKey('educationCertificate') ||
-          _documents.containsKey('education_certificate') ||
-          _documents.containsKey('Education Certificate');
-      
-      final isValid = hasMedicalLicense && hasIdentityDocument && hasEducationCertificate;
-      
-      print('DEBUG: Doctor validation - Medical License: $hasMedicalLicense, '
-          'Identity: $hasIdentityDocument, Education: $hasEducationCertificate, '
-          'Valid: $isValid');
-      
-      return isValid;
+      return hasAnyDocument;
     } else {
-      // For patients, only identity document is required
-      final hasIdentity = _documents.containsKey('identityDocument') ||
-          _documents.containsKey('identity_document') ||
-          _documents.containsKey('Identity Document');
+      // For patients, at least one document is required
+      final hasAnyDocument = _documents.isNotEmpty;
       
-      print('DEBUG: Patient validation - Identity: $hasIdentity');
+      print('DEBUG: Patient validation - Has at least one document: $hasAnyDocument');
       
-      return hasIdentity;
+      return hasAnyDocument;
     }
   }
 

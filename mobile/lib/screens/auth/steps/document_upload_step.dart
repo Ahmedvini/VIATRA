@@ -46,19 +46,19 @@ class _DocumentUploadStepState extends State<DocumentUploadStep> {
         const DocumentUploadConfig(
           type: 'medical_license',
           title: 'Medical License',
-          description: 'Upload your valid medical license or certificate',
-          isRequired: true,
+          description: 'Upload your valid medical license or certificate (optional)',
+          isRequired: false,
         ),
         const DocumentUploadConfig(
           type: 'education_certificate',
           title: 'Education Certificate',
-          description: 'Upload your medical degree or education certificate',
-          isRequired: true,
+          description: 'Upload your medical degree or education certificate (optional)',
+          isRequired: false,
         ),
         const DocumentUploadConfig(
           type: 'proof_of_address',
           title: 'Proof of Address',
-          description: 'Upload a recent utility bill or bank statement',
+          description: 'Upload a recent utility bill or bank statement (optional)',
           isRequired: false,
         ),
       ];
