@@ -1,5 +1,5 @@
 import { PsychologicalAssessment, Patient, SleepSession, FoodLog } from '../models/index.js';
-import { logInfo, logError } from '../config/logger.js';
+import logger, { logError } from '../config/logger.js';
 import { Op } from 'sequelize';
 
 /**
@@ -27,7 +27,7 @@ export const requestConsent = async (req, res) => {
       timestamp: new Date(),
     });
 
-    logInfo(`User ${userId} ${consent_given ? 'granted' : 'revoked'} data consent`);
+    logger.info(`User ${userId} ${consent_given ? 'granted' : 'revoked'} data consent`);
 
     res.status(200).json({
       success: true,
@@ -77,7 +77,7 @@ export const revokeConsent = async (req, res) => {
     const userId = req.user.id;
     userConsents.delete(userId);
 
-    logInfo(`User ${userId} revoked data consent`);
+    logger.info(`User ${userId} revoked data consent`);
 
     res.status(200).json({
       success: true,
@@ -476,7 +476,7 @@ export const sendMessage = async (req, res) => {
       chatHistory.set(userId, chatHistory.get(userId).slice(-100));
     }
 
-    logInfo(`AI chatbot message from user ${userId}`);
+    logger.info(`AI chatbot message from user ${userId}`);
 
     res.status(200).json({
       success: true,
@@ -531,7 +531,7 @@ export const clearHistory = async (req, res) => {
     const userId = req.user.id;
     chatHistory.delete(userId);
 
-    logInfo(`User ${userId} cleared chat history`);
+    logger.info(`User ${userId} cleared chat history`);
 
     res.status(200).json({
       success: true,
