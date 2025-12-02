@@ -1,6 +1,7 @@
 import express from 'express';
 import multer from 'multer';
 import {
+  createFoodLog,
   analyzeFoodImage,
   getFoodLogs,
   getFoodLogById,
@@ -29,6 +30,9 @@ const upload = multer({
 
 // All routes require authentication
 router.use(authenticate);
+
+// POST /api/health/food - Create food log (manual entry)
+router.post('/', createFoodLog);
 
 // POST /api/health/food/analyze - Analyze food image and create log
 router.post('/analyze', upload.single('image'), analyzeFoodImage);

@@ -5,6 +5,64 @@ import logger from '../config/logger.js';
 import { Op } from 'sequelize';
 
 /**
+ * Create food log (manual entry)
+ */
+export const createFoodLog = async (req, res) => {
+  try {
+    const patientId = req.user.id;
+    const {
+      meal_type,
+      food_name,
+      description,
+      calories,
+      protein_grams,
+      carbs_grams,
+      fat_grams,
+      fiber_grams,
+      sugar_grams,
+      sodium_mg,
+      serving_size,
+      servings_count,
+      consumed_at
+    } = req.body;
+
+    logger.info(`Creating manual food log for patient ${patientId}`);
+
+    const foodLog = await FoodLog.create({
+      patient_id: patientId,
+      meal_type: meal_type || 'snack',
+      food_name,
+      description,
+      calories: calories || 0,
+      protein_grams: protein_grams || 0,
+      carbs_grams: carbs_grams || 0,
+      fat_grams: fat_grams || 0,
+      fiber_grams: fiber_grams || 0,
+      sugar_grams: sugar_grams || 0,
+      sodium_mg: sodium_mg || 0,
+      serving_size,
+      servings_count: servings_count || 1.0,
+      consumed_at: consumed_at || new Date()
+    });
+
+    logger.info(`Food log created: ${foodLog.id}`);
+
+    res.status(201).json({
+      success: true,
+      message: 'Food log created successfully',
+      data: foodLog
+    });
+  } catch (error) {
+    logger.error('Error creating food log:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to create food log',
+      error: error.message
+    });
+  }
+};
+
+/**
  * Analyze food image and create log entry
  */
 export const analyzeFoodImage = async (req, res) => {
@@ -27,7 +85,7 @@ export const analyzeFoodImage = async (req, res) => {
     // Analyze image with Gemini AI
     const analysis = await geminiService.analyzeFoodImage(req.file.buffer);
 
-    // Create food log entry
+    // Create food log entry with AI analysis results
     const foodLog = await FoodLog.create({
       patient_id: patientId,
       meal_type: meal_type || 'snack',

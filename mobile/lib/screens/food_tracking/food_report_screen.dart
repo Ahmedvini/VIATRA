@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:fl_chart/fl_chart.dart';
-import '../../models/food_tracking/food_log.dart';
+import 'package:provider/provider.dart';
+import '../../models/food_tracking/food_log.dart' hide NutritionSummary;
+import '../../models/food_tracking/nutrition_summary.dart';
+import '../../services/food_tracking_service.dart';
+import '../../services/api_service.dart';
 
 /// Food report screen - displays nutrition analytics and meal history
 class FoodReportScreen extends StatefulWidget {
@@ -31,69 +35,25 @@ class _FoodReportScreenState extends State<FoodReportScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // TODO: Call API to fetch data based on date range
-      // final service = Provider.of<FoodTrackingService>(context, listen: false);
-      // final logs = await service.getFoodLogs(
-      //   startDate: _getStartDate(),
-      //   endDate: _getEndDate(),
-      // );
-      // final summary = await service.getNutritionSummary(
-      //   startDate: _getStartDate(),
-      //   endDate: _getEndDate(),
-      // );
+      // Get API service with authentication
+      final apiService = context.read<ApiService>();
+      final foodTrackingService = FoodTrackingService(apiService);
 
-      // Simulate API call with mock data
-      await Future.delayed(const Duration(seconds: 1));
-      
+      // Fetch food logs and nutrition summary from API
+      final logs = await foodTrackingService.getFoodLogs(
+        startDate: _getStartDate(),
+        endDate: _getEndDate(),
+      );
+
+      final summary = await foodTrackingService.getNutritionSummary(
+        startDate: _getStartDate(),
+        endDate: _getEndDate(),
+      );
+
       setState(() {
-        _mockSummary = NutritionSummary(
-          totalCalories: 2150,
-          totalProtein: 145,
-          totalCarbs: 210,
-          totalFat: 75,
-          totalFiber: 32,
-          totalSugar: 45,
-          totalSodium: 2100,
-          mealBreakdown: {
-            MealType.breakfast: const MealBreakdown(count: 3, calories: 600),
-            MealType.lunch: const MealBreakdown(count: 4, calories: 800),
-            MealType.dinner: const MealBreakdown(count: 3, calories: 650),
-            MealType.snack: const MealBreakdown(count: 2, calories: 100),
-          },
-          dailyAverages: const DailyAverages(
-            calories: 1791.67,
-            protein: 120.83,
-            carbs: 175.0,
-            fat: 62.5,
-          ),
-          totalLogs: 12,
-          startDate: _getStartDate(),
-          endDate: _getEndDate(),
-          days: 7,
-        );
-        
-        // Generate mock meal history
         _mockMealHistory.clear();
-        final now = DateTime.now();
-        for (int i = 0; i < 8; i++) {
-          _mockMealHistory.add(
-            FoodLog(
-              id: 'mock-$i',
-              patientId: 'patient-123',
-              mealType: MealType.values[i % 4],
-              foodName: _getMockFoodName(i),
-              calories: 250 + (i * 50).toDouble(),
-              proteinGrams: 20 + (i * 3).toDouble(),
-              carbsGrams: 30 + (i * 5).toDouble(),
-              fatGrams: 10 + (i * 2).toDouble(),
-              consumedAt: now.subtract(Duration(hours: i * 4)),
-              createdAt: now.subtract(Duration(hours: i * 4)),
-              updatedAt: now.subtract(Duration(hours: i * 4)),
-              servingSize: '1 portion',
-              servingsCount: 1.0,
-            ),
-          );
-        }
+        _mockMealHistory.addAll(logs);
+        _mockSummary = summary;
       });
     } catch (e) {
       if (mounted) {
@@ -109,20 +69,6 @@ class _FoodReportScreenState extends State<FoodReportScreen> {
         setState(() => _isLoading = false);
       }
     }
-  }
-
-  String _getMockFoodName(int index) {
-    final foods = [
-      'Grilled Chicken Salad',
-      'Oatmeal with Berries',
-      'Turkey Sandwich',
-      'Greek Yogurt',
-      'Salmon with Vegetables',
-      'Protein Smoothie',
-      'Quinoa Bowl',
-      'Apple Slices',
-    ];
-    return foods[index % foods.length];
   }
 
   DateTime _getStartDate() {

@@ -26,67 +26,63 @@ class GeminiService {
       // Use Gemini Pro Vision model
       const model = this.genAI.getGenerativeModel({ model: 'gemini-pro-vision' });
 
-      const prompt = `Analyze this food image and provide detailed nutritional information.
+      const prompt = `You are a nutrition analysis AI. Analyze this food image and extract precise nutritional information for database storage.
 
-IMPORTANT: Respond ONLY with valid JSON, no additional text.
+CRITICAL INSTRUCTIONS:
+1. Respond ONLY with valid JSON - no markdown, no backticks, no additional text
+2. Identify ALL food items visible in the image
+3. Estimate portion sizes accurately based on visual cues
+4. Calculate total nutrition values by summing all food items
+5. Be conservative with estimates - better to underestimate than overestimate
+6. If uncertain, provide your best estimate but lower the confidence score
 
+Required JSON Response Format:
 {
-  "foods": [
+  "foodName": "Brief descriptive name of the meal (e.g., 'Chicken Salad Bowl', 'Breakfast Plate')",
+  "description": "Detailed description of all foods visible: list each item with estimated quantity",
+  "servingSize": "Total estimated serving size (e.g., '1 large bowl', '2 cups', '350g')",
+  "nutrition": {
+    "calories": <number: total calories for entire meal>,
+    "protein": <number: total protein in grams>,
+    "carbs": <number: total carbohydrates in grams>,
+    "fat": <number: total fat in grams>,
+    "fiber": <number: total fiber in grams, can be 0>,
+    "sugar": <number: total sugar in grams, can be 0>,
+    "sodium": <number: total sodium in milligrams, can be 0>
+  },
+  "confidence": <number between 0 and 1: your confidence in this analysis>,
+  "foodItems": [
     {
-      "name": "food item name",
-      "portionSize": "estimated size (e.g., 150g, 1 cup)",
-      "calories": estimated calories as number,
-      "confidence": confidence level 0-1
+      "name": "Food item 1 name",
+      "quantity": "estimated amount (e.g., '150g', '1 cup')",
+      "calories": <number>
     }
-  ],
-  "totalCalories": total estimated calories as number,
-  "macronutrients": {
-    "carbohydrates": {
-      "grams": number,
-      "percentage": number
-    },
-    "fats": {
-      "grams": number,
-      "percentage": number
-    },
-    "proteins": {
-      "grams": number,
-      "percentage": number
-    }
-  },
-  "categories": {
-    "fruits": {
-      "grams": number,
-      "percentage": number,
-      "items": ["fruit names"]
-    },
-    "vegetables": {
-      "grams": number,
-      "percentage": number,
-      "items": ["vegetable names"]
-    },
-    "grains": {
-      "grams": number,
-      "percentage": number,
-      "items": ["grain names"]
-    },
-    "dairy": {
-      "grams": number,
-      "percentage": number,
-      "items": ["dairy names"]
-    },
-    "meat": {
-      "grams": number,
-      "percentage": number,
-      "items": ["meat names"]
-    }
-  },
-  "healthScore": number 0-100,
-  "suggestions": ["health suggestions"],
-  "warnings": ["allergy/health warnings if any"]
+  ]
 }
 
-Be as accurate as possible with portion sizes and calories. If unsure, provide ranges.`;
+IMPORTANT EXTRACTION RULES FOR DATABASE:
+- foodName: Keep it under 100 characters, descriptive but concise
+- description: Full details of what you see, list all ingredients
+- servingSize: Be specific (use grams, cups, bowls, plates, etc.)
+- nutrition.calories: INTEGER, total for entire meal
+- nutrition.protein: DECIMAL, in grams
+- nutrition.carbs: DECIMAL, in grams  
+- nutrition.fat: DECIMAL, in grams
+- nutrition.fiber: DECIMAL, in grams (0 if unknown)
+- nutrition.sugar: DECIMAL, in grams (0 if unknown)
+- nutrition.sodium: INTEGER, in milligrams (0 if unknown)
+- confidence: DECIMAL between 0.0 and 1.0
+- foodItems: Array of individual food components for transparency
+
+COMMON PORTION REFERENCES:
+- 1 cup = ~240ml
+- 1 palm-sized protein = ~100-150g = ~150-250 calories
+- 1 fist-sized carb = ~150-200g = ~150-250 calories
+- 1 thumb of fat = ~15g = ~100-150 calories
+- Large dinner plate = ~400-600g total
+- Bowl = ~300-400g
+
+Analyze the image now and respond with ONLY the JSON object.`;
 
       const imageParts = [
         {
@@ -108,54 +104,76 @@ Be as accurate as possible with portion sizes and calories. If unsure, provide r
       // Parse JSON response
       let analysisData;
       try {
+        // Remove markdown code blocks if present
+        let cleanedText = text.trim();
+        if (cleanedText.startsWith('```json')) {
+          cleanedText = cleanedText.replace(/```json\n?/g, '').replace(/```\n?/g, '');
+        } else if (cleanedText.startsWith('```')) {
+          cleanedText = cleanedText.replace(/```\n?/g, '');
+        }
+
         // Try to extract JSON from response
-        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        const jsonMatch = cleanedText.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
           analysisData = JSON.parse(jsonMatch[0]);
         } else {
-          analysisData = JSON.parse(text);
+          analysisData = JSON.parse(cleanedText);
         }
+
+        // Validate and normalize the response
+        if (!analysisData.foodName || !analysisData.nutrition) {
+          throw new Error('Invalid response format from Gemini');
+        }
+
+        // Ensure all required nutrition fields exist
+        analysisData.nutrition = {
+          calories: analysisData.nutrition.calories || 0,
+          protein: analysisData.nutrition.protein || 0,
+          carbs: analysisData.nutrition.carbs || 0,
+          fat: analysisData.nutrition.fat || 0,
+          fiber: analysisData.nutrition.fiber || 0,
+          sugar: analysisData.nutrition.sugar || 0,
+          sodium: analysisData.nutrition.sodium || 0,
+        };
+
+        // Ensure confidence is between 0 and 1
+        if (!analysisData.confidence || analysisData.confidence > 1) {
+          analysisData.confidence = 0.7;
+        }
+
+        logger.info('Successfully parsed Gemini response', {
+          foodName: analysisData.foodName,
+          calories: analysisData.nutrition.calories,
+          confidence: analysisData.confidence,
+        });
+
       } catch (parseError) {
         logger.error('Failed to parse Gemini response as JSON', {
           error: parseError.message,
-          rawResponse: text,
+          rawResponse: text.substring(0, 500),
         });
 
         // Fallback: create structured response from text
         analysisData = {
-          foods: [
-            {
-              name: 'Various food items',
-              portionSize: 'Unknown',
-              calories: 0,
-              confidence: 0.5,
-            },
-          ],
-          totalCalories: 0,
-          macronutrients: {
-            carbohydrates: { grams: 0, percentage: 0 },
-            fats: { grams: 0, percentage: 0 },
-            proteins: { grams: 0, percentage: 0 },
+          foodName: 'Unknown Food',
+          description: 'Unable to analyze food accurately. Please try with a clearer image.',
+          servingSize: 'Unknown',
+          nutrition: {
+            calories: 0,
+            protein: 0,
+            carbs: 0,
+            fat: 0,
+            fiber: 0,
+            sugar: 0,
+            sodium: 0,
           },
-          categories: {
-            fruits: { grams: 0, percentage: 0, items: [] },
-            vegetables: { grams: 0, percentage: 0, items: [] },
-            grains: { grams: 0, percentage: 0, items: [] },
-            dairy: { grams: 0, percentage: 0, items: [] },
-            meat: { grams: 0, percentage: 0, items: [] },
-          },
-          healthScore: 50,
-          suggestions: ['Unable to analyze food accurately. Please try again with a clearer image.'],
-          warnings: [],
+          confidence: 0.3,
+          foodItems: [],
           rawAnalysis: text,
         };
       }
 
-      return {
-        success: true,
-        data: analysisData,
-        rawResponse: text,
-      };
+      return analysisData;
     } catch (error) {
       logger.error('Error analyzing food image with Gemini', {
         error: error.message,

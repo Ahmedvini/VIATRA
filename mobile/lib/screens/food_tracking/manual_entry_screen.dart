@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../../models/food_tracking/food_log.dart';
+import '../../services/food_tracking_service.dart';
+import '../../services/api_service.dart';
 
 /// Manual food entry screen - allows users to manually input nutrition data
 class ManualEntryScreen extends StatefulWidget {
@@ -85,46 +88,50 @@ class _ManualEntryScreenState extends State<ManualEntryScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // TODO: Get actual patient ID from auth provider
-      const patientId = 'current-patient-id';
+      // Get API service with authentication
+      final apiService = context.read<ApiService>();
+      final foodTrackingService = FoodTrackingService(apiService);
 
-      final foodLogData = {
-        'patientId': patientId,
-        'mealType': _selectedMealType.value,
-        'foodName': _foodNameController.text.trim(),
-        'description': _descriptionController.text.trim().isEmpty
+      // Create food log via API
+      final foodLog = await foodTrackingService.createFoodLog(
+        mealType: _selectedMealType.value,
+        foodName: _foodNameController.text.trim(),
+        description: _descriptionController.text.trim().isEmpty
             ? null
             : _descriptionController.text.trim(),
-        'calories': _parseDouble(_caloriesController.text),
-        'proteinGrams': _parseDouble(_proteinController.text),
-        'carbsGrams': _parseDouble(_carbsController.text),
-        'fatGrams': _parseDouble(_fatController.text),
-        'fiberGrams': _parseDouble(_fiberController.text),
-        'sugarGrams': _parseDouble(_sugarController.text),
-        'sodiumMg': _parseDouble(_sodiumController.text),
-        'servingSize': _servingSizeController.text.trim().isEmpty
+        calories: _parseDouble(_caloriesController.text),
+        proteinGrams: _parseDouble(_proteinController.text),
+        carbsGrams: _parseDouble(_carbsController.text),
+        fatGrams: _parseDouble(_fatController.text),
+        fiberGrams: _parseDouble(_fiberController.text),
+        sugarGrams: _parseDouble(_sugarController.text),
+        sodiumMg: _parseDouble(_sodiumController.text),
+        servingSize: _servingSizeController.text.trim().isEmpty
             ? null
             : _servingSizeController.text.trim(),
-        'servingsCount': double.tryParse(_servingsCountController.text) ?? 1.0,
-        'consumedAt': _consumedAt.toIso8601String(),
-      };
-
-      // TODO: Call API to save food log
-      // await FoodTrackingService().createFoodLog(foodLogData);
-      
-      // For now, just simulate success
-      await Future.delayed(const Duration(seconds: 1));
+        servingsCount: double.tryParse(_servingsCountController.text) ?? 1.0,
+        consumedAt: _consumedAt,
+      );
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Food log saved successfully!'),
-            backgroundColor: Colors.green,
-          ),
-        );
-        
-        // Navigate back to main screen
-        context.go('/food-tracking');
+        if (foodLog != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Food log saved successfully!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+
+          // Navigate back to main screen
+          context.go('/food-tracking');
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Failed to save food log. Please try again.'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
       }
     } catch (e) {
       if (mounted) {
