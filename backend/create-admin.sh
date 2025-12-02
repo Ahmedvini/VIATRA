@@ -1,4 +1,4 @@
-#!/bin/bash
+`#!/bin/bash
 # Script to create admin user via Railway CLI
 # Make sure you have Railway CLI installed and logged in
 

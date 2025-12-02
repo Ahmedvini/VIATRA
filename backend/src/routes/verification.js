@@ -61,7 +61,7 @@ const adminActionLimiter = rateLimit({
  */
 router.post('/submit',
   authenticate,
-  authorize('doctor', 'hospital', 'pharmacy', 'admin'),
+  authorize('doctor', 'hospital', 'pharmacy', 'patient', 'admin'),
   documentUploadLimiter,
   uploadSingle('document'),
   validate(documentUploadSchema),

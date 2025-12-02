@@ -271,7 +271,7 @@ class RegistrationProvider with ChangeNotifier {
       // Handle name fields - support both fullName and firstName/lastName
       String firstName = 'User';
       String lastName = 'Name';
-      
+
       if (_formData['firstName'] != null && _formData['lastName'] != null) {
         firstName = _formData['firstName'].toString();
         lastName = _formData['lastName'].toString();
@@ -297,11 +297,13 @@ class RegistrationProvider with ChangeNotifier {
       // Add role-specific data
       if (_selectedRole == UserRole.doctor) {
         // Doctor-specific fields
-        userData['specialty'] = _formData['specialty'] ?? _formData['specialization'];
+        userData['specialty'] =
+            _formData['specialty'] ?? _formData['specialization'];
         userData['licenseNumber'] = _formData['licenseNumber'];
         userData['consultationFee'] = _formData['consultationFee'];
         userData['title'] = 'Dr.'; // Default title
-        userData['education'] = _formData['bio'] ?? _formData['hospitalAffiliation'];
+        userData['education'] =
+            _formData['bio'] ?? _formData['hospitalAffiliation'];
       } else {
         // Patient-specific fields
         userData['dateOfBirth'] = _formData['dateOfBirth']?.toIso8601String();

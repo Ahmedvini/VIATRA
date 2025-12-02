@@ -32,7 +32,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     final authProvider = context.read<AuthProvider>();
-    
+
     final success = await authProvider.login(
       _emailController.text.trim(),
       _passwordController.text,
@@ -73,7 +73,7 @@ class _LoginScreenState extends State<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 40),
-                
+
                 // Logo or App Name
                 Center(
                   child: Column(
@@ -94,9 +94,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     ],
                   ),
                 ),
-                
+
                 const SizedBox(height: 48),
-                
+
                 // Welcome text
                 Text(
                   'Welcome Back',
@@ -104,27 +104,27 @@ class _LoginScreenState extends State<LoginScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                
+
                 const SizedBox(height: 8),
-                
+
                 Text(
                   'Sign in to continue to your account',
                   style: theme.textTheme.bodyLarge?.copyWith(
                     color: colorScheme.onSurface.withOpacity(0.7),
                   ),
                 ),
-                
+
                 const SizedBox(height: 40),
-                
+
                 // Email field
                 EmailTextField(
                   key: const Key('email_field'),
                   controller: _emailController,
                   validator: Validators.validateEmail,
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Password field
                 PasswordTextField(
                   key: const Key('password_field'),
@@ -136,9 +136,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     return null;
                   },
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // Remember me and forgot password
                 Row(
                   children: [
@@ -167,23 +167,23 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 32),
-                
+
                 // Login button
                 Consumer<AuthProvider>(
                   builder: (context, authProvider, child) => PrimaryButton(
-                      key: const Key('login_button'),
-                      text: 'Sign In',
-                      onPressed: _handleLogin,
-                      isLoading: authProvider.isLoading,
-                      size: ButtonSize.large,
-                      width: double.infinity,
-                    ),
+                    key: const Key('login_button'),
+                    text: 'Sign In',
+                    onPressed: _handleLogin,
+                    isLoading: authProvider.isLoading,
+                    size: ButtonSize.large,
+                    width: double.infinity,
+                  ),
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // Divider
                 Row(
                   children: [
@@ -200,9 +200,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     Expanded(child: Divider(color: colorScheme.outline)),
                   ],
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // Social login buttons (optional)
                 // OutlinedCustomButton(
                 //   text: 'Continue with Google',
@@ -210,9 +210,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 //   width: double.infinity,
                 //   onPressed: () {},
                 // ),
-                
+
                 // const SizedBox(height: 32),
-                
+
                 // Sign up link
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,

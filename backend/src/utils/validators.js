@@ -225,10 +225,17 @@ export const refreshTokenSchema = Joi.object({
 export const documentUploadSchema = Joi.object({
   type: Joi.string()
     .valid('medical_license', 'education', 'certification', 'insurance', 'identity')
-    .required()
+    .optional()
     .messages({
-      'any.only': 'Document type must be one of: medical_license, education, certification, insurance, identity',
-      'any.required': 'Document type is required'
+      'any.only': 'Document type must be one of: medical_license, education, certification, insurance, identity'
+    }),
+  
+  // Support both 'type' and 'documentType' field names
+  documentType: Joi.string()
+    .valid('medical_license', 'education', 'certification', 'insurance', 'identity')
+    .optional()
+    .messages({
+      'any.only': 'Document type must be one of: medical_license, education, certification, insurance, identity'
     }),
   
   description: Joi.string()
@@ -238,6 +245,8 @@ export const documentUploadSchema = Joi.object({
     .messages({
       'string.max': 'Description cannot exceed 500 characters'
     })
+}).or('type', 'documentType').messages({
+  'object.missing': 'Either type or documentType is required'
 });
 
 /**

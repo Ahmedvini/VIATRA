@@ -18,13 +18,23 @@ export const submitDocumentForVerification = async (req, res) => {
   try {
     // Extract data (validation already done by route middleware)
     const userId = req.user.id;
-    const { type, description = '' } = req.body;
+    // Support both 'type' and 'documentType' field names
+    const type = req.body.type || req.body.documentType;
+    const description = req.body.description || '';
     
     // req.file is populated by uploadSingle middleware in routes
     if (!req.file) {
       return res.status(400).json({
         error: 'File required',
         message: 'Please upload a document file'
+      });
+    }
+
+    // Validate document type
+    if (!type) {
+      return res.status(400).json({
+        error: 'Document type required',
+        message: 'Please specify the document type'
       });
     }
 
