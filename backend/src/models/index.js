@@ -13,6 +13,7 @@ import MessageModel from './Message.js';
 import FoodLogModel from './FoodLog.js';
 import SleepSessionModel from './SleepSession.js';
 import SleepInterruptionModel from './SleepInterruption.js';
+import PsychologicalAssessment from './PsychologicalAssessment.js';
 
 // Get sequelize instance
 const sequelize = getSequelize();
@@ -52,6 +53,10 @@ User.hasMany(FoodLog, { foreignKey: 'patient_id', as: 'foodLogs' });
 // User associations with SleepSession
 User.hasMany(SleepSession, { foreignKey: 'patient_id', as: 'sleepSessions' });
 
+// User/Patient associations with PsychologicalAssessment
+Patient.hasMany(PsychologicalAssessment, { foreignKey: 'patient_id', as: 'psychologicalAssessments' });
+PsychologicalAssessment.belongsTo(Patient, { foreignKey: 'patient_id', as: 'patient' });
+
 // FoodLog associations
 FoodLog.belongsTo(User, { foreignKey: 'patient_id', as: 'patient' });
 
@@ -81,7 +86,7 @@ Message.belongsTo(Conversation, { foreignKey: 'conversation_id', as: 'conversati
 Message.belongsTo(User, { foreignKey: 'sender_id', as: 'sender' });
 
 // Export models
-export { User, Doctor, Patient, Appointment, HealthProfile, Verification, Conversation, Message, FoodLog, SleepSession, SleepInterruption, sequelize };
+export { User, Doctor, Patient, Appointment, HealthProfile, Verification, Conversation, Message, FoodLog, SleepSession, SleepInterruption, PsychologicalAssessment, sequelize };
 
 export default {
   User,
@@ -95,6 +100,7 @@ export default {
   FoodLog,
   SleepSession,
   SleepInterruption,
+  PsychologicalAssessment,
   sequelize,
   getSequelize
 };

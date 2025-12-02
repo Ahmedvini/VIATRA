@@ -8,6 +8,7 @@ import chatRoutes from './chat.js';
 import adminRoutes from './admin.js';
 import foodTrackingRoutes from './foodTracking.js';
 import sleepTrackingRoutes from './sleepTracking.js';
+import psychologicalAssessmentRoutes from './psychologicalAssessment.js';
 
 const router = express.Router();
 
@@ -141,6 +142,7 @@ router.use('/chat', chatRoutes);
 router.use('/admin', adminRoutes);
 router.use('/food-tracking', foodTrackingRoutes);
 router.use('/sleep-tracking', sleepTrackingRoutes);
+router.use('/psychological-assessment', psychologicalAssessmentRoutes);
 
 // API status endpoint
 router.get('/status', (req, res) => {
