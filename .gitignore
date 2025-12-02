@@ -113,6 +113,8 @@ Thumbs.db
 # Service account keys and credentials
 *.json
 !package*.json
+!railway.json
+!nixpacks.toml
 !pubspec*.yaml
 *-key.json
 *-credentials.json
