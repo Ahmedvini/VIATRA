@@ -41,9 +41,9 @@ class GeminiService {
         };
       }
 
-      // Use Gemini 1.5 Flash model (supports vision and is faster)
-      // Note: gemini-pro-vision is deprecated, use gemini-1.5-flash or gemini-1.5-pro
-      const model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+      // Use Gemini 2.0 Flash model (fastest, latest, supports vision)
+      // This is the most advanced and fastest model as of Dec 2024
+      const model = this.genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
 
       const prompt = `You are a nutrition analysis AI. Analyze this food image and extract precise nutritional information for database storage.
 

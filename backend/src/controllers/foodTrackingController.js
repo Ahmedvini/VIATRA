@@ -79,11 +79,24 @@ export const analyzeFoodImage = async (req, res) => {
 
     logger.info(`Analyzing food image for patient ${patientId}`);
 
-    // Upload image to storage
-    const imageUrl = await uploadToStorage(req.file, 'food-images');
+    // Analyze image with Gemini AI first (using base64-encoded buffer)
+    // This is faster and doesn't require storage setup
+    const analysis = await geminiService.analyzeFoodImage(
+      req.file.buffer, 
+      req.file.mimetype
+    );
 
-    // Analyze image with Gemini AI
-    const analysis = await geminiService.analyzeFoodImage(req.file.buffer);
+    // Only upload to storage if analysis was successful and storage is available
+    let imageUrl = null;
+    try {
+      imageUrl = await uploadToStorage(req.file, 'food-images');
+      logger.info('Image uploaded to storage successfully');
+    } catch (storageError) {
+      logger.warn('Storage upload failed, continuing without image URL', {
+        error: storageError.message
+      });
+      // Continue without image URL - not critical for functionality
+    }
 
     // Create food log entry with AI analysis results
     const foodLog = await FoodLog.create({
@@ -91,7 +104,7 @@ export const analyzeFoodImage = async (req, res) => {
       meal_type: meal_type || 'snack',
       food_name: analysis.foodName,
       description: analysis.description,
-      image_url: imageUrl,
+      image_url: imageUrl, // Can be null if storage failed
       calories: analysis.nutrition.calories,
       protein_grams: analysis.nutrition.protein,
       carbs_grams: analysis.nutrition.carbs,
