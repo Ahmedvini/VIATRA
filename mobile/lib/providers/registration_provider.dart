@@ -123,13 +123,17 @@ class RegistrationProvider with ChangeNotifier {
 
   // Document management
   void addDocument(String type, File file) {
+    print('DEBUG: Adding document - type: "$type", file: ${file.path}');
     _documents[type] = file;
+    print('DEBUG: Documents after adding: ${_documents.keys.toList()}');
     _error = null;
     notifyListeners();
   }
 
   void removeDocument(String type) {
+    print('DEBUG: Removing document - type: "$type"');
     _documents.remove(type);
+    print('DEBUG: Documents after removing: ${_documents.keys.toList()}');
     notifyListeners();
   }
 
@@ -246,18 +250,41 @@ class RegistrationProvider with ChangeNotifier {
   }
 
   bool _validateDocuments() {
+    // Debug: Print current documents
+    print('DEBUG: Current documents: ${_documents.keys.toList()}');
+    
     if (_selectedRole == UserRole.doctor) {
-      // Support both camelCase and snake_case key names
-      return (_documents.containsKey('medicalLicense') ||
-              _documents.containsKey('medical_license')) &&
-          (_documents.containsKey('identityDocument') ||
-              _documents.containsKey('identity_document')) &&
-          (_documents.containsKey('educationCertificate') ||
-              _documents.containsKey('education_certificate'));
+      // Check for medical license (support multiple variants)
+      final hasMedicalLicense = _documents.containsKey('medicalLicense') ||
+          _documents.containsKey('medical_license') ||
+          _documents.containsKey('Medical License');
+      
+      // Check for identity document (support multiple variants)
+      final hasIdentityDocument = _documents.containsKey('identityDocument') ||
+          _documents.containsKey('identity_document') ||
+          _documents.containsKey('Identity Document');
+      
+      // Check for education certificate (support multiple variants)
+      final hasEducationCertificate = _documents.containsKey('educationCertificate') ||
+          _documents.containsKey('education_certificate') ||
+          _documents.containsKey('Education Certificate');
+      
+      final isValid = hasMedicalLicense && hasIdentityDocument && hasEducationCertificate;
+      
+      print('DEBUG: Doctor validation - Medical License: $hasMedicalLicense, '
+          'Identity: $hasIdentityDocument, Education: $hasEducationCertificate, '
+          'Valid: $isValid');
+      
+      return isValid;
     } else {
       // For patients, only identity document is required
-      return _documents.containsKey('identityDocument') ||
-          _documents.containsKey('identity_document');
+      final hasIdentity = _documents.containsKey('identityDocument') ||
+          _documents.containsKey('identity_document') ||
+          _documents.containsKey('Identity Document');
+      
+      print('DEBUG: Patient validation - Identity: $hasIdentity');
+      
+      return hasIdentity;
     }
   }
 
