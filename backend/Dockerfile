@@ -10,8 +10,8 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install production dependencies
-# Using npm install --omit=dev since package-lock.json is not committed
-RUN npm install --omit=dev && npm cache clean --force
+# Using npm install since package-lock.json may not be in sync
+RUN npm install --production --legacy-peer-deps && npm cache clean --force
 
 # Stage 2: Production
 FROM node:20-alpine AS production
