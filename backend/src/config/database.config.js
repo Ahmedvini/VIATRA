@@ -11,8 +11,8 @@ const dbConfig = {
     dialect: 'postgres',
     logging: console.log,
     pool: {
-      max: 10,
-      min: 0,
+      max: 3, // Conservative for Supabase
+      min: 1,
       acquire: 30000,
       idle: 10000
     },
@@ -58,8 +58,8 @@ const dbConfig = {
       }
     } : {},
     pool: {
-      max: 20,
-      min: 5,
+      max: 3, // Supabase free tier limit
+      min: 1,
       acquire: 60000,
       idle: 10000
     },

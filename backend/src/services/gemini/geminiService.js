@@ -43,7 +43,7 @@ class GeminiService {
 
       // Use Gemini 1.5 Flash - STABLE and TESTED model
       // This is the guaranteed working model for vision tasks
-      const model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+      const model = this.genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
       const prompt = `You are a nutrition analysis AI. Analyze this food image and extract precise nutritional information for database storage.
 
