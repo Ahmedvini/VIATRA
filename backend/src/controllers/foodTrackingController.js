@@ -1,4 +1,4 @@
-import FoodLog from '../models/FoodLog.js';
+import { FoodLog } from '../models/index.js';
 import geminiService from '../services/gemini/geminiService.js';
 import { uploadToStorage } from '../services/storage.js';
 import logger from '../config/logger.js';
@@ -29,23 +29,23 @@ export const analyzeFoodImage = async (req, res) => {
 
     // Create food log entry
     const foodLog = await FoodLog.create({
-      patientId,
-      mealType: meal_type || 'snack',
-      foodName: analysis.foodName,
+      patient_id: patientId,
+      meal_type: meal_type || 'snack',
+      food_name: analysis.foodName,
       description: analysis.description,
-      imageUrl,
+      image_url: imageUrl,
       calories: analysis.nutrition.calories,
-      proteinGrams: analysis.nutrition.protein,
-      carbsGrams: analysis.nutrition.carbs,
-      fatGrams: analysis.nutrition.fat,
-      fiberGrams: analysis.nutrition.fiber,
-      sugarGrams: analysis.nutrition.sugar,
-      sodiumMg: analysis.nutrition.sodium,
-      aiAnalysis: analysis,
-      aiConfidence: analysis.confidence,
-      servingSize: analysis.servingSize,
-      servingsCount: servings_count || 1.0,
-      consumedAt: consumed_at || new Date()
+      protein_grams: analysis.nutrition.protein,
+      carbs_grams: analysis.nutrition.carbs,
+      fat_grams: analysis.nutrition.fat,
+      fiber_grams: analysis.nutrition.fiber,
+      sugar_grams: analysis.nutrition.sugar,
+      sodium_mg: analysis.nutrition.sodium,
+      ai_analysis: analysis,
+      ai_confidence: analysis.confidence,
+      serving_size: analysis.servingSize,
+      servings_count: servings_count || 1.0,
+      consumed_at: consumed_at || new Date()
     });
 
     logger.info(`Food log created: ${foodLog.id}`);
@@ -73,23 +73,23 @@ export const getFoodLogs = async (req, res) => {
     const patientId = req.user.id;
     const { start_date, end_date, meal_type, limit = 50, offset = 0 } = req.query;
 
-    const where = { patientId };
+    const where = { patient_id: patientId };
 
     // Date range filter
     if (start_date || end_date) {
-      where.consumedAt = {};
-      if (start_date) where.consumedAt[Op.gte] = new Date(start_date);
-      if (end_date) where.consumedAt[Op.lte] = new Date(end_date);
+      where.consumed_at = {};
+      if (start_date) where.consumed_at[Op.gte] = new Date(start_date);
+      if (end_date) where.consumed_at[Op.lte] = new Date(end_date);
     }
 
     // Meal type filter
     if (meal_type) {
-      where.mealType = meal_type;
+      where.meal_type = meal_type;
     }
 
     const foodLogs = await FoodLog.findAll({
       where,
-      order: [['consumedAt', 'DESC']],
+      order: [['consumed_at', 'DESC']],
       limit: parseInt(limit),
       offset: parseInt(offset)
     });
@@ -125,7 +125,7 @@ export const getFoodLogById = async (req, res) => {
     const patientId = req.user.id;
 
     const foodLog = await FoodLog.findOne({
-      where: { id, patientId }
+      where: { id, patient_id: patientId }
     });
 
     if (!foodLog) {
@@ -159,7 +159,7 @@ export const updateFoodLog = async (req, res) => {
     const updates = req.body;
 
     const foodLog = await FoodLog.findOne({
-      where: { id, patientId }
+      where: { id, patient_id: patientId }
     });
 
     if (!foodLog) {
@@ -169,11 +169,11 @@ export const updateFoodLog = async (req, res) => {
       });
     }
 
-    // Update allowed fields
+    // Update allowed fields (using snake_case for database columns)
     const allowedUpdates = [
-      'mealType', 'foodName', 'description', 'servingsCount',
-      'consumedAt', 'calories', 'proteinGrams', 'carbsGrams',
-      'fatGrams', 'fiberGrams', 'sugarGrams', 'sodiumMg'
+      'meal_type', 'food_name', 'description', 'servings_count',
+      'consumed_at', 'calories', 'protein_grams', 'carbs_grams',
+      'fat_grams', 'fiber_grams', 'sugar_grams', 'sodium_mg'
     ];
 
     allowedUpdates.forEach(field => {
@@ -210,7 +210,7 @@ export const deleteFoodLog = async (req, res) => {
     const patientId = req.user.id;
 
     const foodLog = await FoodLog.findOne({
-      where: { id, patientId }
+      where: { id, patient_id: patientId }
     });
 
     if (!foodLog) {
@@ -255,8 +255,8 @@ export const getNutritionSummary = async (req, res) => {
 
     const foodLogs = await FoodLog.findAll({
       where: {
-        patientId,
-        consumedAt: {
+        patient_id: patientId,
+        consumed_at: {
           [Op.gte]: new Date(start_date),
           [Op.lte]: new Date(end_date)
         }
@@ -283,14 +283,14 @@ export const getNutritionSummary = async (req, res) => {
 
     foodLogs.forEach(log => {
       summary.totalCalories += log.calories || 0;
-      summary.totalProtein += log.proteinGrams || 0;
-      summary.totalCarbs += log.carbsGrams || 0;
-      summary.totalFat += log.fatGrams || 0;
-      summary.totalFiber += log.fiberGrams || 0;
-      summary.totalSugar += log.sugarGrams || 0;
-      summary.totalSodium += log.sodiumMg || 0;
+      summary.totalProtein += log.protein_grams || 0;
+      summary.totalCarbs += log.carbs_grams || 0;
+      summary.totalFat += log.fat_grams || 0;
+      summary.totalFiber += log.fiber_grams || 0;
+      summary.totalSugar += log.sugar_grams || 0;
+      summary.totalSodium += log.sodium_mg || 0;
 
-      const mealType = log.mealType;
+      const mealType = log.meal_type;
       summary.mealBreakdown[mealType].count++;
       summary.mealBreakdown[mealType].calories += log.calories || 0;
     });

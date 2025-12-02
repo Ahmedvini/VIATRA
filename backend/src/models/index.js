@@ -10,6 +10,7 @@ import HealthProfileModel from './HealthProfile.js';
 import VerificationModel from './Verification.js';
 import ConversationModel from './Conversation.js';
 import MessageModel from './Message.js';
+import FoodLogModel from './FoodLog.js';
 
 // Get sequelize instance
 const sequelize = getSequelize();
@@ -23,6 +24,7 @@ const HealthProfile = HealthProfileModel(sequelize, DataTypes);
 const Verification = VerificationModel(sequelize, DataTypes);
 const Conversation = ConversationModel(sequelize, DataTypes);
 const Message = MessageModel(sequelize, DataTypes);
+const FoodLog = FoodLogModel(sequelize, DataTypes);
 
 // Define associations after all models are initialized
 // User associations
@@ -39,6 +41,12 @@ Doctor.hasMany(Verification, { foreignKey: 'doctor_id', as: 'verifications' });
 Patient.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
 Patient.hasMany(Appointment, { foreignKey: 'patient_id', as: 'appointments' });
 Patient.hasOne(HealthProfile, { foreignKey: 'patient_id', as: 'healthProfile' });
+
+// User associations with FoodLog
+User.hasMany(FoodLog, { foreignKey: 'patient_id', as: 'foodLogs' });
+
+// FoodLog associations
+FoodLog.belongsTo(User, { foreignKey: 'patient_id', as: 'patient' });
 
 // Appointment associations
 Appointment.belongsTo(Patient, { foreignKey: 'patient_id', as: 'patient' });
@@ -59,7 +67,7 @@ Message.belongsTo(Conversation, { foreignKey: 'conversation_id', as: 'conversati
 Message.belongsTo(User, { foreignKey: 'sender_id', as: 'sender' });
 
 // Export models
-export { User, Doctor, Patient, Appointment, HealthProfile, Verification, Conversation, Message, sequelize };
+export { User, Doctor, Patient, Appointment, HealthProfile, Verification, Conversation, Message, FoodLog, sequelize };
 
 export default {
   User,
@@ -70,6 +78,7 @@ export default {
   Verification,
   Conversation,
   Message,
+  FoodLog,
   sequelize,
   getSequelize
 };
