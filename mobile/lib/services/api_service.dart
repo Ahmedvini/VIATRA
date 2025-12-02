@@ -152,6 +152,7 @@ class ApiService {
   /// Make DELETE request
   Future<ApiResponse<T>> delete<T>(
     String endpoint, {
+    Map<String, dynamic>? body,
     Map<String, String>? headers,
   }) async {
     try {
@@ -159,6 +160,7 @@ class ApiService {
       final response = await _client.delete(
         uri,
         headers: {..._defaultHeaders, ...?headers},
+        body: body != null ? jsonEncode(body) : null,
       );
 
       return _handleResponse<T>(response);

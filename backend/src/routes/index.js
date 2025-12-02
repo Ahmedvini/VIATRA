@@ -5,6 +5,7 @@ import healthProfileRoutes from './healthProfile.js';
 import doctorRoutes from './doctor.js';
 import appointmentRoutes from './appointment.js';
 import chatRoutes from './chat.js';
+import adminRoutes from './admin.js';
 
 const router = express.Router();
 
@@ -113,6 +114,7 @@ router.use('/health-profiles', healthProfileRoutes);
 router.use('/doctors', doctorRoutes);
 router.use('/appointments', appointmentRoutes);
 router.use('/chat', chatRoutes);
+router.use('/admin', adminRoutes);
 
 // API status endpoint
 router.get('/status', (req, res) => {
