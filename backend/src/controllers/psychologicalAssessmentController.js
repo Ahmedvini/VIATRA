@@ -1,6 +1,6 @@
 import PsychologicalAssessment from '../models/PsychologicalAssessment.js';
 import { Op } from 'sequelize';
-import logger from '../utils/logger.js';
+import logger from '../config/logger.js';
 
 /**
  * Submit a new PHQ-9 assessment
