@@ -23,6 +23,7 @@ import '../screens/food_tracking/food_tracking_main_screen.dart';
 import '../screens/food_tracking/track_options_screen.dart';
 import '../screens/food_tracking/manual_entry_screen.dart';
 import '../screens/food_tracking/ai_photo_analysis_screen.dart';
+import '../screens/food_tracking/food_report_screen.dart';
 import '../screens/health_profile/allergy_form_screen.dart';
 import '../screens/health_profile/chronic_condition_form_screen.dart';
 import '../screens/health_profile/health_profile_edit_screen.dart';
@@ -169,9 +170,7 @@ class AppRouter {
       GoRoute(
         path: '/food-tracking/report',
         name: 'food-tracking-report',
-        builder: (context, state) => const Placeholder(
-          child: Center(child: Text('Food Report - Coming Soon')),
-        ),
+        builder: (context, state) => const FoodReportScreen(),
       ),
       GoRoute(
         path: '/food-tracking/track-options',

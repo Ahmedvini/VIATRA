@@ -245,6 +245,12 @@ class NutritionSummary {
       days: dateRange['days'] as int,
     );
   }
+
+  /// Convenience getter for meal count (same as totalLogs)
+  int get mealCount => totalLogs;
+
+  /// Convenience getter for average daily calories
+  double get averageDailyCalories => dailyAverages.calories;
 }
 
 /// Meal breakdown data

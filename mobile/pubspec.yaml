@@ -26,6 +26,7 @@ dependencies:
   google_fonts: ^6.1.0
   flutter_svg: ^2.0.9
   cached_network_image: ^3.3.1
+  fl_chart: ^1.1.1  # Charts and data visualization
   
   # Navigation
   go_router: ^12.1.3
