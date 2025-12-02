@@ -6,8 +6,8 @@ FROM node:20-alpine AS builder
 # Set working directory
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+# Copy package files from backend directory
+COPY backend/package*.json ./
 
 # Install production dependencies
 # Using npm install since package-lock.json may not be in sync
@@ -29,11 +29,11 @@ RUN addgroup -g 1001 -S nodejs && \
 # Copy production dependencies from builder stage
 COPY --from=builder --chown=viatra:nodejs /app/node_modules ./node_modules
 
-# Copy package.json for reference
-COPY --chown=viatra:nodejs package*.json ./
+# Copy package.json for reference from backend directory
+COPY --chown=viatra:nodejs backend/package*.json ./
 
-# Copy source code
-COPY --chown=viatra:nodejs src/ ./src/
+# Copy source code from backend directory
+COPY --chown=viatra:nodejs backend/src/ ./src/
 
 # Set environment variables
 ENV NODE_ENV=production
