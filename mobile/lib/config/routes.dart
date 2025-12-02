@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../models/health_profile_model.dart';
+import '../models/sleep_tracking/sleep_session.dart';
+import '../models/psychological/psychological_assessment.dart';
 import '../providers/auth_provider.dart';
 import '../screens/appointments/appointment_detail_screen.dart';
 import '../screens/appointments/appointment_list_screen.dart';
@@ -24,6 +26,15 @@ import '../screens/food_tracking/track_options_screen.dart';
 import '../screens/food_tracking/manual_entry_screen.dart';
 import '../screens/food_tracking/ai_photo_analysis_screen.dart';
 import '../screens/food_tracking/food_report_screen.dart';
+import '../screens/sleep_tracking/sleep_dashboard_screen.dart';
+import '../screens/sleep_tracking/active_sleep_screen.dart';
+import '../screens/sleep_tracking/sleep_history_screen.dart';
+import '../screens/sleep_tracking/sleep_details_screen.dart';
+import '../screens/psychological/phq9_assessment_screen.dart';
+import '../screens/psychological/assessment_result_screen.dart';
+import '../screens/psychological/assessment_history_screen.dart';
+import '../screens/psychological/assessment_details_screen.dart';
+import '../screens/ai_health/ai_health_chatbot_screen.dart';
 import '../screens/health_profile/allergy_form_screen.dart';
 import '../screens/health_profile/chronic_condition_form_screen.dart';
 import '../screens/health_profile/health_profile_edit_screen.dart';
@@ -186,6 +197,69 @@ class AppRouter {
         path: '/food-tracking/ai-analysis',
         name: 'food-tracking-ai-analysis',
         builder: (context, state) => const AiPhotoAnalysisScreen(),
+      ),
+
+      // Sleep Tracking routes (Patients only)
+      GoRoute(
+        path: '/sleep-tracking',
+        name: 'sleep-tracking',
+        builder: (context, state) => const SleepDashboardScreen(),
+      ),
+      GoRoute(
+        path: '/sleep-tracking/active',
+        name: 'active-sleep',
+        builder: (context, state) {
+          final session = state.extra as SleepSession;
+          return ActiveSleepScreen(session: session);
+        },
+      ),
+      GoRoute(
+        path: '/sleep-tracking/history',
+        name: 'sleep-history',
+        builder: (context, state) => const SleepHistoryScreen(),
+      ),
+      GoRoute(
+        path: '/sleep-tracking/details/:sessionId',
+        name: 'sleep-details',
+        builder: (context, state) {
+          final sessionId = state.pathParameters['sessionId']!;
+          return SleepDetailsScreen(sessionId: sessionId);
+        },
+      ),
+
+      // Psychological Assessment routes (PHQ-9)
+      GoRoute(
+        path: '/psychological/phq9',
+        name: 'phq9-assessment',
+        builder: (context, state) => const PHQ9AssessmentScreen(),
+      ),
+      GoRoute(
+        path: '/psychological/result',
+        name: 'assessment-result',
+        builder: (context, state) {
+          final result = state.extra as Map<String, dynamic>;
+          return AssessmentResultScreen(result: result);
+        },
+      ),
+      GoRoute(
+        path: '/psychological/history',
+        name: 'assessment-history',
+        builder: (context, state) => const AssessmentHistoryScreen(),
+      ),
+      GoRoute(
+        path: '/psychological/details/:assessmentId',
+        name: 'assessment-details',
+        builder: (context, state) {
+          final assessment = state.extra as PsychologicalAssessment;
+          return AssessmentDetailsScreen(assessment: assessment);
+        },
+      ),
+
+      // AI Health Chatbot routes
+      GoRoute(
+        path: '/ai-health/chatbot',
+        name: 'ai-health-chatbot',
+        builder: (context, state) => const AIHealthChatbotScreen(),
       ),
 
       // Doctor routes

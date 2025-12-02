@@ -107,6 +107,13 @@ class PatientHomeScreen extends StatelessWidget {
   Widget _buildQuickActionsGrid(BuildContext context) {
     final actions = [
       {
+        'icon': Icons.smart_toy,
+        'title': 'AI Health Assistant',
+        'subtitle': 'Chat with AI advisor',
+        'route': '/ai-health/chatbot',
+        'color': Colors.teal,
+      },
+      {
         'icon': Icons.search,
         'title': 'Find Doctors',
         'subtitle': 'Search for specialists',
@@ -121,11 +128,25 @@ class PatientHomeScreen extends StatelessWidget {
         'color': Colors.green,
       },
       {
+        'icon': Icons.psychology,
+        'title': 'Mental Health',
+        'subtitle': 'PHQ-9 Assessment',
+        'route': '/psychological/phq9',
+        'color': Colors.purple,
+      },
+      {
         'icon': Icons.restaurant_menu,
         'title': 'Food Tracking',
         'subtitle': 'Track your nutrition',
         'route': '/food-tracking',
         'color': Colors.orange,
+      },
+      {
+        'icon': Icons.bedtime,
+        'title': 'Sleep Tracking',
+        'subtitle': 'Monitor your sleep',
+        'route': '/sleep-tracking',
+        'color': Colors.indigo,
       },
       {
         'icon': Icons.favorite,
@@ -165,6 +186,12 @@ class PatientHomeScreen extends StatelessWidget {
             } else if (route == '/food-tracking') {
               // Food tracking route
               context.go('/food-tracking');
+            } else if (route == '/sleep-tracking') {
+              // Sleep tracking route
+              context.go('/sleep-tracking');
+            } else if (route == '/psychological/phq9') {
+              // PHQ-9 Mental Health Assessment
+              context.go('/psychological/phq9');
             } else {
               context.go(route);
             }

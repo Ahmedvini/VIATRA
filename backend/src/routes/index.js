@@ -9,6 +9,7 @@ import adminRoutes from './admin.js';
 import foodTrackingRoutes from './foodTracking.js';
 import sleepTrackingRoutes from './sleepTracking.js';
 import psychologicalAssessmentRoutes from './psychologicalAssessment.js';
+import aiHealthChatbotRoutes from './aiHealthChatbot.js';
 
 const router = express.Router();
 
@@ -143,6 +144,7 @@ router.use('/admin', adminRoutes);
 router.use('/food-tracking', foodTrackingRoutes);
 router.use('/sleep-tracking', sleepTrackingRoutes);
 router.use('/psychological-assessment', psychologicalAssessmentRoutes);
+router.use('/ai-chatbot', aiHealthChatbotRoutes);
 
 // API status endpoint
 router.get('/status', (req, res) => {
