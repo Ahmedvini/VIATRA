@@ -17,8 +17,9 @@ const createPool = () => {
     user: config.database.user,
     password: config.database.password,
     
-    // Pool settings
-    max: 20, // Maximum number of clients in the pool
+    // Pool settings - conservative for Supabase free tier
+    max: 3, // Maximum number of clients in the pool (Supabase free tier limit)
+    min: 1, // Minimum number of clients
     idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
     connectionTimeoutMillis: 10000, // Return an error if no connection available within 10 seconds
     
@@ -32,7 +33,8 @@ const createPool = () => {
   if (config.database.url) {
     return new Pool({
       connectionString: config.database.url,
-      max: 20,
+      max: 3, // Supabase free tier limit
+      min: 1,
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 10000,
       ssl: config.isProduction ? {
