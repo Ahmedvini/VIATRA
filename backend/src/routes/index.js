@@ -7,6 +7,7 @@ import appointmentRoutes from './appointment.js';
 import chatRoutes from './chat.js';
 import adminRoutes from './admin.js';
 import foodTrackingRoutes from './foodTracking.js';
+import sleepTrackingRoutes from './sleepTracking.js';
 
 const router = express.Router();
 
@@ -139,6 +140,7 @@ router.use('/appointments', appointmentRoutes);
 router.use('/chat', chatRoutes);
 router.use('/admin', adminRoutes);
 router.use('/food-tracking', foodTrackingRoutes);
+router.use('/sleep-tracking', sleepTrackingRoutes);
 
 // API status endpoint
 router.get('/status', (req, res) => {
