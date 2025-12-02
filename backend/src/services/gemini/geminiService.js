@@ -20,11 +20,30 @@ class GeminiService {
   async analyzeFoodImage(imageBuffer, mimeType = 'image/jpeg') {
     try {
       if (!this.genAI) {
-        throw new Error('Gemini API key not configured');
+        logger.warn('Gemini API key not configured - returning fallback response');
+        // Return a fallback response instead of throwing error
+        return {
+          foodName: 'Food Item (Manual Entry Required)',
+          description: 'AI analysis unavailable. Please enter details manually.',
+          servingSize: '1 serving',
+          nutrition: {
+            calories: 0,
+            protein: 0,
+            carbs: 0,
+            fat: 0,
+            fiber: 0,
+            sugar: 0,
+            sodium: 0,
+          },
+          confidence: 0.0,
+          foodItems: [],
+          error: 'Gemini API key not configured'
+        };
       }
 
-      // Use Gemini Pro Vision model
-      const model = this.genAI.getGenerativeModel({ model: 'gemini-pro-vision' });
+      // Use Gemini 1.5 Flash model (supports vision and is faster)
+      // Note: gemini-pro-vision is deprecated, use gemini-1.5-flash or gemini-1.5-pro
+      const model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
       const prompt = `You are a nutrition analysis AI. Analyze this food image and extract precise nutritional information for database storage.
 

@@ -615,7 +615,7 @@ class _FoodReportScreenState extends State<FoodReportScreen> {
                           sections: [
                             PieChartSectionData(
                               value: _mockSummary!.totalProtein,
-                              title: '${(_mockSummary!.totalProtein / (_mockSummary!.totalProtein + _mockSummary!.totalCarbs + _mockSummary!.totalFat) * 100).toInt()}%',
+                              title: '${_mockSummary!.proteinPercentage.toInt()}%',
                               color: Colors.red,
                               radius: 60,
                               titleStyle: const TextStyle(
@@ -626,7 +626,7 @@ class _FoodReportScreenState extends State<FoodReportScreen> {
                             ),
                             PieChartSectionData(
                               value: _mockSummary!.totalCarbs,
-                              title: '${(_mockSummary!.totalCarbs / (_mockSummary!.totalProtein + _mockSummary!.totalCarbs + _mockSummary!.totalFat) * 100).toInt()}%',
+                              title: '${_mockSummary!.carbsPercentage.toInt()}%',
                               color: Colors.amber,
                               radius: 60,
                               titleStyle: const TextStyle(
@@ -637,7 +637,7 @@ class _FoodReportScreenState extends State<FoodReportScreen> {
                             ),
                             PieChartSectionData(
                               value: _mockSummary!.totalFat,
-                              title: '${(_mockSummary!.totalFat / (_mockSummary!.totalProtein + _mockSummary!.totalCarbs + _mockSummary!.totalFat) * 100).toInt()}%',
+                              title: '${_mockSummary!.fatPercentage.toInt()}%',
                               color: Colors.deepPurple,
                               radius: 60,
                               titleStyle: const TextStyle(
