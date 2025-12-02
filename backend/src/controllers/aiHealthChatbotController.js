@@ -120,38 +120,46 @@ export const getHealthSummary = async (req, res) => {
 
     const patientId = patient.id;
 
-    // Get recent sleep data (last 7 days)
+    // Get recent sleep data (last 30 days for better analysis)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
+    // Sleep sessions reference users.id directly
     const recentSleep = await SleepSession.findAll({
       where: {
-        patient_id: patientId,
-        start_time: { [Op.gte]: sevenDaysAgo },
+        patient_id: userId, // References users.id, not patients.id
+        start_time: { [Op.gte]: thirtyDaysAgo },
         status: 'completed',
       },
       order: [['start_time', 'DESC']],
-      limit: 7,
+      limit: 30,
     });
 
-    // Get recent food logs (last 7 days)
+    // Get recent food logs (last 30 days)
+    // Food logs also reference users.id directly
     const recentFood = await FoodLog.findAll({
       where: {
-        patient_id: patientId,
-        consumed_at: { [Op.gte]: sevenDaysAgo },
+        patient_id: userId, // References users.id, not patients.id
+        consumed_at: { [Op.gte]: thirtyDaysAgo },
       },
       order: [['consumed_at', 'DESC']],
-      limit: 20,
+      limit: 90, // ~3 meals per day for 30 days
     });
 
-    // Get latest PHQ-9 assessment
-    const latestPHQ9 = await PsychologicalAssessment.findOne({
+    // Get all PHQ-9 assessments for trend analysis
+    const phq9Assessments = await PsychologicalAssessment.findAll({
       where: {
-        patient_id: patientId,
+        patient_id: patientId, // This one DOES reference patients.id
         assessment_type: 'PHQ9',
       },
       order: [['assessment_date', 'DESC']],
+      limit: 5,
     });
+    
+    const latestPHQ9 = phq9Assessments[0] || null;
 
     res.status(200).json({
       success: true,
@@ -159,6 +167,7 @@ export const getHealthSummary = async (req, res) => {
         recent_sleep: recentSleep,
         recent_food: recentFood,
         latest_phq9: latestPHQ9,
+        phq9_history: phq9Assessments,
         has_consent: true,
       },
     });
@@ -176,16 +185,38 @@ export const getHealthSummary = async (req, res) => {
  * Generate AI response based on user message and health data
  */
 const generateAIResponse = async (message, healthData, userId) => {
-  // This is a simplified AI response generator
-  // In production, integrate with OpenAI, Anthropic, or other AI services
-
+  // Medical/Mental Health Scope Enforcement
+  const medicalKeywords = [
+    'health', 'sleep', 'food', 'eat', 'nutrition', 'diet', 'mental', 'depress', 
+    'anxious', 'stress', 'tired', 'energy', 'mood', 'feel', 'wellness', 'fitness',
+    'exercise', 'weight', 'symptom', 'pain', 'medication', 'therapy', 'treatment',
+    'doctor', 'appointment', 'medical', 'condition', 'illness', 'diagnosis'
+  ];
+  
   const lowercaseMessage = message.toLowerCase();
+  const isMedicalQuery = medicalKeywords.some(keyword => lowercaseMessage.includes(keyword));
+  
+  // Block non-medical queries
+  if (!isMedicalQuery && message.length > 10) {
+    return {
+      content: '🏥 **Medical & Mental Health Assistant**\n\n' +
+        'I\'m specialized in health-related topics. I can help you with:\n\n' +
+        '• 😴 Sleep patterns and quality\n' +
+        '• 🍽️ Nutrition and dietary habits\n' +
+        '• 🧠 Mental health and wellness\n' +
+        '• ⚕️ General health insights\n' +
+        '• 📊 Health data analysis\n\n' +
+        'Please ask me something related to your health or wellbeing!',
+      needsDoctorVisit: false,
+    };
+  }
 
   // Analyze health data
-  const { recentSleep, recentFood, latestPHQ9 } = healthData;
+  const { recentSleep, recentFood, latestPHQ9, phq9History } = healthData;
 
   let response = '';
   let needsDoctorVisit = false;
+  const insights = [];
 
   // Check for urgent keywords
   const urgentKeywords = ['suicide', 'kill myself', 'end my life', 'hurt myself', 'emergency'];
@@ -199,6 +230,94 @@ const generateAIResponse = async (message, healthData, userId) => {
         'Your life matters, and help is available 24/7.',
       needsDoctorVisit: true,
     };
+  }
+
+  // ============================================
+  // CORRELATION ANALYSIS: Connect Health Data
+  // ============================================
+  
+  // Calculate health metrics for correlation
+  let avgSleepHours = 0;
+  let avgSleepQuality = 0;
+  let avgCaloriesPerDay = 0;
+  let mentalHealthTrend = 'stable';
+  
+  if (recentSleep && recentSleep.length > 0) {
+    avgSleepHours = (recentSleep.reduce((sum, s) => sum + (s.total_duration_minutes || 0), 0) / recentSleep.length) / 60;
+    avgSleepQuality = recentSleep.reduce((sum, s) => sum + (s.quality_rating || 0), 0) / recentSleep.length;
+  }
+  
+  if (recentFood && recentFood.length > 0) {
+    const totalCalories = recentFood.reduce((sum, f) => sum + (f.calories || 0), 0);
+    const daysWithFood = Math.ceil(recentFood.length / 3); // Estimate days
+    avgCaloriesPerDay = totalCalories / Math.max(daysWithFood, 7);
+  }
+  
+  if (phq9History && phq9History.length >= 2) {
+    const latestScore = phq9History[0].total_score;
+    const previousScore = phq9History[1].total_score;
+    if (latestScore < previousScore - 3) mentalHealthTrend = 'improving';
+    else if (latestScore > previousScore + 3) mentalHealthTrend = 'declining';
+  }
+  
+  // CORRELATION INSIGHTS
+  
+  // 1. Poor sleep + declining mental health
+  if (avgSleepHours < 6 && latestPHQ9 && latestPHQ9.total_score >= 10) {
+    insights.push({
+      type: 'sleep_mental_correlation',
+      message: '⚠️ **Sleep-Mental Health Connection**: Your poor sleep (avg ${avgSleepHours.toFixed(1)}h) may be contributing to your mental health challenges (PHQ-9: ${latestPHQ9.total_score}). Improving sleep hygiene could help improve mood.'
+    });
+  }
+  
+  // 2. Poor nutrition + low energy/depression
+  if (avgCaloriesPerDay < 1500 && latestPHQ9 && (latestPHQ9.q4_energy >= 2 || latestPHQ9.total_score >= 10)) {
+    insights.push({
+      type: 'nutrition_mental_correlation',
+      message: '⚠️ **Nutrition-Energy Connection**: Your low calorie intake (~${avgCaloriesPerDay.toFixed(0)} cal/day) may be contributing to low energy and mood issues. Adequate nutrition is essential for mental health.'
+    });
+  }
+  
+  // 3. Good sleep + improving mental health
+  if (avgSleepHours >= 7 && avgSleepHours <= 9 && mentalHealthTrend === 'improving') {
+    insights.push({
+      type: 'positive_correlation',
+      message: '✅ **Positive Trend**: Your healthy sleep pattern (${avgSleepHours.toFixed(1)}h/night) aligns with your improving mental health scores. Keep up these great habits!'
+    });
+  }
+  
+  // 4. Irregular eating + sleep issues
+  if (recentFood && recentFood.length > 0 && recentSleep && recentSleep.length > 0) {
+    const mealsPerDay = recentFood.length / Math.ceil(recentFood.length / 3);
+    if ((mealsPerDay < 2 || avgCaloriesPerDay > 3000) && avgSleepQuality < 3) {
+      insights.push({
+        type: 'eating_sleep_correlation',
+        message: '⚠️ **Diet-Sleep Connection**: Irregular eating patterns may be affecting your sleep quality. Try to maintain consistent meal times and avoid heavy meals 3 hours before bed.'
+      });
+    }
+  }
+  
+  // 5. Overall wellness assessment
+  if (recentSleep && recentFood && latestPHQ9) {
+    let wellnessFactors = 0;
+    let positiveFactors = 0;
+    
+    if (avgSleepHours >= 7 && avgSleepHours <= 9) positiveFactors++;
+    wellnessFactors++;
+    
+    if (avgCaloriesPerDay >= 1800 && avgCaloriesPerDay <= 2500) positiveFactors++;
+    wellnessFactors++;
+    
+    if (latestPHQ9.total_score < 10) positiveFactors++;
+    wellnessFactors++;
+    
+    const wellnessScore = (positiveFactors / wellnessFactors) * 100;
+    
+    insights.push({
+      type: 'overall_wellness',
+      message: `📊 **Overall Wellness Score**: ${wellnessScore.toFixed(0)}%\n` +
+        `Based on sleep (${avgSleepHours.toFixed(1)}h), nutrition (${avgCaloriesPerDay.toFixed(0)}cal), and mental health (PHQ-9: ${latestPHQ9.total_score})`
+    });
   }
 
   // Sleep-related responses
@@ -370,9 +489,17 @@ const generateAIResponse = async (message, healthData, userId) => {
     response += 'What would you like to know?';
   }
 
+  // Add correlation insights if available
+  if (insights.length > 0) {
+    response += '\n\n---\n\n**🔍 Health Insights & Correlations:**\n\n';
+    insights.forEach(insight => {
+      response += insight.message + '\n\n';
+    });
+  }
+
   // Add doctor visit recommendation
   if (needsDoctorVisit) {
-    response += '\n\n⚕️ **Important: Based on your data, I recommend scheduling a doctor appointment soon.**';
+    response += '\n⚕️ **Important: Based on your data, I recommend scheduling a doctor appointment soon.**';
   }
 
   return {
@@ -413,35 +540,41 @@ export const sendMessage = async (req, res) => {
       const patient = await Patient.findOne({ where: { user_id: userId } });
       if (patient) {
         const patientId = patient.id;
-        const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
         healthData = {
+          // Sleep and Food reference users.id directly, not patients.id
           recentSleep: await SleepSession.findAll({
             where: {
-              patient_id: patientId,
-              start_time: { [Op.gte]: sevenDaysAgo },
+              patient_id: userId, // References users.id
+              start_time: { [Op.gte]: thirtyDaysAgo },
               status: 'completed',
             },
             order: [['start_time', 'DESC']],
-            limit: 7,
+            limit: 30,
           }),
           recentFood: await FoodLog.findAll({
             where: {
-              patient_id: patientId,
-              consumed_at: { [Op.gte]: sevenDaysAgo },
+              patient_id: userId, // References users.id
+              consumed_at: { [Op.gte]: thirtyDaysAgo },
             },
             order: [['consumed_at', 'DESC']],
-            limit: 20,
+            limit: 90,
           }),
-          latestPHQ9: await PsychologicalAssessment.findOne({
+          // PHQ-9 assessments reference patients.id
+          phq9History: await PsychologicalAssessment.findAll({
             where: {
-              patient_id: patientId,
+              patient_id: patientId, // References patients.id
               assessment_type: 'PHQ9',
             },
             order: [['assessment_date', 'DESC']],
+            limit: 5,
           }),
         };
+        
+        // Set latestPHQ9 for backward compatibility
+        healthData.latestPHQ9 = healthData.phq9History[0] || null;
       }
     }
 
