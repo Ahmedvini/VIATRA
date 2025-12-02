@@ -10,7 +10,8 @@ module.exports = {
         primaryKey: true,
         allowNull: false
       },
-      user_id: {
+      // Link to patient (users table with role='patient')
+      patient_id: {
         type: Sequelize.UUID,
         allowNull: false,
         references: {
@@ -102,9 +103,9 @@ module.exports = {
     });
 
     // Add indexes for faster queries
-    await queryInterface.addIndex('food_logs', ['user_id']);
+    await queryInterface.addIndex('food_logs', ['patient_id']);
     await queryInterface.addIndex('food_logs', ['consumed_at']);
-    await queryInterface.addIndex('food_logs', ['user_id', 'consumed_at']);
+    await queryInterface.addIndex('food_logs', ['patient_id', 'consumed_at']);
     await queryInterface.addIndex('food_logs', ['meal_type']);
   },
 

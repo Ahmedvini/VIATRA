@@ -10,7 +10,7 @@ import { Op } from 'sequelize';
 export const analyzeFoodImage = async (req, res) => {
   try {
     const { meal_type, consumed_at, servings_count } = req.body;
-    const userId = req.user.id;
+    const patientId = req.user.id;
 
     if (!req.file) {
       return res.status(400).json({
@@ -19,7 +19,7 @@ export const analyzeFoodImage = async (req, res) => {
       });
     }
 
-    logger.info(`Analyzing food image for user ${userId}`);
+    logger.info(`Analyzing food image for patient ${patientId}`);
 
     // Upload image to storage
     const imageUrl = await uploadToStorage(req.file, 'food-images');
@@ -29,7 +29,7 @@ export const analyzeFoodImage = async (req, res) => {
 
     // Create food log entry
     const foodLog = await FoodLog.create({
-      userId,
+      patientId,
       mealType: meal_type || 'snack',
       foodName: analysis.foodName,
       description: analysis.description,
@@ -70,10 +70,10 @@ export const analyzeFoodImage = async (req, res) => {
  */
 export const getFoodLogs = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const patientId = req.user.id;
     const { start_date, end_date, meal_type, limit = 50, offset = 0 } = req.query;
 
-    const where = { userId };
+    const where = { patientId };
 
     // Date range filter
     if (start_date || end_date) {
@@ -122,10 +122,10 @@ export const getFoodLogs = async (req, res) => {
 export const getFoodLogById = async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.user.id;
+    const patientId = req.user.id;
 
     const foodLog = await FoodLog.findOne({
-      where: { id, userId }
+      where: { id, patientId }
     });
 
     if (!foodLog) {
@@ -155,11 +155,11 @@ export const getFoodLogById = async (req, res) => {
 export const updateFoodLog = async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.user.id;
+    const patientId = req.user.id;
     const updates = req.body;
 
     const foodLog = await FoodLog.findOne({
-      where: { id, userId }
+      where: { id, patientId }
     });
 
     if (!foodLog) {
@@ -207,10 +207,10 @@ export const updateFoodLog = async (req, res) => {
 export const deleteFoodLog = async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.user.id;
+    const patientId = req.user.id;
 
     const foodLog = await FoodLog.findOne({
-      where: { id, userId }
+      where: { id, patientId }
     });
 
     if (!foodLog) {
@@ -243,7 +243,7 @@ export const deleteFoodLog = async (req, res) => {
  */
 export const getNutritionSummary = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const patientId = req.user.id;
     const { start_date, end_date } = req.query;
 
     if (!start_date || !end_date) {
@@ -255,7 +255,7 @@ export const getNutritionSummary = async (req, res) => {
 
     const foodLogs = await FoodLog.findAll({
       where: {
-        userId,
+        patientId,
         consumedAt: {
           [Op.gte]: new Date(start_date),
           [Op.lte]: new Date(end_date)

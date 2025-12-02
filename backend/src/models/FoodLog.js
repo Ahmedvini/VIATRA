@@ -7,10 +7,14 @@ const FoodLog = sequelize.define('FoodLog', {
     defaultValue: DataTypes.UUIDV4,
     primaryKey: true
   },
-  userId: {
+  patientId: {
     type: DataTypes.UUID,
     allowNull: false,
-    field: 'user_id'
+    field: 'patient_id',
+    references: {
+      model: 'users',
+      key: 'id'
+    }
   },
   mealType: {
     type: DataTypes.ENUM('breakfast', 'lunch', 'dinner', 'snack'),
@@ -108,7 +112,7 @@ FoodLog.prototype.toJSON = function() {
   const values = { ...this.get() };
   return {
     id: values.id,
-    userId: values.userId,
+    patientId: values.patientId,
     mealType: values.mealType,
     foodName: values.foodName,
     description: values.description,
