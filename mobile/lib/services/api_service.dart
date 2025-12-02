@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import '../config/app_config.dart';
 import '../utils/logger.dart';
 
@@ -184,9 +185,13 @@ class ApiService {
       // Add headers
       request.headers.addAll({..._defaultHeaders, ...?headers});
 
-      // Add file
-      request.files
-          .add(await http.MultipartFile.fromPath(fieldName, file.path));
+      // Add file with explicit content type
+      final mimeType = _getMimeType(file.path);
+      request.files.add(await http.MultipartFile.fromPath(
+        fieldName,
+        file.path,
+        contentType: mimeType != null ? MediaType.parse(mimeType) : null,
+      ));
 
       // Add fields
       if (fields != null) {
@@ -251,6 +256,26 @@ class ApiService {
       return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
     } catch (e) {
       return false;
+    }
+  }
+
+  /// Get MIME type from file path
+  String? _getMimeType(String path) {
+    final extension = path.split('.').last.toLowerCase();
+    switch (extension) {
+      case 'jpg':
+      case 'jpeg':
+        return 'image/jpeg';
+      case 'png':
+        return 'image/png';
+      case 'gif':
+        return 'image/gif';
+      case 'webp':
+        return 'image/webp';
+      case 'bmp':
+        return 'image/bmp';
+      default:
+        return null;
     }
   }
 
