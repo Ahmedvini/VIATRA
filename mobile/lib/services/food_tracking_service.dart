@@ -9,7 +9,7 @@ class FoodTrackingService {
   FoodTrackingService(this._apiService);
 
   final ApiService _apiService;
-  static const String _baseEndpoint = '/api/health/food';
+  static const String _baseEndpoint = '/food-tracking';
 
   /// Create a food log entry (manual entry)
   /// No validation is performed - all fields are optional except meal_type and food_name
