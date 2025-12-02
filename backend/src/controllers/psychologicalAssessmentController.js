@@ -1,4 +1,5 @@
 import PsychologicalAssessment from '../models/PsychologicalAssessment.js';
+import { Patient } from '../models/index.js';
 import { Op } from 'sequelize';
 import logger from '../config/logger.js';
 
@@ -7,7 +8,19 @@ import logger from '../config/logger.js';
  */
 export const submitAssessment = async (req, res) => {
   try {
-    const patientId = req.user.id;
+    // Find patient by user ID
+    const patient = await Patient.findOne({
+      where: { user_id: req.user.id }
+    });
+
+    if (!patient) {
+      return res.status(404).json({
+        success: false,
+        message: 'Patient profile not found'
+      });
+    }
+
+    const patientId = patient.id;
     const {
       assessment_type = 'PHQ9',
       q1_interest,
@@ -86,7 +99,19 @@ export const submitAssessment = async (req, res) => {
  */
 export const getAssessmentHistory = async (req, res) => {
   try {
-    const patientId = req.user.id;
+    // Find patient by user ID
+    const patient = await Patient.findOne({
+      where: { user_id: req.user.id }
+    });
+
+    if (!patient) {
+      return res.status(404).json({
+        success: false,
+        message: 'Patient profile not found'
+      });
+    }
+
+    const patientId = patient.id;
     const { startDate, endDate, limit = 50 } = req.query;
 
     const whereClause = {
@@ -128,8 +153,20 @@ export const getAssessmentHistory = async (req, res) => {
  */
 export const getAssessmentById = async (req, res) => {
   try {
+    // Find patient by user ID
+    const patient = await Patient.findOne({
+      where: { user_id: req.user.id }
+    });
+
+    if (!patient) {
+      return res.status(404).json({
+        success: false,
+        message: 'Patient profile not found'
+      });
+    }
+
     const { assessmentId } = req.params;
-    const patientId = req.user.id;
+    const patientId = patient.id;
 
     const assessment = await PsychologicalAssessment.findOne({
       where: {
@@ -173,7 +210,19 @@ export const getAssessmentById = async (req, res) => {
  */
 export const getAssessmentAnalytics = async (req, res) => {
   try {
-    const patientId = req.user.id;
+    // Find patient by user ID
+    const patient = await Patient.findOne({
+      where: { user_id: req.user.id }
+    });
+
+    if (!patient) {
+      return res.status(404).json({
+        success: false,
+        message: 'Patient profile not found'
+      });
+    }
+
+    const patientId = patient.id;
     const { days = 90 } = req.query;
 
     const startDate = new Date();
@@ -268,8 +317,20 @@ export const getAssessmentAnalytics = async (req, res) => {
  */
 export const deleteAssessment = async (req, res) => {
   try {
+    // Find patient by user ID
+    const patient = await Patient.findOne({
+      where: { user_id: req.user.id }
+    });
+
+    if (!patient) {
+      return res.status(404).json({
+        success: false,
+        message: 'Patient profile not found'
+      });
+    }
+
     const { assessmentId } = req.params;
-    const patientId = req.user.id;
+    const patientId = patient.id;
 
     const assessment = await PsychologicalAssessment.findOne({
       where: {
